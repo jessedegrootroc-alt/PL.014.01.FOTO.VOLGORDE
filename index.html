@@ -502,6 +502,7 @@ main{padding-block:var(--s5) var(--s6)}
           <div class="opt-bar" id="opt-bar" hidden>
             <span class="stand" id="opt-stand"></span>
             <button class="btn btn-primary" id="opt-alles" type="button">Alles optimaliseren</button>
+            <button class="btn" id="opt-zip" type="button">Alles als zip</button>
           </div>
           <div id="opt-lijst"></div>
           <p class="opt-hint" id="opt-hint"></p>
@@ -1524,7 +1525,7 @@ main{padding-block:var(--s5) var(--s6)}
       var f = bestanden[i];
       if(!/^image\//.test(f.type) && ["heic","avif","webp"].indexOf(extVan(f.name)) === -1) continue;
       var url = URL.createObjectURL(f);
-      var it = {id:++optId, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
+      var it = {id:++optId, bestand:f, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
       OPT.push(it);
@@ -1590,7 +1591,7 @@ main{padding-block:var(--s5) var(--s6)}
         + '</div>'
         + '<div class="opt-acties">'
         +   (pr.length ? '<button type="button" class="doe" data-act="opt">'+(pr.length===1 ? "Los op" : pr.length+" punten oplossen")+'</button>' : '')
-        +   (it.blob ? '<button type="button" data-act="dl">Downloaden</button>' : '')
+        +   ((it.blob || it.bestand) ? '<button type="button" data-act="dl">Downloaden</button>' : '')
         +   '<button type="button" data-act="weg">Verwijderen</button>'
         + '</div></div>';
     }).join("");
@@ -1614,7 +1615,7 @@ main{padding-block:var(--s5) var(--s6)}
         await optimaliseer(it); renderSamenvatting();
       });
       var dl = rij.querySelector('[data-act="dl"]');
-      if(dl) dl.addEventListener("click", function(){ bewaar(it, dl); });
+      if(dl) dl.addEventListener("click", function(){ bewaar(it); });
       rij.querySelector('[data-act="weg"]').addEventListener("click", function(){
         if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
         URL.revokeObjectURL(it.bronUrl);
@@ -1624,31 +1625,127 @@ main{padding-block:var(--s5) var(--s6)}
     });
 
     $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
-      ? "Geoptimaliseerde foto's sla je op met de knop ernaast. In de artifact-weergave vraagt de browser eerst om bevestiging."
-      : "";
+      ? "Sla foto's los op met de knop ernaast, of alles samen met Alles als zip. In de zip zit ook alt-teksten.txt."
+      : (OPT.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
+  }
+
+
+  /* ---------- zip maken ---------- */
+  var CRC = (function(){
+    var t = new Uint32Array(256);
+    for(var n=0;n<256;n++){
+      var c = n;
+      for(var k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+  function crc32(bytes){
+    var c = 0xFFFFFFFF;
+    for(var i=0;i<bytes.length;i++) c = CRC[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  function dosTijd(d){
+    return {
+      tijd: ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF,
+      datum: (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF
+    };
+  }
+  function schrijf(lengte, vul){
+    var b = new Uint8Array(lengte);
+    vul(new DataView(b.buffer), b);
+    return b;
+  }
+  async function maakZip(bestanden){
+    // bestanden: [{naam, data:Uint8Array}] — opgeslagen zonder compressie
+    var nu = dosTijd(new Date()), delen = [], centraal = [], offset = 0;
+    bestanden.forEach(function(f){
+      var naam = new TextEncoder().encode(f.naam);
+      var crc = crc32(f.data), n = f.data.length;
+      var kop = schrijf(30 + naam.length, function(v, b){
+        v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true);
+        v.setUint16(8, 0, true); v.setUint16(10, nu.tijd, true); v.setUint16(12, nu.datum, true);
+        v.setUint32(14, crc, true); v.setUint32(18, n, true); v.setUint32(22, n, true);
+        v.setUint16(26, naam.length, true); v.setUint16(28, 0, true);
+        b.set(naam, 30);
+      });
+      delen.push(kop, f.data);
+      centraal.push(schrijf(46 + naam.length, function(v, b){
+        v.setUint32(0, 0x02014b50, true); v.setUint16(4, 20, true); v.setUint16(6, 20, true);
+        v.setUint16(8, 0x0800, true); v.setUint16(10, 0, true);
+        v.setUint16(12, nu.tijd, true); v.setUint16(14, nu.datum, true);
+        v.setUint32(16, crc, true); v.setUint32(20, n, true); v.setUint32(24, n, true);
+        v.setUint16(28, naam.length, true);
+        v.setUint32(42, offset, true);
+        b.set(naam, 46);
+      }));
+      offset += kop.length + n;
+    });
+    var centraalLengte = centraal.reduce(function(a, c){ return a + c.length; }, 0);
+    var eind = schrijf(22, function(v){
+      v.setUint32(0, 0x06054b50, true);
+      v.setUint16(8, bestanden.length, true); v.setUint16(10, bestanden.length, true);
+      v.setUint32(12, centraalLengte, true); v.setUint32(16, offset, true);
+    });
+    return new Blob(delen.concat(centraal, [eind]), {type:"application/zip"});
+  }
+
+  async function downloadAlles(knop){
+    if(!OPT.length) return;
+    var oud = knop.textContent;
+    knop.disabled = true; knop.textContent = "Zip maken…";
+    try{
+      var gebruikt = {}, bestanden = [], regels = [];
+      for(var i=0;i<OPT.length;i++){
+        var it = OPT[i];
+        var bron = it.blob || it.bestand;
+        if(!bron) continue;
+        var naam = it.naam, basis = naam.replace(/\.[^.]+$/,""), ext = extVan(naam);
+        if(gebruikt[naam.toLowerCase()]){
+          gebruikt[naam.toLowerCase()]++;
+          naam = basis + "-" + gebruikt[naam.toLowerCase()] + "." + ext;
+        } else { gebruikt[naam.toLowerCase()] = 1; }
+        var buf = new Uint8Array(await bron.arrayBuffer());
+        bestanden.push({naam:naam, data:buf});
+        regels.push(naam + "\t" + (it.alt || altVoorstel(it)));
+      }
+      if(!bestanden.length){ knop.disabled = false; knop.textContent = oud; return; }
+      bestanden.push({naam:"alt-teksten.txt",
+        data:new TextEncoder().encode("Bestandsnaam\tAlt-tekst\n" + regels.join("\n") + "\n")});
+      var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
+      var blob = await maakZip(bestanden);
+      await bewaarBlob(blob, zipNaam);
+    }catch(e){
+      toast("Zip maken lukt niet");
+    }
+    knop.disabled = false; knop.textContent = oud;
   }
 
   var DOWNLOADS = null;
   if(window.claude && typeof window.claude.use === "function"){
     window.claude.use("downloads").then(function(d){ DOWNLOADS = d; }, function(){});
   }
-  async function bewaar(it, knop){
-    if(!it.blob) return;
+  async function bewaarBlob(blob, naam){
     if(DOWNLOADS){
       try{
-        await DOWNLOADS.save({filename:it.naam, data:it.blob});
-        toast("Opgeslagen als " + it.naam);
+        await DOWNLOADS.save({filename:naam, data:blob});
+        toast("Opgeslagen als " + naam);
       }catch(e){
-        if(e && e.code === "declined") return;
-        toast("Opslaan lukt niet in deze weergave");
+        if(!e || e.code !== "declined") toast("Opslaan lukt niet in deze weergave");
       }
       return;
     }
+    var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = it.url; a.download = it.naam;
+    a.href = url; a.download = naam;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    if(knop) knop.textContent = "Downloaden";
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
   }
+  function bewaar(it){
+    if(it.blob || it.bestand) bewaarBlob(it.blob || it.bestand, it.naam);
+  }
+
+  $("#opt-zip").addEventListener("click", function(){ downloadAlles(this); });
 
   $("#opt-alles").addEventListener("click", async function(){
     var b = this; b.disabled = true; b.textContent = "Bezig…";

@@ -39,8 +39,10 @@ Daarna http://localhost:8014 openen. Serveer het bestand via een server met
 ## Foto's optimaliseren
 
 Alles gebeurt in de browser, met canvas. Er gaat geen enkele foto naar een server.
-Het downloaden van een geoptimaliseerde foto werkt in een gewone browser; in een
-ingesloten voorbeeldvenster met een sandbox blokkeert de browser de download.
+Foto's sla je los op, of samen als zip met `Alles als zip`. In die zip zit ook
+`alt-teksten.txt` met per bestandsnaam de alt-tekst. De zip wordt in de browser
+gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
+gecomprimeerd.
 
 HEIC kunnen de meeste browsers niet openen. Die foto's worden gemeld in plaats van
 omgezet.
