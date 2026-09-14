@@ -49,6 +49,14 @@ gecomprimeerd.
 HEIC kunnen de meeste browsers niet openen. Die foto's worden gemeld in plaats van
 omgezet.
 
+## Iconen
+
+De iconen komen uit de set in `MAZUREL/assets/iconen` en staan als `<symbol>`
+bovenaan `index.html`. Ze zijn omgezet naar `currentColor`, zodat de tool ze
+groen, oranje of rood kleurt via CSS. Een icoon toevoegen betekent: het pad uit
+het bronbestand kopiëren, `#212121` vervangen door `currentColor` en er een
+`<symbol id="ic-...">` van maken.
+
 ## Opslag
 
 De ingevulde check blijft in de `localStorage` van de browser staan tot iemand op
