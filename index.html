@@ -37,17 +37,8 @@ button,input,textarea,select{font:inherit; color:inherit}
 .dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
 .paginakop h1{font-size:27px; line-height:1.1}
 .paginakop .sub{font-size:14px; color:var(--ink-2); margin-top:3px}
-.kop-acties{display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s3);
-  padding-bottom:var(--s3); margin-bottom:var(--s3); border-bottom:1px solid var(--line-soft)}
-.seizoen .fg-lbl{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
-  color:var(--ink-3); font-weight:700; margin-bottom:4px}
-.seg2{display:inline-flex; gap:4px}
-.seg2 button{border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
-  padding:7px 14px; font-size:13.5px; cursor:pointer; color:var(--ink-2)}
-.seg2 button:hover{border-color:var(--ink-3); color:var(--ink)}
-.seg2 button[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg);
-  color:var(--accent-hover); font-weight:600}
-.seizoen-hint{font-size:12px; color:var(--ink-3); margin-top:4px}
+.kop-acties{display:flex; justify-content:flex-end; padding-bottom:var(--s3);
+  margin-bottom:var(--s3); border-bottom:1px solid var(--line-soft)}
 
 .meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3)}
 .field{display:flex; flex-direction:column; gap:3px}
@@ -396,14 +387,6 @@ main{padding-block:var(--s5) var(--s6)}
     <p class="lead">Waarom zou iemand dit arrangement boeken? Kies de filters die eraan gekoppeld zijn. Markeer daarna maximaal drie kenmerken als belangrijkste, die wegen het zwaarst in het advies voor de eerste 5 foto's.</p>
     <div class="block-b">
       <div class="kop-acties">
-        <div class="seizoen">
-          <span class="fg-lbl" id="seizoen-lbl">Seizoen</span>
-          <div class="seg2" role="group" aria-labelledby="seizoen-lbl">
-            <button type="button" data-s="Lente / zomer">Lente / zomer</button>
-            <button type="button" data-s="Herfst / winter">Herfst / winter</button>
-          </div>
-          <p class="seizoen-hint" id="seizoen-hint"></p>
-        </div>
         <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
       </div>
       <div id="filters"></div>
@@ -580,6 +563,9 @@ main{padding-block:var(--s5) var(--s6)}
     "stad":           {label:"Stad",                    groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
     "bezienswaardigheid":{label:"Bezienswaardigheid",   groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
 
+    "evenement":      {label:"Concert of voorstelling",  groep:"Package include", tags:["package","activiteit"]},
+    "museum":         {label:"Museum of tentoonstelling", groep:"Package include", tags:["package","activiteit"]},
+
     "anders":         {label:"Anders",                  groep:"Overig", tags:[]}
   };
   var GROEPEN = ["Droombeeld","Hotel","Package include","Omgeving","Overig"];
@@ -591,6 +577,11 @@ main{padding-block:var(--s5) var(--s6)}
     "hotelwellness":{label:"Hotels met wellness",       groep:"Hotel",       cats:["wellness"]},
     "bijzonder":    {label:"Bijzondere overnachtingen", groep:"Hotel",       cats:["droom-kamer","suite"]},
     "fiets":        {label:"Fietsarrangement",          groep:"Arrangement", cats:["droom-fietsen","fietsen"]},
+    "wandel":       {label:"Wandelarrangement",         groep:"Arrangement", cats:["droom-wandelen","natuur"]},
+    "auto":         {label:"Autoarrangement",           groep:"Arrangement", cats:["droom-omgeving","bezienswaardigheid"]},
+    "concert":      {label:"Concert",                   groep:"Arrangement", cats:["evenement"]},
+    "tentoonstelling":{label:"Tentoonstelling",         groep:"Arrangement", cats:["museum"]},
+    "museum":       {label:"Museum",                    groep:"Arrangement", cats:["museum"]},
     "diner":        {label:"Met diner",                 groep:"Arrangement", cats:["diner"]},
     "mini":         {label:"Mini vakanties",            groep:"Arrangement", cats:[], sfeer:"Kort verblijf, houd de reeks compact en sterk."},
     "zee":          {label:"Aan zee",                   groep:"Locatie",     cats:["droom-zee","zee"]},
@@ -604,7 +595,8 @@ main{padding-block:var(--s5) var(--s6)}
     "exclusief":    {label:"Exclusief bij ViaLuxury",   groep:"Extra",       cats:[], sfeer:"Geen eigen foto nodig, laat het zien in de kwaliteit van de beelden."}
   };
   var FGROEPEN = ["Hotel","Arrangement","Locatie","Extra"];
-  var PACKAGES = ["diner","ontbijt","wellness","zwembad","fietsen","activiteit"];
+  var FGROEPLABEL = {"Extra":"Extra (optioneel)"};
+  var PACKAGES = ["diner","ontbijt","wellness","zwembad","fietsen","evenement","museum","activiteit"];
   var HOTELBEELD = ["gebouw","kamer","suite","jacuzzi","interieur","tuin"];
   var DROOM = ["droom-hotel","droom-kamer","droom-wellness","droom-zwembad","droom-omgeving",
                "droom-natuur","droom-zee","droom-stad","droom-wandelen","droom-fietsen"];
@@ -642,10 +634,9 @@ main{padding-block:var(--s5) var(--s6)}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v9";
+  var STORE = "vialuxury-fotocheck-v10";
   function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
   var state = {
-    seizoen:null, seizoenHand:false, seizoenAuto:null,
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
     gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{}
@@ -661,9 +652,6 @@ main{padding-block:var(--s5) var(--s6)}
     try{
       var raw = localStorage.getItem(STORE); if(!raw) return;
       var d = JSON.parse(raw); if(!d) return;
-      if(d.seizoen) state.seizoen = d.seizoen;
-      state.seizoenHand = !!d.seizoenHand;
-      state.seizoenAuto = d.seizoenAuto || null;
       if(typeof d.count === "number") state.count = d.count;
       state.gebouwNiet = !!d.gebouwNiet;
       if(d.checks) state.checks = d.checks;
@@ -1063,7 +1051,7 @@ main{padding-block:var(--s5) var(--s6)}
   function renderFilters(){
     fHost.innerHTML = FGROEPEN.map(function(groep){
       var ids = Object.keys(FILTERS).filter(function(k){ return FILTERS[k].groep === groep; });
-      return '<div class="fgroep"><p class="fg-lbl">'+esc(groep)+'</p><div class="fchips">'
+      return '<div class="fgroep"><p class="fg-lbl">'+esc(FGROEPLABEL[groep] || groep)+'</p><div class="fchips">'
         + ids.map(function(k){
             var st = filterStaat(k);
             return '<button type="button" class="fchip" data-id="'+k+'" data-state="'+(st==="uit"?"uit":"aan")+'" aria-pressed="'+(st!=="uit")+'">'
@@ -1374,6 +1362,8 @@ main{padding-block:var(--s5) var(--s6)}
     "zee":{slug:"zee-strand",               alt:"Zee en strand bij {h}"},
     "stad":{slug:"stad",                    alt:"De stad bij {h}"},
     "bezienswaardigheid":{slug:"bezienswaardigheid", alt:"Bezienswaardigheid in de omgeving van {h}"},
+    "evenement":{slug:"concert",            alt:"Concert tijdens het verblijf bij {h}"},
+    "museum":{slug:"museum",                alt:"Museum in de omgeving van {h}"},
     "anders":{slug:"foto",                  alt:"Foto van {h}"}
   };
   var OPT = [], optId = 0, hotelNaam = "";
@@ -1770,41 +1760,12 @@ main{padding-block:var(--s5) var(--s6)}
   });
   $("#hotelnaam").addEventListener("input", function(){ hotelNaam = this.value; renderOpt(); });
 
-  /* ---------- seizoen ---------- */
   var MAANDEN = ["januari","februari","maart","april","mei","juni","juli","augustus",
                  "september","oktober","november","december"];
-  function autoSeizoen(d){
-    var m = d.getMonth() + 1;                 // maart t/m augustus is lente en zomer
-    return (m >= 3 && m <= 8) ? "Lente / zomer" : "Herfst / winter";
-  }
   function vandaagNL(){
     var d = new Date();
     return d.getDate() + " " + MAANDEN[d.getMonth()] + " " + d.getFullYear();
   }
-  function zetSeizoen(){
-    var nu = autoSeizoen(new Date());
-    // een handmatige keuze blijft staan tot het seizoen zelf omslaat
-    if(!state.seizoen || !state.seizoenHand || state.seizoenAuto !== nu){
-      state.seizoen = nu; state.seizoenHand = false;
-    }
-    state.seizoenAuto = nu;
-  }
-  function renderSeizoen(){
-    each(document.querySelectorAll(".seg2 button"), function(b){
-      b.setAttribute("aria-pressed", String(b.getAttribute("data-s") === state.seizoen));
-    });
-    $("#seizoen-hint").textContent = state.seizoenHand
-      ? "Zelf gekozen. Automatisch zou het " + state.seizoenAuto.toLowerCase() + " zijn."
-      : "Automatisch gekozen op " + vandaagNL() + ".";
-  }
-  each(document.querySelectorAll(".seg2 button"), function(b){
-    b.addEventListener("click", function(){
-      var v = b.getAttribute("data-s");
-      state.seizoen = v;
-      state.seizoenHand = (v !== state.seizoenAuto);
-      renderSeizoen(); save();
-    });
-  });
 
   /* ---------- knoppen ---------- */
   function toast(msg){
@@ -1814,7 +1775,7 @@ main{padding-block:var(--s5) var(--s6)}
   $("#btn-copy").addEventListener("click", function(){
     var t = telling(), L = [];
     L.push("Fotocheck arrangement");
-    L.push(vandaagNL() + " · Seizoen: " + state.seizoen);
+    L.push(vandaagNL());
     L.push("Aantal foto's: " + state.count + " / 14");
     var tops = state.filters.filter(function(f){ return f.top; }).map(function(f){ return FILTERS[f.id].label; });
     var rest = state.filters.filter(function(f){ return !f.top; }).map(function(f){ return FILTERS[f.id].label; });
@@ -1854,9 +1815,7 @@ main{padding-block:var(--s5) var(--s6)}
     state.checks = {}; state.notes = {}; state.hoofd = 0; state.count = 10;
     state.gebouwNiet = false;
     state.filters = []; state.eigen = [];
-    state.seizoenHand = false;
     try{ localStorage.removeItem(STORE); }catch(e){}
-    zetSeizoen(); renderSeizoen();
     renderRows(); renderCount(); renderFilters(); renderAlles();
     toast("Leeg, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
@@ -1864,8 +1823,6 @@ main{padding-block:var(--s5) var(--s6)}
 
   /* ---------- start ---------- */
   load();
-  zetSeizoen();
-  renderSeizoen();
   renderRows();
   renderOpt();
   renderCount();
