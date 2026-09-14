@@ -105,6 +105,14 @@ main{padding-block:var(--s5) var(--s6)}
 .uchip.todo{border-color:var(--dev-line); background:var(--dev-bg); color:var(--dev); font-weight:600}
 .usp-leeg{font-size:12.5px; color:var(--ink-3)}
 
+/* ---------- voortgang stap 01 ---------- */
+.sv{padding:0 20px var(--s3)}
+.sv-track{height:10px; border-radius:var(--r); background:var(--na-bg); overflow:hidden; display:flex; gap:2px}
+.sv-track i{display:block; height:100%; width:0; background:var(--accent); transition:width .25s ease}
+.sv-track i.klaar{background:var(--ok)}
+.sv-lbl{font-size:12.5px; color:var(--ink-2); margin-top:5px; font-variant-numeric:tabular-nums}
+.sv-lbl b{color:var(--ink); font-weight:600}
+
 /* ---------- overzichtsstrip ---------- */
 .strip{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--s2); padding:0 20px var(--s3)}
 .tile{border:1px solid var(--line); border-radius:var(--r); background:var(--surface-2); padding:9px 10px;
@@ -407,6 +415,11 @@ main{padding-block:var(--s5) var(--s6)}
       <span class="tag sp">Richtlijn</span>
     </div>
     <p class="lead">Foto 1 is altijd het hoofdbeeld en altijd een droombeeld, geef aan wat voor soort. Na elke keuze rekent de tool opnieuw uit wat de volgende foto het beste kan zijn, en houdt daarbij rekening met wat al gebruikt is. Sleep een kaart met <b>⠿</b> of de pijlen om de volgorde te wisselen.</p>
+
+    <div class="sv">
+      <div class="sv-track"><i id="sv-fill"></i></div>
+      <p class="sv-lbl" id="sv-lbl"></p>
+    </div>
 
     <div class="strip" id="strip"></div>
     <div class="cards" id="cards"></div>
@@ -723,6 +736,10 @@ main{padding-block:var(--s5) var(--s6)}
       .filter(function(d){ return d && d.sfeer; });
   }
 
+  function kamerNodig(i){
+    return !state.gebouwNiet && gebruikt(i,"gebouw") && !gebruikt(i,"kamer");
+  }
+
   function advies(i){
     var a = {titel:"", waarom:"", primair:[], alt:[], gebouwKnop:false};
     var fc = filterCats(), bron = fc.bron;
@@ -800,7 +817,8 @@ main{padding-block:var(--s5) var(--s6)}
           : (tweede ? "Een tweede belangrijk onderdeel dat nieuwe informatie toevoegt ten opzichte van de vorige foto."
                     : "De belangrijkste reden om dit arrangement te boeken. Diner, ontbijt, wellness of activiteit.");
         a.primair = rij.slice(0,1);
-        a.alt = rij.slice(1,4);
+        a.alt = uniek((kamerNodig(i) ? ["kamer"] : []).concat(rij.slice(1))).slice(0,4);
+        if(kamerNodig(i)) a.waarom += " Het gebouw staat er al, een kamerbeeld mag ook nog in de eerste 5.";
       } else {
         a.titel = "Aanvullend hotelbeeld";
         a.waarom = "Alle package includes staan al in de reeks.";
@@ -812,7 +830,8 @@ main{padding-block:var(--s5) var(--s6)}
 
     var omg = eersteMet(i, "omgeving");
     if(omg !== -1){
-      var mist = uniek(wens.filter(function(c){ return !heeftTag(c,"omgeving"); })
+      var mist = uniek((kamerNodig(i) ? ["kamer"] : [])
+                  .concat(wens.filter(function(c){ return !heeftTag(c,"omgeving"); }))
                   .concat(vrij(i, PACKAGES.concat(HOTELBEELD))));
       a.titel = mist.length ? lbl(mist[0]) : "Aanvullend hotelbeeld";
       a.waarom = "Omgeving is al sterk vertegenwoordigd in foto " + (omg+1) + " (" + lbl(state.pos[omg].cat) + "). "
@@ -828,7 +847,8 @@ main{padding-block:var(--s5) var(--s6)}
         : "Laat zien waar de gast terechtkomt. Parijs, Veluwe, kust, stad of natuur.";
       var omgWens = wens.filter(function(c){ return heeftTag(c,"omgeving") && !isDroom(c); });
       a.primair = omgWens.length ? omgWens.slice(0,1) : vrij(i,["omgeving"]);
-      a.alt = vrij(i, uniek(omgWens.concat(["omgeving","natuur","zee","stad","bezienswaardigheid"])))
+      a.alt = vrij(i, uniek((kamerNodig(i) ? ["kamer"] : [])
+                .concat(omgWens, ["omgeving","natuur","zee","stad","bezienswaardigheid"])))
                 .filter(function(c){ return a.primair.indexOf(c) === -1; }).slice(0,3);
       if(omgWens.length) a.titel = lbl(omgWens[0]);
     }
@@ -1246,6 +1266,9 @@ main{padding-block:var(--s5) var(--s6)}
       if(p.niveau === "hotel") lvH++; else if(p.niveau === "arrangement") lvA++; else lvOpen++;
     });
     if(typen === 5 && hotels < 3) devList.push("Slechts " + hotels + " van de eerste 4 foto's is hotelgerelateerd");
+    if(typen === 5 && !state.gebouwNiet && posMet("gebouw") !== -1 && posMet("kamer") === -1){
+      devList.push("Het gebouw staat in de reeks, maar een kamerbeeld ontbreekt in de eerste 5");
+    }
     OPT.forEach(function(it, n){
       problemen(it).forEach(function(pb){
         err++; errList.push("Foto " + (n+1) + " (" + it.naam + ") — " + pb.tekst);
@@ -1255,9 +1278,15 @@ main{padding-block:var(--s5) var(--s6)}
       devList.push("Foto 1 is het hoofdbeeld, dat is bij voorkeur een droombeeld");
     }
     var u = uspZichtbaar();
-    if(typen === 5) u.open.forEach(function(c){
-      devList.push((u.bron[c] || lbl(c)) + " is een kenmerk van dit arrangement maar staat niet in de eerste 5");
-    });
+    if(typen === 5){
+      var gemeld = [];
+      u.open.forEach(function(c){
+        var naam = u.bron[c] || lbl(c);
+        if(gemeld.indexOf(naam) !== -1) return;   // één melding per kenmerk, niet per categorie
+        gemeld.push(naam);
+        devList.push(naam + " is een kenmerk van dit arrangement maar staat niet in de eerste 5");
+      });
+    }
     if(state.count < 8) devList.push("Reeks telt " + state.count + " foto's, richtlijn is minimaal 8");
     if(state.count > 14) devList.push("Reeks telt " + state.count + " foto's, richtlijn is maximaal 14");
 
@@ -1281,6 +1310,13 @@ main{padding-block:var(--s5) var(--s6)}
     else if(t.dev > 0) v = "<b>Klaar om live te zetten.</b> Met " + t.dev + (t.dev===1?" bewuste afwijking":" bewuste afwijkingen") + ", en dat mag.";
     else v = "<b>Klaar om live te zetten.</b> Alles volgt de richtlijn.";
     $("#verdict").innerHTML = v;
+
+    var pct = t.typen * 20;
+    var fill = $("#sv-fill");
+    fill.style.width = pct + "%";
+    fill.className = (t.typen === 5) ? "klaar" : "";
+    $("#sv-lbl").innerHTML = "<b>" + t.typen + " van 5 foto's ingevuld · " + pct + "%</b>"
+      + (t.typen < 5 ? " — nog " + (5 - t.typen) + " te gaan, elke foto is 20%" : " — de opbouw is compleet");
 
     var cT = $("#chip-typen");
     cT.innerHTML = "<b>" + t.typen + " / 5</b> typen gekozen";
