@@ -201,8 +201,8 @@ main{padding-block:var(--s5) var(--s6)}
 .seg button[data-v="na"][aria-pressed="true"]{background:var(--na-bg); border-color:var(--na); color:var(--na)}
 .c-note{display:none}
 .card[data-status="dev"] .c-note{display:block}
-.c-note input{width:100%; border:1px solid var(--dev-line); background:var(--dev-bg); border-radius:var(--r);
-  padding:6px 9px; font-size:13px}
+.c-note .uitleg{font-size:12.5px; line-height:1.45; padding:8px 10px; border-radius:var(--r);
+  border:1px solid var(--dev-line); background:var(--dev-bg); color:var(--dev); margin:0}
 
 .barline{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3); align-items:center; padding:14px 20px;
   border-top:1px solid var(--line-soft); background:var(--surface-2)}
@@ -230,11 +230,10 @@ main{padding-block:var(--s5) var(--s6)}
 .mini button[data-v="dev"][aria-pressed="true"]{background:var(--dev-bg); border-color:var(--dev); color:var(--dev)}
 .mini button[data-v="bad"][aria-pressed="true"]{background:var(--err-bg); border-color:var(--err); color:var(--err)}
 .mini button[data-v="na"][aria-pressed="true"]{background:var(--na-bg); border-color:var(--na); color:var(--na)}
-.row .note{display:none; width:100%; margin-top:var(--s2)}
-.row[data-status="dev"] .note, .row[data-status="bad"] .note{display:block}
-.row .note input{width:100%; border:1px solid var(--dev-line); background:var(--dev-bg); border-radius:var(--r);
-  padding:6px 9px; font-size:13px}
-.row[data-status="bad"] .note input{border-color:var(--err-line); background:var(--err-bg)}
+.row .uitleg{display:none; font-size:12.5px; line-height:1.45; margin-top:6px; padding:7px 10px;
+  border-radius:var(--r); border:1px solid var(--dev-line); background:var(--dev-bg); color:var(--dev)}
+.row[data-status="dev"] .uitleg, .row[data-status="bad"] .uitleg{display:block}
+.row[data-status="bad"] .uitleg{border-color:var(--err-line); background:var(--err-bg); color:var(--err)}
 
 /* ---------- teller ---------- */
 .counter{display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap; padding-bottom:var(--s2)}
@@ -620,29 +619,39 @@ main{padding-block:var(--s5) var(--s6)}
 
   var GROUPS = {
     reeks:{kind:"guide", items:[
-      {id:"rs1", label:"Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden"},
-      {id:"rs2", label:"De reeks eindigt waar mogelijk met omgevingsbeelden"},
-      {id:"rs3", label:"De reeks voelt als de reis van de gast", sub:"Aankomst, verblijf, arrangement, hotel, omgeving."}
+      {id:"rs1", label:"Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden",
+       uitleg:"Na de eerste vijf wil de gast het hotel zien. Vervang de omgevingsbeelden verderop door kamers, faciliteiten of interieur."},
+      {id:"rs2", label:"De reeks eindigt waar mogelijk met omgevingsbeelden",
+       uitleg:"De laatste foto's laten zien waar de gast terechtkomt. Zet de omgevingsbeelden achteraan in plaats van ertussen."},
+      {id:"rs3", label:"De reeks voelt als de reis van de gast", sub:"Aankomst, verblijf, arrangement, hotel, omgeving.",
+       uitleg:"Zonder die lijn springt de reeks heen en weer. Sorteer op aankomst, verblijf, arrangement, hotel en omgeving."}
     ]},
     visueel:{kind:"guide", items:[
-      {id:"v1", label:"Foto's hebben ongeveer dezelfde lichtstelling"},
-      {id:"v2", label:"Geen rare mix van warm en koel licht"},
-      {id:"v3", label:"Geen flitsfoto tussen natuurlijke beelden"},
-      {id:"v4", label:"Geen zwaar bewerkte beelden"},
-      {id:"v5", label:"Geen collages"},
-      {id:"v6", label:"Geen onrealistische AI-beelden"}
+      {id:"v1", label:"Foto's hebben ongeveer dezelfde lichtstelling",
+       uitleg:"Wisselend licht laat de reeks op verschillende hotels lijken. Kies beelden van hetzelfde moment van de dag, of bouw bewust op van dag naar avond."},
+      {id:"v2", label:"Geen rare mix van warm en koel licht",
+       uitleg:"Warm en koel licht door elkaar maakt de reeks onrustig. Vervang de foto die qua kleur uit de toon valt."},
+      {id:"v3", label:"Geen flitsfoto tussen natuurlijke beelden",
+       uitleg:"Een flitsfoto valt hard op tussen daglichtbeelden. Zoek een natuurlijk belichte foto van dezelfde ruimte."},
+      {id:"v4", label:"Geen zwaar bewerkte beelden",
+       uitleg:"Zwaar bewerkte beelden wekken een verwachting die het hotel niet waarmaakt. Gebruik de onbewerkte versie."},
+      {id:"v5", label:"Geen collages",
+       uitleg:"Een collage is op mobiel niet te lezen en oogt goedkoop. Splits hem op in losse foto's of laat hem weg."},
+      {id:"v6", label:"Geen onrealistische AI-beelden",
+       uitleg:"Een onrealistisch beeld levert klachten op bij aankomst. Vervang het door een echte foto."}
     ]},
     techniek:{kind:"tech", items:[
-      {id:"tc6", label:"Commercieel gebruik van alle foto's is toegestaan", sub:"Een foto uit een persmap mag niet vanzelf in advertenties."}
+      {id:"tc6", label:"Commercieel gebruik van alle foto's is toegestaan", sub:"Een foto uit een persmap mag niet vanzelf in advertenties.",
+       uitleg:"Zonder schriftelijke toestemming mag het beeld niet in advertenties. Vraag het hotel om akkoord of kies een foto waarvan de rechten wel rond zijn."}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v11";
-  function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
+  var STORE = "vialuxury-fotocheck-v12";
+  function leegPos(){ return {cat:null, anders:"", status:null, niveau:null}; }
   var state = {
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
-    gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{}
+    gebouwNiet:false, hoofd:0, count:10, checks:{}
   };
 
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
@@ -658,12 +667,11 @@ main{padding-block:var(--s5) var(--s6)}
       if(typeof d.count === "number") state.count = d.count;
       state.gebouwNiet = !!d.gebouwNiet;
       if(d.checks) state.checks = d.checks;
-      if(d.notes) state.notes = d.notes;
       if(Array.isArray(d.filters)) state.filters = d.filters;
       if(Array.isArray(d.eigen)) state.eigen = d.eigen;
       if(Array.isArray(d.pos)) d.pos.forEach(function(p,i){
         if(i>4 || !p) return;
-        state.pos[i] = {cat:p.cat||null, anders:p.anders||"", status:p.status||null, note:p.note||"", niveau:p.niveau||null};
+        state.pos[i] = {cat:p.cat||null, anders:p.anders||"", status:p.status||null, niveau:p.niveau||null};
       });
     }catch(e){}
   }
@@ -845,6 +853,35 @@ main{padding-block:var(--s5) var(--s6)}
     return a;
   }
 
+  function redenAfwijking(i){
+    var p = state.pos[i];
+    if(!p.cat) return "Kies eerst een type beeld, dan legt de tool uit wat er nog mist.";
+    var a = advies(i), v = volgtAdvies(i), stukken = [];
+
+    if(i === 0 && !isDroom(p.cat)){
+      stukken.push("Foto 1 is het hoofdbeeld en is bij voorkeur een droombeeld, een beeld waarvan de gast denkt: hier wil ik heen.");
+    }
+    if(v === "afwijkend"){
+      stukken.push("Je koos " + lbl(p.cat) + ", het advies was " + a.titel.toLowerCase() + ". " + a.waarom);
+    } else if(v === "alternatief"){
+      stukken.push(lbl(p.cat) + " is een goed alternatief voor deze positie, maar niet de eerste keuze. Het advies was " + a.titel.toLowerCase() + ".");
+    }
+    if(gebruikt(i, p.cat)){
+      var j = posMet(p.cat);
+      stukken.push("Dit onderwerp staat ook op foto " + (j+1) + ", daardoor mist de reeks variatie.");
+    }
+    var u = uspZichtbaar();
+    if(u.open.length){
+      var namen = [];
+      u.open.forEach(function(c){ var n = u.bron[c] || lbl(c); if(namen.indexOf(n) === -1) namen.push(n); });
+      stukken.push("Nog niet zichtbaar in de eerste vijf: " + namen.slice(0,3).join(", ") + ".");
+    }
+    if(!stukken.length){
+      stukken.push("Deze keuze volgt het advies. Je hebt hem zelf als afwijking gemarkeerd, bijvoorbeeld omdat het beeld zelf tegenvalt.");
+    }
+    return stukken.join(" ");
+  }
+
   function volgtAdvies(i){
     var c = state.pos[i].cat; if(!c) return null;
     var a = advies(i);
@@ -936,7 +973,7 @@ main{padding-block:var(--s5) var(--s6)}
         +     '<button type="button" data-v="dev" aria-pressed="'+(p.status==="dev")+'">Afwijking</button>'
         +     '<button type="button" data-v="na" aria-pressed="'+(p.status==="na")+'">N.v.t.</button>'
         +   '</div>'
-        +   '<div class="c-note"><input id="note-pos-'+i+'" placeholder="Waarom wijkt deze positie bewust af?" aria-label="Toelichting positie '+(i+1)+'"></div>'
+        +   '<div class="c-note"><p class="uitleg">'+esc(redenAfwijking(i))+'</p></div>'
         + '</div>'
         + '</div>';
     }).join("");
@@ -979,9 +1016,6 @@ main{padding-block:var(--s5) var(--s6)}
         });
       });
 
-      var note = card.querySelector(".c-note input");
-      note.value = state.pos[i].note || "";
-      note.addEventListener("input", function(){ state.pos[i].note = note.value; save(); renderOverzicht(); });
 
       card.querySelector('[data-act="up"]').addEventListener("click", function(){ if(i>0) verplaats(i,i-1); });
       card.querySelector('[data-act="down"]').addEventListener("click", function(){ if(i<4) verplaats(i,i+1); });
@@ -1158,14 +1192,13 @@ main{padding-block:var(--s5) var(--s6)}
       var mid = g.kind === "tech" ? "bad" : "dev";
       var midLbl = g.kind === "tech" ? "Aanpassen voor live" : "Bewuste afwijking";
       var midIco = g.kind === "tech" ? "!" : "~";
-      var ph = g.kind === "tech" ? "Wat moet er aangepast worden?" : "Waarom wijkt dit bewust af?";
 
       host.innerHTML = g.items.map(function(it){
         var v = state.checks[it.id];
         return '<div class="row" data-id="'+it.id+'"'+(v?' data-status="'+v+'"':'')+'>'
           + '<span class="txt"><span class="lbl">'+esc(it.label)+'</span>'
           +   (it.sub ? '<p class="sub">'+esc(it.sub)+'</p>' : '')
-          +   '<div class="note"><input id="note-'+it.id+'" placeholder="'+ph+'" aria-label="Toelichting: '+esc(it.label)+'"></div>'
+          +   (it.uitleg ? '<p class="uitleg">'+esc(it.uitleg)+'</p>' : '')
           + '</span>'
           + '<span class="mini" role="group" aria-label="'+esc(it.label)+'">'
           +   '<button type="button" data-v="ok" title="Volgens richtlijn" aria-label="Volgens richtlijn: '+esc(it.label)+'" aria-pressed="'+(v==="ok")+'">✓</button>'
@@ -1188,9 +1221,6 @@ main{padding-block:var(--s5) var(--s6)}
             renderSamenvatting(); save();
           });
         });
-        var note = row.querySelector(".note input");
-        note.value = state.notes[id] || "";
-        note.addEventListener("input", function(){ state.notes[id] = note.value; save(); renderOverzicht(); });
       });
     });
   }
@@ -1227,9 +1257,7 @@ main{padding-block:var(--s5) var(--s6)}
       if(p.status === "ok"){ ok++; okList.push(naam); }
       else if(p.status === "dev"){
         dev++;
-        var v = volgtAdvies(i);
-        var uitleg = p.note ? p.note : (v === "afwijkend" ? "advies was " + advies(i).titel : "");
-        devList.push(naam + (uitleg ? " — " + uitleg : ""));
+        devList.push(naam + (volgtAdvies(i) === "afwijkend" ? " — advies was " + advies(i).titel.toLowerCase() : ""));
       }
       else if(p.status !== "na") open++;
     });
@@ -1237,10 +1265,10 @@ main{padding-block:var(--s5) var(--s6)}
     Object.keys(GROUPS).forEach(function(key){
       GROUPS[key].items.forEach(function(it){
         total++;
-        var v = state.checks[it.id], note = state.notes[it.id];
+        var v = state.checks[it.id];
         if(v === "ok"){ ok++; okList.push(it.label); }
-        else if(v === "dev"){ dev++; devList.push(it.label + (note ? " — " + note : "")); }
-        else if(v === "bad"){ err++; errList.push(it.label + (note ? " — " + note : "")); }
+        else if(v === "dev"){ dev++; devList.push(it.label + (it.uitleg ? " — " + it.uitleg : "")); }
+        else if(v === "bad"){ err++; errList.push(it.label + (it.uitleg ? " — " + it.uitleg : "")); }
         else if(v !== "na") open++;
       });
     });
@@ -1838,7 +1866,7 @@ main{padding-block:var(--s5) var(--s6)}
   }
   $("#btn-reset").addEventListener("click", function(){
     state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
-    state.checks = {}; state.notes = {}; state.hoofd = 0; state.count = 10;
+    state.checks = {}; state.hoofd = 0; state.count = 10;
     state.gebouwNiet = false;
     state.filters = []; state.eigen = [];
     try{ localStorage.removeItem(STORE); }catch(e){}
