@@ -58,7 +58,18 @@ main{padding-block:var(--s5) var(--s6)}
 
 .block{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); overflow:hidden}
 .block.hero{margin-bottom:var(--s5); border-color:var(--line)}
-.block-h{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); padding:16px 20px 12px}
+.block-h{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); padding:16px 20px 12px;
+  cursor:pointer; user-select:none}
+.block-h:hover .blok-toggle{border-color:var(--ink-3); color:var(--ink)}
+.block.dicht .block-h{padding-bottom:16px}
+.blok-toggle{margin-left:auto; width:30px; height:30px; border:1px solid var(--line); border-radius:var(--r);
+  background:var(--surface); color:var(--ink-3); display:grid; place-items:center; cursor:pointer; flex:none}
+.blok-toggle .ic{transition:transform .18s ease}
+.block.dicht .blok-toggle .ic{transform:rotate(180deg)}
+.block-h .sp{margin-left:auto}
+.block-h .sp ~ .blok-toggle{margin-left:0}
+.blok-stand{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){ .blok-toggle .ic{transition:none} }
 .step{font-family:var(--font-head); font-size:13px; font-weight:600; color:var(--ink-3); font-variant-numeric:tabular-nums}
 .block-h h2{font-size:19px}
 .block.hero .block-h h2{font-size:23px}
@@ -1916,6 +1927,62 @@ main{padding-block:var(--s5) var(--s6)}
     window.scrollTo({top:0, behavior:"smooth"});
   });
 
+  /* ---------- blokken in- en uitklappen ---------- */
+  var OPEN_STORE = "vialuxury-fotocheck-open";
+  var STANDAARD_DICHT = ["h3a","h4a","h6a"];   // reeks, visuele kwaliteit en techniek starten dicht
+
+  function leesOpen(){
+    try{ return JSON.parse(localStorage.getItem(OPEN_STORE)) || {}; }catch(e){ return {}; }
+  }
+  function bewaarOpen(kaart){
+    try{ localStorage.setItem(OPEN_STORE, JSON.stringify(kaart)); }catch(e){}
+  }
+
+  function maakInklapbaar(){
+    var bewaard = leesOpen();
+    each(document.querySelectorAll("main .block"), function(blok){
+      var kop = blok.querySelector(".block-h");
+      var titel = kop.querySelector("h2");
+      var sleutel = titel ? titel.id : "";
+      if(!kop || blok.querySelector(".blok-inhoud")) return;
+
+      var inhoud = document.createElement("div");
+      inhoud.className = "blok-inhoud";
+      inhoud.id = "inhoud-" + sleutel;
+      while(kop.nextSibling) inhoud.appendChild(kop.nextSibling);
+      blok.appendChild(inhoud);
+
+      var knop = document.createElement("button");
+      knop.type = "button";
+      knop.className = "blok-toggle";
+      knop.innerHTML = ico("omhoog");
+      knop.setAttribute("aria-controls", inhoud.id);
+      kop.appendChild(knop);
+
+      var dicht = (sleutel in bewaard) ? !bewaard[sleutel] : (STANDAARD_DICHT.indexOf(sleutel) !== -1);
+      zetOpen(blok, inhoud, knop, titel, !dicht);
+
+      function wissel(){
+        var nuDicht = blok.classList.contains("dicht");
+        zetOpen(blok, inhoud, knop, titel, nuDicht);
+        var kaart = leesOpen();
+        kaart[sleutel] = nuDicht;
+        bewaarOpen(kaart);
+      }
+      knop.addEventListener("click", function(e){ e.stopPropagation(); wissel(); });
+      kop.addEventListener("click", function(e){
+        if(e.target.closest("button, a, input, select")) return;
+        wissel();
+      });
+    });
+  }
+  function zetOpen(blok, inhoud, knop, titel, open){
+    blok.classList.toggle("dicht", !open);
+    inhoud.hidden = !open;
+    knop.setAttribute("aria-expanded", String(open));
+    knop.setAttribute("aria-label", (open ? "Sluit " : "Open ") + (titel ? titel.textContent : "dit blok"));
+  }
+
   /* ---------- start ---------- */
   load();
   renderRows();
@@ -1923,5 +1990,6 @@ main{padding-block:var(--s5) var(--s6)}
   renderCount();
   renderFilters();
   renderAlles();
+  maakInklapbaar();
 })();
 </script>
