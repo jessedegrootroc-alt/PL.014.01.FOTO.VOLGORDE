@@ -16,7 +16,7 @@ browser is genoeg.
   arrangementniveau geldt alleen voor dit arrangement.
 - **Hoofdbeeldregister**: elk arrangement van hetzelfde hotel heeft een eigen
   droombeeld nodig. Dubbele bestandsnamen worden gemeld.
-- **Korte controle** op de rest van de reeks, visuele kwaliteit en seizoen.
+- **Korte controle** op de rest van de reeks en de visuele kwaliteit.
 - **Techniek lost zichzelf op**: voeg de foto's toe en de tool controleert breedte,
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
   oplossen, lost hij op: comprimeren tot onder de limiet, WebP, HEIC of AVIF

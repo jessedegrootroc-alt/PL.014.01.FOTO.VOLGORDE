@@ -463,14 +463,8 @@ main{padding-block:var(--s5) var(--s6)}
         <div class="block-b"><div class="rows" data-rows="visueel"></div></div>
       </section>
 
-      <section class="block" aria-labelledby="h5a">
-        <div class="block-h"><span class="step">04</span><h2 id="h5a">Seizoen</h2><span class="tag sp">Richtlijn</span></div>
-        <p class="lead">Kijk de beelden na begin lente en begin herfst. Houd de opbouw van de eerste 5 zoveel mogelijk gelijk.</p>
-        <div class="block-b"><div class="rows" data-rows="seizoen"></div></div>
-      </section>
-
       <section class="block" aria-labelledby="h6a">
-        <div class="block-h"><span class="step">05</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
+        <div class="block-h"><span class="step">04</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
         <p class="lead">Voeg de foto's toe, de tool controleert ze en lost wat kan zelf op: te groot, verkeerd formaat, bestandsnaam en alt-tekst.</p>
         <div class="block-b">
           <table class="spec">
@@ -638,16 +632,12 @@ main{padding-block:var(--s5) var(--s6)}
       {id:"v5", label:"Geen collages"},
       {id:"v6", label:"Geen onrealistische AI-beelden"}
     ]},
-    seizoen:{kind:"guide", items:[
-      {id:"sz1", label:"De beelden passen bij het huidige seizoen"},
-      {id:"sz2", label:"De opbouw van de eerste 5 is behouden"}
-    ]},
     techniek:{kind:"tech", items:[
       {id:"tc6", label:"Commercieel gebruik van alle foto's is toegestaan", sub:"Een foto uit een persmap mag niet vanzelf in advertenties."}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v10";
+  var STORE = "vialuxury-fotocheck-v11";
   function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
   var state = {
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
