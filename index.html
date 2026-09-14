@@ -389,7 +389,7 @@ main{padding-block:var(--s5) var(--s6)}
       <h2 id="h-eerste5">De eerste 5 foto's</h2>
       <span class="tag sp">Richtlijn</span>
     </div>
-    <p class="lead">Kies per positie wat voor soort beeld het is. Na elke keuze rekent de tool opnieuw uit wat de volgende foto het beste kan zijn, en houdt daarbij rekening met wat al gebruikt is. Sleep een kaart met <b>⠿</b> of de pijlen om de volgorde te wisselen.</p>
+    <p class="lead">Foto 1 is altijd het hoofdbeeld en altijd een droombeeld, geef aan wat voor soort. Na elke keuze rekent de tool opnieuw uit wat de volgende foto het beste kan zijn, en houdt daarbij rekening met wat al gebruikt is. Sleep een kaart met <b>⠿</b> of de pijlen om de volgorde te wisselen.</p>
 
     <div class="strip" id="strip"></div>
     <div class="cards" id="cards"></div>
@@ -414,7 +414,7 @@ main{padding-block:var(--s5) var(--s6)}
             <div class="level"><h3>Hotelniveau</h3><p>Komt terug op alle pakketten van dit hotel. Gebruik dit voor beelden die bij elk arrangement kloppen.</p></div>
             <div class="level mark"><h3>Arrangementniveau</h3><p>Geldt alleen voor dit arrangement en is eenmalig. Het hoofdbeeld hoort altijd hier.</p></div>
           </div>
-          <p class="pills-lbl">Welke van de eerste 5 posities is het hoofdbeeld?</p>
+          <p class="pills-lbl">Het hoofdbeeld is altijd foto 1, en altijd een droombeeld. Het soort droombeeld bepaal je bij stap 01, de andere foto's houden daar rekening mee.</p>
           <div class="pills" id="hoofdpills" role="group" aria-label="Positie van het hoofdbeeld"></div>
           <div class="rows" data-rows="hoofdbeeld"></div>
         </div>
@@ -517,10 +517,13 @@ main{padding-block:var(--s5) var(--s6)}
 
   /* ---------- categorieën ---------- */
   var CATS = {
-    "droom-hotel":    {label:"Droombeeld hotel",    groep:"Droombeeld", tags:["droom","hotel"]},
-    "droom-natuur":   {label:"Droombeeld natuur",   groep:"Droombeeld", tags:["droom","omgeving"]},
-    "droom-wandelen": {label:"Droombeeld wandelen", groep:"Droombeeld", tags:["droom","omgeving","activiteit"]},
-    "droom-fietsen":  {label:"Droombeeld fietsen",  groep:"Droombeeld", tags:["droom","omgeving","activiteit"]},
+    "droom-hotel":    {label:"Droombeeld hotel",    groep:"Droombeeld", tags:["droom","hotel"],  dekt:["gebouw"]},
+    "droom-kamer":    {label:"Droombeeld kamer",    groep:"Droombeeld", tags:["droom","hotel"],  dekt:["kamer"]},
+    "droom-wellness": {label:"Droombeeld wellness", groep:"Droombeeld", tags:["droom","hotel"],  dekt:["wellness"]},
+    "droom-omgeving": {label:"Droombeeld omgeving", groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving"]},
+    "droom-natuur":   {label:"Droombeeld natuur",   groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving"]},
+    "droom-wandelen": {label:"Droombeeld wandelen", groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit"]},
+    "droom-fietsen":  {label:"Droombeeld fietsen",  groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit"]},
     "gebouw":         {label:"Gebouw",              groep:"Hotel",      tags:["hotel"]},
     "kamer":          {label:"Kamer",               groep:"Hotel",      tags:["hotel"]},
     "diner":          {label:"Diner",               groep:"Package include", tags:["package"]},
@@ -553,6 +556,11 @@ main{padding-block:var(--s5) var(--s6)}
   };
   var FGROEPEN = ["Hotel","Arrangement","Locatie","Extra"];
   var PACKAGES = ["diner","ontbijt","wellness","activiteit"];
+  var DROOM = ["droom-hotel","droom-kamer","droom-wellness","droom-omgeving","droom-natuur","droom-wandelen","droom-fietsen"];
+  var DROOMVAN = {"omgeving":"droom-omgeving","gebouw":"droom-hotel","kamer":"droom-kamer","wellness":"droom-wellness","activiteit":"droom-wandelen"};
+  function isDroom(c){ return DROOM.indexOf(c) !== -1; }
+  function naarDroom(c){ return isDroom(c) ? c : (DROOMVAN[c] || null); }
+  function dekt(c){ return [c].concat((CATS[c] && CATS[c].dekt) || []); }
 
   function lbl(c){ return CATS[c] ? CATS[c].label : c; }
   function heeftTag(c, t){ return !!(CATS[c] && CATS[c].tags.indexOf(t) !== -1); }
@@ -591,7 +599,7 @@ main{padding-block:var(--s5) var(--s6)}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v6";
+  var STORE = "vialuxury-fotocheck-v7";
   function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
   var state = {
     meta:{hotel:"",arrangement:"",medewerker:"",seizoen:"Lente / zomer",datum:""},
@@ -612,7 +620,6 @@ main{padding-block:var(--s5) var(--s6)}
       var raw = localStorage.getItem(STORE); if(!raw) return;
       var d = JSON.parse(raw); if(!d) return;
       if(d.meta) state.meta = Object.assign(state.meta, d.meta);
-      if(typeof d.hoofd === "number") state.hoofd = d.hoofd;
       if(typeof d.count === "number") state.count = d.count;
       state.gebouwNiet = !!d.gebouwNiet;
       if(d.checks) state.checks = d.checks;
@@ -631,7 +638,11 @@ main{padding-block:var(--s5) var(--s6)}
   function anderen(i){
     return state.pos.map(function(p,j){ return j===i ? null : p.cat; }).filter(Boolean);
   }
-  function gebruikt(i, cat){ return anderen(i).indexOf(cat) !== -1; }
+  function gebruikt(i, cat){
+    var lijst = anderen(i);
+    for(var j=0;j<lijst.length;j++){ if(dekt(lijst[j]).indexOf(cat) !== -1) return true; }
+    return false;
+  }
   function alleCats(){ return state.pos.map(function(p){ return p.cat; }).filter(Boolean); }
   function eersteMet(i, tag){
     for(var j=0;j<5;j++){ if(j!==i && state.pos[j].cat && heeftTag(state.pos[j].cat, tag)) return j; }
@@ -656,11 +667,16 @@ main{padding-block:var(--s5) var(--s6)}
     });
     return {cats:cats, bron:bron};
   }
+  function gedekt(){
+    var out = [];
+    alleCats().forEach(function(c){ dekt(c).forEach(function(d){ if(out.indexOf(d) === -1) out.push(d); }); });
+    return out;
+  }
   function uspZichtbaar(){
-    var fc = filterCats(), gebruiktAl = alleCats();
+    var fc = filterCats(), dek = gedekt();
     return {
-      klaar: fc.cats.filter(function(c){ return gebruiktAl.indexOf(c) !== -1; }),
-      open:  fc.cats.filter(function(c){ return gebruiktAl.indexOf(c) === -1; }),
+      klaar: fc.cats.filter(function(c){ return dek.indexOf(c) !== -1; }),
+      open:  fc.cats.filter(function(c){ return dek.indexOf(c) === -1; }),
       bron:  fc.bron
     };
   }
@@ -676,20 +692,23 @@ main{padding-block:var(--s5) var(--s6)}
     function reden(c, staart){ return (bron[c] ? bron[c] + " is een kenmerk van dit arrangement. " : "") + staart; }
 
     if(i === 0){
-      var droomSet = ["droom-hotel","droom-natuur","droom-wandelen","droom-fietsen","omgeving","gebouw"];
-      var kies = wens.filter(function(c){ return droomSet.indexOf(c) !== -1; });
+      var kies = [], droomBron = {};
+      fc.cats.forEach(function(c){
+        var d = naarDroom(c);
+        if(d && kies.indexOf(d) === -1){ kies.push(d); if(bron[c]) droomBron[d] = bron[c]; }
+      });
       if(kies.length){
-        a.titel = "Droombeeld · " + lbl(kies[0]);
-        a.waarom = reden(kies[0], "Open met het sterkste verkoopargument, een beeld waarvan de gast denkt: hier wil ik heen.");
+        a.titel = lbl(kies[0]);
+        a.waarom = (droomBron[kies[0]] ? droomBron[kies[0]] + " is een kenmerk van dit arrangement. " : "")
+                 + "De hoofdfoto is altijd een droombeeld. Open met het sterkste verkoopargument.";
         a.primair = [kies[0]];
-        a.alt = uniek(kies.slice(1).concat(vrij(i,["droom-hotel","droom-natuur","omgeving"])))
+        a.alt = uniek(kies.slice(1).concat(["droom-hotel","droom-omgeving","droom-natuur"]))
                   .filter(function(c){ return c !== kies[0]; }).slice(0,3);
       } else {
         a.titel = "Droombeeld";
-        a.waarom = "Een beeld waarvan de gast denkt: hier wil ik heen. Hotel, natuur, wandelen of fietsen.";
-        a.primair = vrij(i,["droom-hotel"]);
-        a.alt = vrij(i,["droom-natuur","droom-wandelen","droom-fietsen","omgeving"]);
-        if(!a.primair.length){ a.primair = a.alt.slice(0,1); a.alt = a.alt.slice(1); }
+        a.waarom = "De hoofdfoto is altijd een droombeeld. Geef aan wat voor soort, dan houden de andere foto's daar rekening mee.";
+        a.primair = ["droom-hotel"];
+        a.alt = ["droom-omgeving","droom-natuur","droom-fietsen"];
       }
       return a;
     }
@@ -784,13 +803,18 @@ main{padding-block:var(--s5) var(--s6)}
   var cardsHost = $("#cards"), stripHost = $("#strip"), dragFrom = null;
 
   function optiesHTML(i){
-    var cur = state.pos[i].cat;
-    var out = '<option value=""'+(cur?"":" selected")+'>Kies een type…</option>';
+    var cur = state.pos[i].cat, hoofd = (i === 0);
+    var out = '<option value=""'+(cur?"":" selected")+'>'+(hoofd ? "Kies een droombeeld…" : "Kies een type…")+'</option>';
     GROEPEN.forEach(function(g){
+      var keys = Object.keys(CATS).filter(function(k){
+        if(CATS[k].groep !== g) return false;
+        if(k === cur) return true;
+        return hoofd ? (isDroom(k) || k === "anders") : !isDroom(k);
+      });
+      if(!keys.length) return;
       out += '<optgroup label="'+g+'">';
-      Object.keys(CATS).forEach(function(k){
-        if(CATS[k].groep !== g) return;
-        var dubbel = gebruikt(i,k) ? " — staat al in de reeks" : "";
+      keys.forEach(function(k){
+        var dubbel = (!hoofd && gebruikt(i,k)) ? " — staat al in de reeks" : "";
         out += '<option value="'+k+'"'+(cur===k?" selected":"")+'>'+esc(CATS[k].label+dubbel)+'</option>';
       });
       out += '</optgroup>';
@@ -834,7 +858,7 @@ main{padding-block:var(--s5) var(--s6)}
         +     '<button type="button" data-act="down" aria-label="Naar positie '+(i+2)+'">▼</button></span>'
         + '</div>'
         + '<div class="c-main">'
-        +   '<p class="c-role">'+esc(p.cat ? lbl(p.cat) : "Foto "+(i+1))
+        +   '<p class="c-role">'+esc(p.cat ? lbl(p.cat) : (i===0 ? "Hoofdbeeld" : "Foto "+(i+1)))
         +     (isHoofd ? '<span class="badge">Hoofdbeeld · arrangementniveau</span>' : '')+'</p>'
         +   (p.cat ? '<p class="c-sub">Positie '+(i+1)+' in de reeks</p>' : '')
         +   advBlok
@@ -943,9 +967,6 @@ main{padding-block:var(--s5) var(--s6)}
   function verplaats(van, naar){
     var item = state.pos.splice(van,1)[0];
     state.pos.splice(naar,0,item);
-    if(state.hoofd === van) state.hoofd = naar;
-    else if(van < state.hoofd && naar >= state.hoofd) state.hoofd--;
-    else if(van > state.hoofd && naar <= state.hoofd) state.hoofd++;
     dragFrom = null;
     renderAlles(); save();
   }
@@ -1107,16 +1128,9 @@ main{padding-block:var(--s5) var(--s6)}
   /* ---------- hoofdbeeld ---------- */
   var pills = $("#hoofdpills");
   function renderPills(){
-    pills.innerHTML = state.pos.map(function(p,i){
-      return '<button type="button" class="pill" data-i="'+i+'" aria-pressed="'+(state.hoofd===i)+'">'
-        + (i+1)+' · '+esc(p.cat ? lbl(p.cat) : "nog geen type")+'</button>';
-    }).join("");
-    each(pills.children, function(b){
-      b.addEventListener("click", function(){
-        state.hoofd = parseInt(b.getAttribute("data-i"),10);
-        renderAlles(); save();
-      });
-    });
+    var c = state.pos[0].cat;
+    pills.innerHTML = '<span class="chip' + (c ? " ok" : "") + '"><b>Foto 1</b> is het hoofdbeeld · '
+      + esc(c ? lbl(c) : "nog geen droombeeld gekozen") + '</span>';
   }
 
   /* ---------- register ---------- */
@@ -1249,6 +1263,9 @@ main{padding-block:var(--s5) var(--s6)}
       if(p.niveau === "hotel") lvH++; else if(p.niveau === "arrangement") lvA++; else lvOpen++;
     });
     if(typen === 5 && hotels < 3) devList.push("Slechts " + hotels + " van de eerste 4 foto's is hotelgerelateerd");
+    if(state.pos[0].cat && !isDroom(state.pos[0].cat) && state.pos[0].cat !== "anders"){
+      devList.push("Foto 1 is het hoofdbeeld, dat is bij voorkeur een droombeeld");
+    }
     var u = uspZichtbaar();
     if(typen === 5) u.open.forEach(function(c){
       devList.push((u.bron[c] || lbl(c)) + " is een kenmerk van dit arrangement maar staat niet in de eerste 5");
