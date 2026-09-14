@@ -1,0 +1,1180 @@
+<title>Fotocheck arrangement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap">
+<style>
+:root{
+  --font-head:'Recoleta','Fraunces',Georgia,'Times New Roman',serif;
+  --font-body:'Basis Grotesque','Archivo','Helvetica Neue',Arial,sans-serif;
+
+  --accent:#FB862C; --accent-hover:#EE7126;
+  --ink:#141414; --ink-2:#555555; --ink-3:#8E8A84;
+  --bg:#FBFAF8; --surface:#FFFFFF; --surface-2:#FBFAF8;
+  --line:#E5E2DA; --line-soft:#F0EEE9;
+
+  --ok:#0E8A5F; --ok-bg:#EDF7F2; --ok-line:#BEE3D2;
+  --dev:#C2650F; --dev-bg:#FDF2E7; --dev-line:#F3D6B4;
+  --err:#D32F2F; --err-bg:#FBECEC; --err-line:#F0C6C6;
+  --na:#8E8A84; --na-bg:#F4F3F1; --na-line:#E5E2DA;
+
+  color-scheme:light;
+  --r:6px;
+  --s1:4px; --s2:8px; --s3:16px; --s4:24px; --s5:32px; --s6:48px;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body);
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-head); font-weight:600; margin:0; text-wrap:balance; letter-spacing:-.02em}
+p{margin:0}
+button,input,textarea,select{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.wrap{max-width:1137px; margin:0 auto; padding-inline:24px}
+
+/* ---------- kop ---------- */
+.topbar{position:sticky; top:0; z-index:20; background:var(--bg); border-bottom:1px solid var(--line); padding-block:var(--s3)}
+.topbar .wrap{display:flex; flex-wrap:wrap; gap:var(--s3) var(--s4); align-items:flex-end; justify-content:space-between}
+.brandline{display:flex; align-items:center; gap:var(--s2); font-size:11px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-bottom:var(--s1)}
+.dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
+.topbar h1{font-size:25px; line-height:1.1}
+.topbar .sub{font-size:14px; color:var(--ink-2); margin-top:2px}
+.meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3)}
+.field{display:flex; flex-direction:column; gap:3px}
+.field label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:600}
+.field input,.field select{background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
+  padding:6px 10px; font-size:14px; min-width:130px}
+.field input::placeholder{color:var(--ink-3)}
+
+main{padding-block:var(--s5) var(--s6)}
+.cols{display:grid; grid-template-columns:minmax(0,1fr) 304px; gap:var(--s5); align-items:start}
+.stack{display:flex; flex-direction:column; gap:var(--s4)}
+
+.block{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); overflow:hidden}
+.block.hero{margin-bottom:var(--s5); border-color:var(--line)}
+.block-h{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); padding:16px 20px 12px}
+.step{font-family:var(--font-head); font-size:13px; font-weight:600; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.block-h h2{font-size:19px}
+.block.hero .block-h h2{font-size:23px}
+.block-h .sp{margin-left:auto}
+.lead{font-size:13.5px; color:var(--ink-2); padding:0 20px 12px; max-width:70ch}
+.lead b{font-weight:600; color:var(--ink)}
+.block-b{padding:0 20px 16px}
+.tag{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+  padding:3px 7px; border-radius:var(--r); border:1px solid var(--dev-line); color:var(--dev); background:var(--dev-bg)}
+.tag.hard{border-color:var(--err-line); color:var(--err); background:var(--err-bg)}
+
+/* ---------- overzichtsstrip ---------- */
+.strip{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:var(--s2); padding:0 20px var(--s3)}
+.tile{border:1px solid var(--line); border-radius:var(--r); background:var(--surface-2); padding:9px 10px;
+  text-align:left; cursor:pointer; min-width:0}
+.tile:hover{border-color:var(--ink-3)}
+.tile .t-n{font-family:var(--font-head); font-size:12px; font-weight:600; color:var(--ink-3)}
+.tile .t-c{font-size:13px; font-weight:600; line-height:1.3; margin-top:2px; overflow:hidden; text-overflow:ellipsis}
+.tile .t-e{font-size:13px; color:var(--ink-3); margin-top:2px}
+.tile[data-status="ok"]{border-color:var(--ok-line); background:var(--ok-bg)}
+.tile[data-status="ok"] .t-n,.tile[data-status="ok"] .t-c{color:var(--ok)}
+.tile[data-status="dev"]{border-color:var(--dev-line); background:var(--dev-bg)}
+.tile[data-status="dev"] .t-n,.tile[data-status="dev"] .t-c{color:var(--dev)}
+.tile[data-status="na"]{border-color:var(--na-line)}
+.tile.next{border-color:var(--accent); box-shadow:0 0 0 2px rgba(251,134,44,.18)}
+
+/* ---------- kaarten ---------- */
+.cards{display:flex; flex-direction:column; gap:var(--s2); padding:0 20px var(--s3)}
+.card{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); padding:14px 16px;
+  display:grid; grid-template-columns:34px minmax(0,1fr) minmax(0,320px); gap:var(--s3); align-items:start}
+.card.next{border-color:var(--accent); background:#FFFDFA}
+.card[data-status="ok"]{border-color:var(--ok-line)}
+.card[data-status="dev"]{border-color:var(--dev-line)}
+.card.dragging{opacity:.4}
+.card.dropping{border-color:var(--accent); box-shadow:0 0 0 2px rgba(251,134,44,.25)}
+.c-num{display:flex; flex-direction:column; align-items:center; gap:6px}
+.num{font-family:var(--font-head); font-size:15px; font-weight:600; line-height:1; width:30px; height:30px;
+  display:grid; place-items:center; border-radius:var(--r); background:var(--ink); color:#FFFFFF}
+.card[data-status="ok"] .num{background:var(--ok)}
+.card[data-status="dev"] .num{background:var(--dev)}
+.card[data-status="na"] .num{background:var(--na)}
+.handle{cursor:grab; color:var(--ink-3); font-size:14px; line-height:1; background:none; border:0; padding:2px}
+.handle:active{cursor:grabbing}
+.movers{display:flex; gap:2px}
+.movers button{width:16px; height:18px; border:0; background:none; color:var(--ink-3); cursor:pointer; font-size:10px; padding:0}
+.movers button:hover{color:var(--ink)}
+
+.c-main{min-width:0}
+.c-role{font-family:var(--font-head); font-size:16px; font-weight:600; line-height:1.3}
+.c-role .badge{display:inline-block; font-family:var(--font-body); font-size:10px; font-weight:700; letter-spacing:.8px;
+  text-transform:uppercase; padding:2px 6px; border-radius:var(--r); border:1px solid var(--dev-line);
+  background:var(--dev-bg); color:var(--dev); margin-left:8px; vertical-align:2px}
+.c-sub{font-size:13px; color:var(--ink-2); margin-top:2px}
+
+.advice{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--r);
+  background:var(--surface-2); padding:10px 12px; margin-top:10px}
+.advice .a-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3)}
+.advice .a-main{font-size:14.5px; font-weight:600; margin-top:2px}
+.advice .a-why{font-size:12.5px; color:var(--ink-2); margin-top:3px}
+.advice .a-alts{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; align-items:center}
+.advice .a-alts .a-alts-lbl{font-size:12px; color:var(--ink-3)}
+.sugg{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:4px 10px;
+  font-size:12.5px; cursor:pointer; color:var(--ink-2)}
+.sugg:hover{border-color:var(--accent); color:var(--accent-hover)}
+.sugg.primary{border-color:var(--accent); background:var(--dev-bg); color:var(--accent-hover); font-weight:600}
+.linkbtn{background:none; border:0; padding:0; font-size:12.5px; color:var(--ink-2); text-decoration:underline;
+  cursor:pointer; margin-top:8px}
+.linkbtn:hover{color:var(--accent-hover)}
+.linkbtn[aria-pressed="true"]{color:var(--dev); font-weight:600}
+
+.verdictline{font-size:12.5px; font-weight:600; margin-top:8px; display:flex; align-items:center; gap:6px}
+.verdictline.ok{color:var(--ok)}
+.verdictline.dev{color:var(--dev)}
+
+.c-side{display:flex; flex-direction:column; gap:var(--s2); min-width:0}
+.pick label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:600;
+  display:block; margin-bottom:3px}
+.pick select{width:100%; background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
+  padding:8px 10px; font-size:14px}
+.pick select.empty{border-color:var(--accent)}
+.anders input{width:100%; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  padding:6px 9px; font-size:13px; margin-top:6px}
+.niveau{display:flex; gap:4px}
+.niveau button{flex:1; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  padding:5px 8px; font-size:12px; cursor:pointer; color:var(--ink-2); white-space:nowrap}
+.niveau button:hover{border-color:var(--ink-3); color:var(--ink)}
+.niveau button[data-n="hotel"][aria-pressed="true"]{border-color:var(--ink); background:var(--na-bg); color:var(--ink); font-weight:600}
+.niveau button[data-n="arrangement"][aria-pressed="true"]{border-color:var(--dev); background:var(--dev-bg); color:var(--dev); font-weight:600}
+.niveau button[data-n="hotel"][aria-pressed="true"].warn{border-color:var(--err); background:var(--err-bg); color:var(--err)}
+.niveau-warn{font-size:12px; color:var(--err); font-weight:500}
+.seg{display:grid; grid-template-columns:repeat(3,1fr); gap:4px}
+.seg button{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:6px 2px;
+  font-size:12px; font-weight:600; cursor:pointer; color:var(--ink-2)}
+.seg button:hover{border-color:var(--ink-3)}
+.seg button[data-v="ok"][aria-pressed="true"]{background:var(--ok-bg); border-color:var(--ok); color:var(--ok)}
+.seg button[data-v="dev"][aria-pressed="true"]{background:var(--dev-bg); border-color:var(--dev); color:var(--dev)}
+.seg button[data-v="na"][aria-pressed="true"]{background:var(--na-bg); border-color:var(--na); color:var(--na)}
+.c-note{display:none}
+.card[data-status="dev"] .c-note{display:block}
+.c-note input{width:100%; border:1px solid var(--dev-line); background:var(--dev-bg); border-radius:var(--r);
+  padding:6px 9px; font-size:13px}
+
+.barline{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3); align-items:center; padding:14px 20px;
+  border-top:1px solid var(--line-soft); background:var(--surface-2)}
+.barline.col{flex-direction:column; align-items:stretch}
+.chip{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:var(--r);
+  padding:5px 10px; background:var(--surface); font-size:13px; font-variant-numeric:tabular-nums}
+.chip b{font-weight:600}
+.chip.ok{border-color:var(--ok-line); background:var(--ok-bg); color:var(--ok)}
+.chip.dev{border-color:var(--dev-line); background:var(--dev-bg); color:var(--dev)}
+.barhint{font-size:13px; color:var(--ink-2); flex:1; min-width:200px}
+.barhint.dev{color:var(--dev)}
+
+/* ---------- checklistrijen ---------- */
+.rows{display:flex; flex-direction:column}
+.row{display:flex; align-items:flex-start; gap:var(--s3); padding:11px 0; border-top:1px solid var(--line-soft)}
+.rows .row:first-child{border-top:0}
+.row .txt{min-width:0; flex:1}
+.row .lbl{font-size:14.5px; line-height:1.45}
+.row .sub{font-size:12.5px; color:var(--ink-2); line-height:1.45; margin-top:2px}
+.row .mini{display:flex; gap:4px; flex:none; padding-top:1px}
+.mini button{width:36px; height:30px; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  cursor:pointer; font-size:13px; font-weight:700; color:var(--ink-3); display:grid; place-items:center}
+.mini button:hover{border-color:var(--ink-3); color:var(--ink)}
+.mini button[data-v="ok"][aria-pressed="true"]{background:var(--ok-bg); border-color:var(--ok); color:var(--ok)}
+.mini button[data-v="dev"][aria-pressed="true"]{background:var(--dev-bg); border-color:var(--dev); color:var(--dev)}
+.mini button[data-v="bad"][aria-pressed="true"]{background:var(--err-bg); border-color:var(--err); color:var(--err)}
+.mini button[data-v="na"][aria-pressed="true"]{background:var(--na-bg); border-color:var(--na); color:var(--na)}
+.row .note{display:none; width:100%; margin-top:var(--s2)}
+.row[data-status="dev"] .note, .row[data-status="bad"] .note{display:block}
+.row .note input{width:100%; border:1px solid var(--dev-line); background:var(--dev-bg); border-radius:var(--r);
+  padding:6px 9px; font-size:13px}
+.row[data-status="bad"] .note input{border-color:var(--err-line); background:var(--err-bg)}
+
+/* ---------- fotoniveau + register ---------- */
+.levels{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s2); padding-bottom:var(--s3)}
+.level{border:1px solid var(--line); border-radius:var(--r); padding:12px 14px; background:var(--surface-2)}
+.level h3{font-family:var(--font-body); font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  font-weight:700; color:var(--ink-3); margin-bottom:3px}
+.level p{font-size:13px; color:var(--ink-2); line-height:1.45}
+.level.mark{border-color:var(--dev-line); background:var(--dev-bg)}
+.level.mark h3{color:var(--dev)}
+.reg-title{font-size:13.5px; color:var(--ink-2); margin-bottom:var(--s2)}
+.reg-title b{color:var(--ink); font-weight:600}
+.reg-head,.reg-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) 32px; gap:6px; align-items:center}
+.reg-head{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700; margin-bottom:4px}
+.reg{display:flex; flex-direction:column; gap:6px}
+.reg-row input{width:100%; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  padding:7px 9px; font-size:13.5px}
+.reg-row.dupe input{border-color:var(--err); background:var(--err-bg)}
+.reg-del{height:32px; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  cursor:pointer; color:var(--ink-3); font-size:15px; line-height:1}
+.reg-del:hover{border-color:var(--err); color:var(--err)}
+.reg-add{margin-top:var(--s2); align-self:flex-start; border:1px dashed var(--line); background:none;
+  border-radius:var(--r); padding:7px 12px; font-size:13px; cursor:pointer; color:var(--ink-2)}
+.reg-add:hover{border-color:var(--accent); color:var(--accent-hover)}
+#reg-msg{font-size:13px; color:var(--ink-2); margin-top:var(--s2)}
+#reg-msg.bad{color:var(--err); font-weight:500}
+#reg-msg.good{color:var(--ok)}
+.pills{display:flex; flex-wrap:wrap; gap:6px; padding-bottom:var(--s2)}
+.pill{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:5px 11px;
+  font-size:13px; cursor:pointer}
+.pill:hover{border-color:var(--ink-3)}
+.pill[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg); color:var(--accent-hover); font-weight:600}
+.pills-lbl{font-size:12.5px; color:var(--ink-3); padding-bottom:6px}
+
+/* ---------- teller ---------- */
+.counter{display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap; padding-bottom:var(--s2)}
+.bignum{font-family:var(--font-head); font-size:32px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
+.bignum span{font-size:17px; color:var(--ink-3)}
+.stepper{display:flex; align-items:center; gap:var(--s1)}
+.stepper button{width:32px; height:32px; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); cursor:pointer; font-size:16px; line-height:1}
+.stepper button:hover{border-color:var(--ink)}
+.stepper input{width:62px; text-align:center; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:6px; font-variant-numeric:tabular-nums}
+.gauge{flex:1; min-width:170px}
+.gauge .track{height:8px; border-radius:var(--r); background:var(--na-bg); overflow:hidden}
+.gauge .fill{height:100%; width:0; background:var(--ok); transition:width .25s ease}
+.gauge .fill.warn{background:var(--dev)}
+.gauge .scale{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-3); margin-top:4px}
+#cnt-msg{font-size:13px; color:var(--ink-2)}
+
+.spec{width:100%; border-collapse:collapse; font-size:13.5px; margin-bottom:var(--s2)}
+.spec th,.spec td{text-align:left; padding:7px 10px; border-bottom:1px solid var(--line-soft)}
+.spec th{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700}
+.spec td:first-child{font-weight:600}
+.spec td{font-variant-numeric:tabular-nums}
+.filetypes{display:flex; flex-wrap:wrap; gap:6px; padding-bottom:var(--s3)}
+.ft{font-size:12px; font-weight:600; padding:3px 9px; border-radius:var(--r); border:1px solid var(--ok-line);
+  background:var(--ok-bg); color:var(--ok)}
+.ft.no{border-color:var(--err-line); background:var(--err-bg); color:var(--err); text-decoration:line-through}
+
+/* ---------- samenvatting ---------- */
+.side{position:sticky; top:116px; display:flex; flex-direction:column; gap:var(--s3)}
+.sum{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); padding:18px}
+.sum h2{font-size:17px; margin-bottom:var(--s2)}
+.progress{height:8px; border-radius:var(--r); background:var(--na-bg); overflow:hidden; margin:var(--s2) 0 6px}
+.progress i{display:block; height:100%; background:var(--accent); width:0; transition:width .25s ease}
+.prog-lbl{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.stats{display:flex; flex-direction:column; gap:var(--s1); margin-top:var(--s3)}
+.stat{display:flex; align-items:center; gap:var(--s2); padding:8px 10px; border-radius:var(--r);
+  border:1px solid var(--line); background:var(--surface); font-size:13.5px}
+.stat b{margin-left:auto; font-family:var(--font-head); font-size:18px; font-variant-numeric:tabular-nums}
+.stat.ok{border-color:var(--ok-line); color:var(--ok); background:var(--ok-bg)}
+.stat.dev{border-color:var(--dev-line); color:var(--dev); background:var(--dev-bg)}
+.stat.err{border-color:var(--err-line); color:var(--err); background:var(--err-bg)}
+.verdict{margin-top:var(--s3); font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.verdict b{color:var(--ink)}
+.btn{border-radius:var(--r); border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer; width:100%}
+.btn:hover{border-color:var(--ink)}
+.btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn-primary:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
+.btn-row{display:flex; flex-direction:column; gap:var(--s2)}
+
+.overview{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); margin-top:var(--s5)}
+.ov-h{padding:16px 20px 4px}
+.ov-h h2{font-size:19px}
+.ov-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr))}
+.ov-col{padding:16px 20px; border-right:1px solid var(--line-soft)}
+.ov-col:last-child{border-right:0}
+.ov-col h3{font-family:var(--font-body); font-size:12px; text-transform:uppercase; letter-spacing:1px;
+  font-weight:700; display:flex; align-items:center; gap:var(--s2); margin-bottom:var(--s2)}
+.ov-col.ok h3{color:var(--ok)} .ov-col.dev h3{color:var(--dev)} .ov-col.err h3{color:var(--err)}
+.ov-col h3 span{font-family:var(--font-head); font-size:19px; letter-spacing:0}
+.ov-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13.5px}
+.ov-list li{padding-left:14px; position:relative; color:var(--ink-2); line-height:1.45}
+.ov-list li::before{content:""; position:absolute; left:0; top:8px; width:5px; height:5px; border-radius:999px; background:currentColor}
+.ov-list li em{font-style:normal; color:var(--ink); font-weight:600}
+.ov-empty{font-size:13.5px; color:var(--ink-3)}
+.foot{margin-top:var(--s4); font-size:12.5px; color:var(--ink-3)}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:60; background:var(--ink);
+  color:#FFFFFF; padding:10px 18px; border-radius:var(--r); font-size:14px}
+.toast[hidden]{display:none !important}
+
+@media (max-width:1100px){
+  .card{grid-template-columns:34px minmax(0,1fr); }
+  .c-side{grid-column:2}
+}
+@media (max-width:980px){
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .side{position:static}
+  .ov-grid{grid-template-columns:minmax(0,1fr)}
+  .ov-col{border-right:0; border-bottom:1px solid var(--line-soft)}
+  .ov-col:last-child{border-bottom:0}
+}
+@media (max-width:760px){ .strip{grid-template-columns:repeat(2,minmax(0,1fr))} .levels{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:560px){
+  .topbar h1{font-size:21px}
+  .strip{grid-template-columns:minmax(0,1fr)}
+  .row{flex-wrap:wrap}
+  .row .mini{width:100%}
+  .reg-head{display:none}
+  .reg-row{grid-template-columns:minmax(0,1fr) 32px}
+  .reg-row input:first-child{grid-column:1 / -1}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <div>
+      <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
+      <h1>Fotocheck arrangement</h1>
+      <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
+    </div>
+    <div class="meta">
+      <div class="field"><label for="m-hotel">Hotel</label><input id="m-hotel" data-meta="hotel" placeholder="Naam hotel"></div>
+      <div class="field"><label for="m-arr">Arrangement</label><input id="m-arr" data-meta="arrangement" placeholder="Naam arrangement"></div>
+      <div class="field"><label for="m-med">Medewerker</label><input id="m-med" data-meta="medewerker" placeholder="Naam"></div>
+      <div class="field"><label for="m-seizoen">Seizoen</label>
+        <select id="m-seizoen" data-meta="seizoen"><option>Lente / zomer</option><option>Herfst / winter</option></select>
+      </div>
+      <div class="field"><label for="m-datum">Datum</label><input id="m-datum" type="date" data-meta="datum"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="block hero" aria-labelledby="h-eerste5">
+    <div class="block-h">
+      <span class="step">01</span>
+      <h2 id="h-eerste5">De eerste 5 foto's</h2>
+      <span class="tag sp">Richtlijn</span>
+    </div>
+    <p class="lead">Kies per positie wat voor soort beeld het is. Na elke keuze rekent de tool opnieuw uit wat de volgende foto het beste kan zijn, en houdt daarbij rekening met wat al gebruikt is. Sleep een kaart met <b>⠿</b> of de pijlen om de volgorde te wisselen.</p>
+
+    <div class="strip" id="strip"></div>
+    <div class="cards" id="cards"></div>
+
+    <div class="barline">
+      <span class="chip" id="chip-typen"><b>0 / 5</b> typen gekozen</span>
+      <span class="chip" id="chip-hotel"><b>0 / 4</b> hotelgerelateerd</span>
+      <span class="chip" id="chip-niveau"><b>0</b> hotelniveau · <b>0</b> arrangementniveau</span>
+      <p class="barhint" id="bar-hint"></p>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div class="stack">
+
+      <section class="block" aria-labelledby="h2a">
+        <div class="block-h"><span class="step">02</span><h2 id="h2a">Fotoniveau en hoofdbeeld</h2><span class="tag sp">Richtlijn</span></div>
+        <p class="lead">Een foto op hotelniveau komt terug bij <b>elk pakket</b> van dit hotel. Een foto op arrangementniveau geldt alleen hier, die upload je per arrangement opnieuw.</p>
+        <div class="block-b">
+          <div class="levels">
+            <div class="level"><h3>Hotelniveau</h3><p>Komt terug op alle pakketten van dit hotel. Gebruik dit voor beelden die bij elk arrangement kloppen.</p></div>
+            <div class="level mark"><h3>Arrangementniveau</h3><p>Geldt alleen voor dit arrangement en is eenmalig. Het hoofdbeeld hoort altijd hier.</p></div>
+          </div>
+          <p class="pills-lbl">Welke van de eerste 5 posities is het hoofdbeeld?</p>
+          <div class="pills" id="hoofdpills" role="group" aria-label="Positie van het hoofdbeeld"></div>
+          <div class="rows" data-rows="hoofdbeeld"></div>
+        </div>
+        <div class="barline col">
+          <p class="reg-title"><b>Hoofdbeelden van dit hotel</b> — drie arrangementen betekent drie verschillende droombeelden. Zet ze hier naast elkaar, dan zie je meteen of er een dubbel staat.</p>
+          <div class="reg-head"><span>Arrangement</span><span>Bestandsnaam hoofdfoto</span><span></span></div>
+          <div class="reg" id="reg"></div>
+          <button class="reg-add" id="reg-add" type="button">+ Arrangement toevoegen</button>
+          <p id="reg-msg"></p>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="h3a">
+        <div class="block-h"><span class="step">03</span><h2 id="h3a">Rest van de fotoreeks</h2><span class="tag sp">Richtlijn</span></div>
+        <p class="lead">Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden. Eindig waar mogelijk met omgeving.</p>
+        <div class="block-b">
+          <div class="counter">
+            <div class="bignum" id="count-big">10 <span>/ 14</span></div>
+            <div class="stepper">
+              <button type="button" id="cnt-min" aria-label="Eén foto minder">−</button>
+              <input id="cnt" type="number" min="0" max="30" value="10" aria-label="Aantal foto's in de reeks">
+              <button type="button" id="cnt-plus" aria-label="Eén foto meer">+</button>
+            </div>
+            <div class="gauge">
+              <div class="track"><i class="fill" id="cnt-fill"></i></div>
+              <div class="scale"><span>0</span><span>8 minimaal</span><span>14 maximaal</span></div>
+            </div>
+          </div>
+          <p id="cnt-msg"></p>
+          <div class="rows" data-rows="reeks"></div>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="h4a">
+        <div class="block-h"><span class="step">04</span><h2 id="h4a">Visuele kwaliteit</h2><span class="tag sp">Richtlijn</span></div>
+        <p class="lead">Een bewuste opbouw van dag naar avond mag wel.</p>
+        <div class="block-b"><div class="rows" data-rows="visueel"></div></div>
+      </section>
+
+      <section class="block" aria-labelledby="h5a">
+        <div class="block-h"><span class="step">05</span><h2 id="h5a">Seizoen</h2><span class="tag sp">Richtlijn</span></div>
+        <p class="lead">Kijk de beelden na begin lente en begin herfst. Houd de opbouw van de eerste 5 zoveel mogelijk gelijk.</p>
+        <div class="block-b"><div class="rows" data-rows="seizoen"></div></div>
+      </section>
+
+      <section class="block" aria-labelledby="h6a">
+        <div class="block-h"><span class="step">06</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
+        <div class="block-b">
+          <table class="spec">
+            <thead><tr><th>Type</th><th>Minimale breedte</th><th>Maximale grootte</th></tr></thead>
+            <tbody>
+              <tr><td>Hoofdbeeld</td><td>1920 px</td><td>400 KB</td></tr>
+              <tr><td>Overige foto's</td><td>1600 px</td><td>250 KB</td></tr>
+            </tbody>
+          </table>
+          <div class="filetypes">
+            <span class="ft">JPG</span><span class="ft">JPEG</span><span class="ft">PNG</span>
+            <span class="ft no">WebP</span><span class="ft no">HEIC</span><span class="ft no">AVIF</span>
+          </div>
+          <div class="rows" data-rows="techniek"></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side" aria-label="Samenvatting">
+      <div class="sum">
+        <h2>Stand van zaken</h2>
+        <div class="progress"><i id="prog"></i></div>
+        <p class="prog-lbl" id="prog-lbl">0 van 0 gecontroleerd</p>
+        <div class="stats">
+          <div class="stat ok">Volgens richtlijn <b id="s-ok">0</b></div>
+          <div class="stat dev">Bewuste afwijkingen <b id="s-dev">0</b></div>
+          <div class="stat err">Aanpassen voor live <b id="s-err">0</b></div>
+        </div>
+        <p class="verdict" id="verdict"></p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-copy" type="button">Kopieer samenvatting</button>
+        <button class="btn" id="btn-reset" type="button">Leegmaken voor volgend arrangement</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="overview" aria-labelledby="h-ov">
+    <div class="ov-h"><h2 id="h-ov">Overzicht</h2></div>
+    <div class="ov-grid">
+      <div class="ov-col ok"><h3>Volgens richtlijn <span id="ov-ok-n">0</span></h3><div id="ov-ok"></div></div>
+      <div class="ov-col dev"><h3>Bewuste afwijkingen <span id="ov-dev-n">0</span></h3><div id="ov-dev"></div></div>
+      <div class="ov-col err"><h3>Aanpassen voor live <span id="ov-err-n">0</span></h3><div id="ov-err"></div></div>
+    </div>
+  </section>
+  <p class="foot">Je invoer blijft in deze browser bewaard tot je op leegmaken klikt.</p>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- categorieën ---------- */
+  var CATS = {
+    "droom-hotel":    {label:"Droombeeld hotel",    groep:"Droombeeld", tags:["droom","hotel"]},
+    "droom-natuur":   {label:"Droombeeld natuur",   groep:"Droombeeld", tags:["droom","omgeving"]},
+    "droom-wandelen": {label:"Droombeeld wandelen", groep:"Droombeeld", tags:["droom","omgeving","activiteit"]},
+    "droom-fietsen":  {label:"Droombeeld fietsen",  groep:"Droombeeld", tags:["droom","omgeving","activiteit"]},
+    "gebouw":         {label:"Gebouw",              groep:"Hotel",      tags:["hotel"]},
+    "kamer":          {label:"Kamer",               groep:"Hotel",      tags:["hotel"]},
+    "diner":          {label:"Diner",               groep:"Package include", tags:["package"]},
+    "ontbijt":        {label:"Ontbijt",             groep:"Package include", tags:["package"]},
+    "wellness":       {label:"Wellness",            groep:"Package include", tags:["package","hotel"]},
+    "activiteit":     {label:"Activiteit",          groep:"Package include", tags:["package","activiteit"]},
+    "omgeving":       {label:"Omgeving",            groep:"Omgeving",   tags:["omgeving"]},
+    "anders":         {label:"Anders",              groep:"Overig",     tags:[]}
+  };
+  var GROEPEN = ["Droombeeld","Hotel","Package include","Omgeving","Overig"];
+  var PACKAGES = ["diner","ontbijt","wellness","activiteit"];
+
+  function lbl(c){ return CATS[c] ? CATS[c].label : c; }
+  function heeftTag(c, t){ return !!(CATS[c] && CATS[c].tags.indexOf(t) !== -1); }
+
+  var GROUPS = {
+    hoofdbeeld:{kind:"guide", items:[
+      {id:"hb1", label:"Het hoofdbeeld is op arrangementniveau geüpload", sub:"Op hotelniveau komt dezelfde foto terug bij elk pakket van dit hotel."},
+      {id:"hb2", label:"Geen ander arrangement van dit hotel gebruikt deze foto als hoofdbeeld"},
+      {id:"hb3", label:"Het hoofdbeeld staat niet ook tussen de hotelniveau-foto's", sub:"Anders verschijnt dezelfde foto dubbel."},
+      {id:"hb4", label:"Foto's die per arrangement verschillen staan op arrangementniveau"}
+    ]},
+    reeks:{kind:"guide", items:[
+      {id:"rs1", label:"Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden"},
+      {id:"rs2", label:"De reeks eindigt waar mogelijk met omgevingsbeelden"},
+      {id:"rs3", label:"De reeks voelt als de reis van de gast", sub:"Aankomst, verblijf, arrangement, hotel, omgeving."}
+    ]},
+    visueel:{kind:"guide", items:[
+      {id:"v1", label:"Foto's hebben ongeveer dezelfde lichtstelling"},
+      {id:"v2", label:"Geen rare mix van warm en koel licht"},
+      {id:"v3", label:"Geen flitsfoto tussen natuurlijke beelden"},
+      {id:"v4", label:"Geen zwaar bewerkte beelden"},
+      {id:"v5", label:"Geen collages"},
+      {id:"v6", label:"Geen onrealistische AI-beelden"}
+    ]},
+    seizoen:{kind:"guide", items:[
+      {id:"sz1", label:"De beelden passen bij het huidige seizoen"},
+      {id:"sz2", label:"De opbouw van de eerste 5 is behouden"}
+    ]},
+    techniek:{kind:"tech", items:[
+      {id:"tc1", label:"Hoofdbeeld is minimaal 1920 px breed en maximaal 400 KB"},
+      {id:"tc2", label:"Overige foto's zijn minimaal 1600 px breed en maximaal 250 KB"},
+      {id:"tc3", label:"Alle bestanden zijn JPG, JPEG of PNG", sub:"WebP, HEIC en AVIF worden niet ondersteund."},
+      {id:"tc4", label:"Beschrijvende bestandsnaam"},
+      {id:"tc5", label:"Alt-tekst ingevuld"},
+      {id:"tc6", label:"Commercieel gebruik toegestaan"}
+    ]}
+  };
+
+  var STORE = "vialuxury-fotocheck-v5";
+  function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
+  var state = {
+    meta:{hotel:"",arrangement:"",medewerker:"",seizoen:"Lente / zomer",datum:""},
+    pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
+    gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{},
+    arrangementen:[{naam:"",foto:""}]
+  };
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function each(l,f){ Array.prototype.forEach.call(l,f); }
+
+  function save(){ try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){} }
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE); if(!raw) return;
+      var d = JSON.parse(raw); if(!d) return;
+      if(d.meta) state.meta = Object.assign(state.meta, d.meta);
+      if(typeof d.hoofd === "number") state.hoofd = d.hoofd;
+      if(typeof d.count === "number") state.count = d.count;
+      state.gebouwNiet = !!d.gebouwNiet;
+      if(d.checks) state.checks = d.checks;
+      if(d.notes) state.notes = d.notes;
+      if(Array.isArray(d.arrangementen) && d.arrangementen.length) state.arrangementen = d.arrangementen;
+      if(Array.isArray(d.pos)) d.pos.forEach(function(p,i){
+        if(i>4 || !p) return;
+        state.pos[i] = {cat:p.cat||null, anders:p.anders||"", status:p.status||null, note:p.note||"", niveau:p.niveau||null};
+      });
+    }catch(e){}
+  }
+
+  /* ---------- adviesmotor ---------- */
+  function anderen(i){
+    return state.pos.map(function(p,j){ return j===i ? null : p.cat; }).filter(Boolean);
+  }
+  function gebruikt(i, cat){ return anderen(i).indexOf(cat) !== -1; }
+  function eersteMet(i, tag){
+    for(var j=0;j<5;j++){ if(j!==i && state.pos[j].cat && heeftTag(state.pos[j].cat, tag)) return j; }
+    return -1;
+  }
+  function vrij(i, lijst){ return lijst.filter(function(c){ return !gebruikt(i,c); }); }
+
+  function advies(i){
+    var a = {titel:"", waarom:"", primair:[], alt:[], gebouwKnop:false};
+
+    if(i === 0){
+      a.titel = "Droombeeld";
+      a.waarom = "Een beeld waarvan de gast denkt: hier wil ik heen. Hotel, natuur, wandelen of fietsen.";
+      a.primair = vrij(i, ["droom-hotel"]);
+      a.alt = vrij(i, ["droom-natuur","droom-wandelen","droom-fietsen","omgeving"]);
+      if(!a.primair.length){ a.primair = a.alt.slice(0,1); a.alt = a.alt.slice(1); }
+      return a;
+    }
+
+    if(i === 1){
+      a.gebouwKnop = true;
+      if(state.gebouwNiet){
+        a.titel = "Kamer";
+        a.waarom = "Het gebouw is niet aantrekkelijk genoeg, gebruik dan een sterk kamerbeeld.";
+        a.primair = vrij(i,["kamer"]);
+        a.alt = vrij(i,["wellness","diner","omgeving"]);
+      } else if(gebruikt(i,"gebouw")){
+        a.titel = "Kamer";
+        a.waarom = "Het gebouw staat al op foto " + (state.pos.map(function(p){return p.cat;}).indexOf("gebouw")+1) + ".";
+        a.primair = vrij(i,["kamer"]);
+        a.alt = vrij(i,["wellness","diner","omgeving"]);
+      } else {
+        a.titel = "Gebouw of kamer";
+        a.waarom = "Bij voorkeur het gebouw. Niet aantrekkelijk genoeg? Geef dat hieronder aan.";
+        a.primair = vrij(i,["gebouw"]);
+        a.alt = vrij(i,["kamer","wellness"]);
+      }
+      if(!a.primair.length){ a.primair = a.alt.slice(0,1); a.alt = a.alt.slice(1); }
+      return a;
+    }
+
+    if(i === 2 || i === 3){
+      var open = vrij(i, PACKAGES);
+      var tweede = (i === 3);
+      if(open.length){
+        a.titel = tweede ? "Tweede package include" : "Belangrijkste package include";
+        a.waarom = tweede
+          ? "Een tweede belangrijk onderdeel dat nieuwe informatie toevoegt ten opzichte van de vorige foto."
+          : "De belangrijkste reden om dit arrangement te boeken. Diner, ontbijt, wellness of activiteit.";
+        a.primair = open.slice(0,1);
+        a.alt = open.slice(1);
+      } else {
+        a.titel = "Aanvullend hotelbeeld";
+        a.waarom = "Alle package includes staan al in de reeks.";
+        a.primair = vrij(i, ["kamer","gebouw"]).slice(0,1);
+        a.alt = vrij(i, ["kamer","gebouw","omgeving"]).slice(1,3);
+      }
+      return a;
+    }
+
+    var omg = eersteMet(i, "omgeving");
+    if(omg !== -1){
+      var mist = vrij(i, ["kamer","diner","ontbijt","wellness","activiteit","gebouw"]);
+      a.titel = mist.length ? lbl(mist[0]) : "Aanvullend hotelbeeld";
+      a.waarom = "Omgeving is al sterk vertegenwoordigd in foto " + (omg+1) + " (" + lbl(state.pos[omg].cat) +
+                 "). Gebruik deze plek voor het belangrijkste onderdeel dat nog ontbreekt.";
+      a.primair = mist.slice(0,1);
+      a.alt = mist.slice(1,4);
+    } else {
+      a.titel = "Omgeving";
+      a.waarom = "Laat zien waar de gast terechtkomt. Parijs, Veluwe, kust, stad of natuur.";
+      a.primair = vrij(i,["omgeving"]);
+      a.alt = vrij(i,["droom-natuur","kamer","gebouw"]).slice(0,3);
+    }
+    return a;
+  }
+
+  function volgtAdvies(i){
+    var c = state.pos[i].cat; if(!c) return null;
+    var a = advies(i);
+    if(a.primair.indexOf(c) !== -1) return "primair";
+    if(a.alt.indexOf(c) !== -1) return "alternatief";
+    return "afwijkend";
+  }
+  function volgendeLeeg(){
+    for(var i=0;i<5;i++){ if(!state.pos[i].cat) return i; }
+    return -1;
+  }
+
+  /* ---------- kaarten ---------- */
+  var cardsHost = $("#cards"), stripHost = $("#strip"), dragFrom = null;
+
+  function optiesHTML(i){
+    var cur = state.pos[i].cat;
+    var out = '<option value=""'+(cur?"":" selected")+'>Kies een type…</option>';
+    GROEPEN.forEach(function(g){
+      out += '<optgroup label="'+g+'">';
+      Object.keys(CATS).forEach(function(k){
+        if(CATS[k].groep !== g) return;
+        var dubbel = gebruikt(i,k) ? " — staat al in de reeks" : "";
+        out += '<option value="'+k+'"'+(cur===k?" selected":"")+'>'+esc(CATS[k].label+dubbel)+'</option>';
+      });
+      out += '</optgroup>';
+    });
+    return out;
+  }
+
+  function renderCards(){
+    var nxt = volgendeLeeg();
+    cardsHost.innerHTML = state.pos.map(function(p,i){
+      var a = advies(i), v = volgtAdvies(i), isHoofd = (i === state.hoofd);
+      var advBlok = "";
+      if(!p.cat){
+        advBlok = '<div class="advice">'
+          + '<p class="a-lbl">Aanbevolen voor foto '+(i+1)+'</p>'
+          + '<p class="a-main">'+esc(a.titel)+'</p>'
+          + '<p class="a-why">'+esc(a.waarom)+'</p>'
+          + '<div class="a-alts">'
+          +   a.primair.map(function(c){ return '<button type="button" class="sugg primary" data-set="'+c+'">'+esc(lbl(c))+'</button>'; }).join("")
+          +   (a.alt.length ? '<span class="a-alts-lbl">of</span>' + a.alt.map(function(c){
+                 return '<button type="button" class="sugg" data-set="'+c+'">'+esc(lbl(c))+'</button>'; }).join("") : "")
+          + '</div>'
+          + (a.gebouwKnop ? '<button type="button" class="linkbtn" data-gebouw aria-pressed="'+state.gebouwNiet+'">'
+              + (state.gebouwNiet ? "Gebouw staat op niet geschikt, terugzetten" : "Gebouw niet geschikt voor dit hotel") + '</button>' : "")
+          + '</div>';
+      } else {
+        var cls = (v === "afwijkend") ? "dev" : "ok";
+        var tekst = v === "primair" ? "Volgt het advies voor deze positie"
+                  : v === "alternatief" ? "Goed alternatief voor deze positie"
+                  : "Wijkt af van het advies (" + a.titel + ")";
+        advBlok = '<p class="verdictline '+cls+'"><span aria-hidden="true">'+(cls==="ok"?"✓":"~")+'</span> '+esc(tekst)+'</p>'
+          + (v === "afwijkend" ? '<p class="c-sub">Mag, als dat voor dit arrangement logischer of visueel sterker is. Zet de status op afwijking en leg vast waarom.</p>' : "")
+          + (gebruikt(i, p.cat) ? '<p class="c-sub" style="color:var(--dev)">Dit type staat ook op een andere positie. Kijk of meer variatie mogelijk is.</p>' : "");
+      }
+
+      return '<div class="card'+(i===nxt?" next":"")+'" data-i="'+i+'"'+(p.status?' data-status="'+p.status+'"':'')+'>'
+        + '<div class="c-num">'
+        +   '<span class="num">'+(i+1)+'</span>'
+        +   '<button type="button" class="handle" title="Sleep om te verplaatsen" aria-hidden="true">⠿</button>'
+        +   '<span class="movers"><button type="button" data-act="up" aria-label="Naar positie '+i+'">▲</button>'
+        +     '<button type="button" data-act="down" aria-label="Naar positie '+(i+2)+'">▼</button></span>'
+        + '</div>'
+        + '<div class="c-main">'
+        +   '<p class="c-role">'+esc(p.cat ? lbl(p.cat) : "Foto "+(i+1))
+        +     (isHoofd ? '<span class="badge">Hoofdbeeld · arrangementniveau</span>' : '')+'</p>'
+        +   (p.cat ? '<p class="c-sub">Positie '+(i+1)+' in de reeks</p>' : '')
+        +   advBlok
+        + '</div>'
+        + '<div class="c-side">'
+        +   '<div class="pick"><label for="cat-'+i+'">Wat voor soort beeld is dit?</label>'
+        +     '<select id="cat-'+i+'" class="'+(p.cat?"":"empty")+'">'+optiesHTML(i)+'</select>'
+        +     (p.cat === "anders" ? '<span class="anders"><input id="anders-'+i+'" placeholder="Omschrijf het beeld" aria-label="Omschrijving beeld positie '+(i+1)+'"></span>' : '')
+        +   '</div>'
+        +   '<div class="niveau" role="group" aria-label="Fotoniveau positie '+(i+1)+'">'
+        +     '<button type="button" data-n="hotel" class="'+(isHoofd?"warn":"")+'" aria-pressed="'+(p.niveau==="hotel")+'">Hotelniveau</button>'
+        +     '<button type="button" data-n="arrangement" aria-pressed="'+(p.niveau==="arrangement")+'">Arrangementniveau</button>'
+        +   '</div>'
+        +   (isHoofd && p.niveau === "hotel" ? '<p class="niveau-warn">Het hoofdbeeld mag niet op hotelniveau staan.</p>' : '')
+        +   '<div class="seg" role="group" aria-label="Status positie '+(i+1)+'">'
+        +     '<button type="button" data-v="ok" aria-pressed="'+(p.status==="ok")+'">Klopt</button>'
+        +     '<button type="button" data-v="dev" aria-pressed="'+(p.status==="dev")+'">Afwijking</button>'
+        +     '<button type="button" data-v="na" aria-pressed="'+(p.status==="na")+'">N.v.t.</button>'
+        +   '</div>'
+        +   '<div class="c-note"><input id="note-pos-'+i+'" placeholder="Waarom wijkt deze positie bewust af?" aria-label="Toelichting positie '+(i+1)+'"></div>'
+        + '</div>'
+        + '</div>';
+    }).join("");
+
+    each(cardsHost.querySelectorAll(".card"), function(card){
+      var i = parseInt(card.getAttribute("data-i"),10);
+
+      each(card.querySelectorAll("[data-set]"), function(b){
+        b.addEventListener("click", function(){ kiesCat(i, b.getAttribute("data-set")); });
+      });
+      var gb = card.querySelector("[data-gebouw]");
+      if(gb) gb.addEventListener("click", function(){
+        state.gebouwNiet = !state.gebouwNiet; renderAlles(); save();
+      });
+
+      var sel = card.querySelector("select");
+      sel.addEventListener("change", function(){
+        kiesCat(i, sel.value || null, true);
+      });
+
+      var anders = card.querySelector(".anders input");
+      if(anders){
+        anders.value = state.pos[i].anders || "";
+        anders.addEventListener("input", function(){ state.pos[i].anders = anders.value; save(); renderOverzicht(); });
+      }
+
+      each(card.querySelectorAll(".niveau button"), function(b){
+        b.addEventListener("click", function(){
+          var n = b.getAttribute("data-n");
+          state.pos[i].niveau = (state.pos[i].niveau === n) ? null : n;
+          renderAlles(); save();
+        });
+      });
+
+      each(card.querySelectorAll(".seg button"), function(b){
+        b.addEventListener("click", function(){
+          var v = b.getAttribute("data-v");
+          state.pos[i].status = (state.pos[i].status === v) ? null : v;
+          renderAlles(); save();
+        });
+      });
+
+      var note = card.querySelector(".c-note input");
+      note.value = state.pos[i].note || "";
+      note.addEventListener("input", function(){ state.pos[i].note = note.value; save(); renderOverzicht(); });
+
+      card.querySelector('[data-act="up"]').addEventListener("click", function(){ if(i>0) verplaats(i,i-1); });
+      card.querySelector('[data-act="down"]').addEventListener("click", function(){ if(i<4) verplaats(i,i+1); });
+
+      var handle = card.querySelector(".handle");
+      handle.addEventListener("mousedown", function(){ card.setAttribute("draggable","true"); });
+      card.addEventListener("dragstart", function(e){
+        dragFrom = i; card.classList.add("dragging");
+        try{ e.dataTransfer.setData("text/plain", String(i)); e.dataTransfer.effectAllowed = "move"; }catch(err){}
+      });
+      card.addEventListener("dragend", function(){
+        dragFrom = null; card.classList.remove("dragging"); card.removeAttribute("draggable");
+        each(cardsHost.children, function(c){ c.classList.remove("dropping"); });
+      });
+      card.addEventListener("dragover", function(e){
+        if(dragFrom === null || dragFrom === i) return;
+        e.preventDefault(); card.classList.add("dropping");
+      });
+      card.addEventListener("dragleave", function(){ card.classList.remove("dropping"); });
+      card.addEventListener("drop", function(e){
+        if(dragFrom === null || dragFrom === i) return;
+        e.preventDefault(); verplaats(dragFrom, i);
+      });
+    });
+  }
+
+  function kiesCat(i, cat, viaSelect){
+    var vorig = state.pos[i].cat;
+    state.pos[i].cat = cat;
+    if(cat !== "anders") state.pos[i].anders = "";
+    if(cat && state.pos[i].status === null){
+      var v = volgtAdvies(i);
+      state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
+    }
+    if(!cat && vorig) state.pos[i].status = null;
+    renderAlles(); save();
+    var el = document.getElementById(viaSelect ? ("cat-"+i) : ("cat-"+i));
+    if(el) el.focus();
+  }
+
+  function verplaats(van, naar){
+    var item = state.pos.splice(van,1)[0];
+    state.pos.splice(naar,0,item);
+    if(state.hoofd === van) state.hoofd = naar;
+    else if(van < state.hoofd && naar >= state.hoofd) state.hoofd--;
+    else if(van > state.hoofd && naar <= state.hoofd) state.hoofd++;
+    dragFrom = null;
+    renderAlles(); save();
+  }
+
+  function renderStrip(){
+    var nxt = volgendeLeeg();
+    stripHost.innerHTML = state.pos.map(function(p,i){
+      var a = advies(i);
+      return '<button type="button" class="tile'+(i===nxt?" next":"")+'" data-i="'+i+'"'
+        + (p.status?' data-status="'+p.status+'"':'')+'>'
+        + '<span class="t-n">Foto '+(i+1)+(i===state.hoofd?" · hoofdbeeld":"")+'</span>'
+        + (p.cat ? '<div class="t-c">'+esc(lbl(p.cat))+'</div>'
+                 : '<div class="t-e">Advies: '+esc(a.titel)+'</div>')
+        + '</button>';
+    }).join("");
+    each(stripHost.children, function(b){
+      b.addEventListener("click", function(){
+        var i = parseInt(b.getAttribute("data-i"),10);
+        var card = cardsHost.querySelector('.card[data-i="'+i+'"]');
+        if(card){ card.scrollIntoView({block:"center", behavior:"smooth"}); }
+        var sel = document.getElementById("cat-"+i); if(sel) sel.focus();
+      });
+    });
+  }
+
+  /* ---------- checklistrijen ---------- */
+  function renderRows(){
+    Object.keys(GROUPS).forEach(function(key){
+      var host = document.querySelector('[data-rows="'+key+'"]');
+      var g = GROUPS[key];
+      var mid = g.kind === "tech" ? "bad" : "dev";
+      var midLbl = g.kind === "tech" ? "Aanpassen voor live" : "Bewuste afwijking";
+      var midIco = g.kind === "tech" ? "!" : "~";
+      var ph = g.kind === "tech" ? "Wat moet er aangepast worden?" : "Waarom wijkt dit bewust af?";
+
+      host.innerHTML = g.items.map(function(it){
+        var v = state.checks[it.id];
+        return '<div class="row" data-id="'+it.id+'"'+(v?' data-status="'+v+'"':'')+'>'
+          + '<span class="txt"><span class="lbl">'+esc(it.label)+'</span>'
+          +   (it.sub ? '<p class="sub">'+esc(it.sub)+'</p>' : '')
+          +   '<div class="note"><input id="note-'+it.id+'" placeholder="'+ph+'" aria-label="Toelichting: '+esc(it.label)+'"></div>'
+          + '</span>'
+          + '<span class="mini" role="group" aria-label="'+esc(it.label)+'">'
+          +   '<button type="button" data-v="ok" title="Volgens richtlijn" aria-label="Volgens richtlijn: '+esc(it.label)+'" aria-pressed="'+(v==="ok")+'">✓</button>'
+          +   '<button type="button" data-v="'+mid+'" title="'+midLbl+'" aria-label="'+midLbl+': '+esc(it.label)+'" aria-pressed="'+(v===mid)+'">'+midIco+'</button>'
+          +   '<button type="button" data-v="na" title="Niet van toepassing" aria-label="Niet van toepassing: '+esc(it.label)+'" aria-pressed="'+(v==="na")+'">–</button>'
+          + '</span></div>';
+      }).join("");
+
+      each(host.querySelectorAll(".row"), function(row){
+        var id = row.getAttribute("data-id");
+        each(row.querySelectorAll(".mini button"), function(b){
+          b.addEventListener("click", function(){
+            var v = b.getAttribute("data-v");
+            state.checks[id] = (state.checks[id] === v) ? null : v;
+            if(state.checks[id]) row.setAttribute("data-status", state.checks[id]);
+            else row.removeAttribute("data-status");
+            each(row.querySelectorAll(".mini button"), function(x){
+              x.setAttribute("aria-pressed", String(x.getAttribute("data-v") === state.checks[id]));
+            });
+            renderSamenvatting(); save();
+          });
+        });
+        var note = row.querySelector(".note input");
+        note.value = state.notes[id] || "";
+        note.addEventListener("input", function(){ state.notes[id] = note.value; save(); renderOverzicht(); });
+      });
+    });
+  }
+
+  /* ---------- hoofdbeeld ---------- */
+  var pills = $("#hoofdpills");
+  function renderPills(){
+    pills.innerHTML = state.pos.map(function(p,i){
+      return '<button type="button" class="pill" data-i="'+i+'" aria-pressed="'+(state.hoofd===i)+'">'
+        + (i+1)+' · '+esc(p.cat ? lbl(p.cat) : "nog geen type")+'</button>';
+    }).join("");
+    each(pills.children, function(b){
+      b.addEventListener("click", function(){
+        state.hoofd = parseInt(b.getAttribute("data-i"),10);
+        renderAlles(); save();
+      });
+    });
+  }
+
+  /* ---------- register ---------- */
+  function dubbeleIndex(){
+    var seen = {}, out = [];
+    state.arrangementen.forEach(function(a,i){
+      var k = (a.foto||"").trim().toLowerCase(); if(!k) return;
+      if(seen[k] !== undefined){ if(out.indexOf(seen[k]) === -1) out.push(seen[k]); out.push(i); }
+      else seen[k] = i;
+    });
+    return out;
+  }
+  function dubbeleNamen(){
+    var seen = {}, out = [];
+    state.arrangementen.forEach(function(a){
+      var k = (a.foto||"").trim().toLowerCase(); if(!k) return;
+      if(seen[k]){ if(out.indexOf(a.foto.trim()) === -1) out.push(a.foto.trim()); } else seen[k] = true;
+    });
+    return out;
+  }
+  var reg = $("#reg");
+  function renderReg(){
+    reg.innerHTML = state.arrangementen.map(function(a,i){
+      return '<div class="reg-row" data-i="'+i+'">'
+        + '<input data-f="naam" id="reg-naam-'+i+'" value="'+esc(a.naam)+'" placeholder="Arrangement '+(i+1)+'" aria-label="Naam arrangement '+(i+1)+'">'
+        + '<input data-f="foto" id="reg-foto-'+i+'" value="'+esc(a.foto)+'" placeholder="droombeeld-tuin.jpg" aria-label="Bestandsnaam hoofdfoto '+(i+1)+'">'
+        + '<button type="button" class="reg-del" aria-label="Regel '+(i+1)+' verwijderen">×</button></div>';
+    }).join("");
+    each(reg.querySelectorAll(".reg-row"), function(row){
+      var i = parseInt(row.getAttribute("data-i"),10);
+      each(row.querySelectorAll("input"), function(inp){
+        inp.addEventListener("input", function(){
+          state.arrangementen[i][inp.getAttribute("data-f")] = inp.value;
+          markReg(); renderSamenvatting(); save();
+        });
+      });
+      row.querySelector(".reg-del").addEventListener("click", function(){
+        if(state.arrangementen.length === 1) state.arrangementen = [{naam:"",foto:""}];
+        else state.arrangementen.splice(i,1);
+        renderReg(); renderSamenvatting(); save();
+      });
+    });
+    markReg();
+  }
+  function markReg(){
+    var dup = dubbeleIndex();
+    each(reg.querySelectorAll(".reg-row"), function(row){
+      row.classList.toggle("dupe", dup.indexOf(parseInt(row.getAttribute("data-i"),10)) !== -1);
+    });
+    var n = state.arrangementen.length;
+    var vol = state.arrangementen.filter(function(a){ return (a.foto||"").trim(); }).length;
+    var msg = $("#reg-msg");
+    if(dup.length){
+      msg.className = "bad";
+      msg.textContent = "Dezelfde hoofdfoto staat bij meerdere arrangementen. Elk arrangement heeft een eigen droombeeld nodig.";
+    } else if(vol < n){
+      msg.className = "";
+      msg.textContent = n + (n===1?" arrangement":" arrangementen")+" van dit hotel, dus "+n+(n===1?" hoofdfoto":" verschillende hoofdfoto's")+" nodig. Nog "+(n-vol)+" in te vullen.";
+    } else {
+      msg.className = "good";
+      msg.textContent = n + (n===1?" arrangement met een eigen hoofdfoto.":" arrangementen, allemaal met een eigen hoofdfoto.");
+    }
+  }
+  $("#reg-add").addEventListener("click", function(){
+    state.arrangementen.push({naam:"",foto:""});
+    renderReg(); renderSamenvatting(); save();
+  });
+
+  /* ---------- teller ---------- */
+  var cnt = $("#cnt");
+  function renderCount(){
+    var n = state.count;
+    if(document.activeElement !== cnt) cnt.value = n;
+    $("#count-big").innerHTML = n + ' <span>/ 14</span>';
+    var fill = $("#cnt-fill");
+    fill.style.width = Math.max(0, Math.min(100,(n/14)*100)) + "%";
+    fill.className = "fill" + ((n<8||n>14) ? " warn" : "");
+    $("#cnt-msg").textContent = n < 8
+      ? "Richtlijn is minimaal 8 foto's. Er " + (8-n===1 ? "ontbreekt nog 1 foto" : "ontbreken er nog "+(8-n)) + "."
+      : (n > 14 ? "Richtlijn is maximaal 14 foto's. Haal er "+(n-14)+" weg en houd de sterkste over."
+                : "Binnen de richtlijn van 8 tot 14 foto's.");
+  }
+  cnt.addEventListener("input", function(){
+    var v = parseInt(cnt.value,10);
+    state.count = isNaN(v) ? 0 : Math.max(0, Math.min(30,v));
+    renderCount(); renderSamenvatting(); save();
+  });
+  $("#cnt-min").addEventListener("click", function(){ state.count = Math.max(0,state.count-1); renderCount(); renderSamenvatting(); save(); });
+  $("#cnt-plus").addEventListener("click", function(){ state.count = Math.min(30,state.count+1); renderCount(); renderSamenvatting(); save(); });
+
+  /* ---------- optellen ---------- */
+  function telling(){
+    var ok=0, dev=0, err=0, open=0, total=0, okList=[], devList=[], errList=[];
+
+    state.pos.forEach(function(p,i){
+      total++;
+      var naam = "Foto " + (i+1) + (p.cat ? " · " + lbl(p.cat) : "");
+      if(p.status === "ok"){ ok++; okList.push(naam); }
+      else if(p.status === "dev"){
+        dev++;
+        var v = volgtAdvies(i);
+        var uitleg = p.note ? p.note : (v === "afwijkend" ? "advies was " + advies(i).titel : "");
+        devList.push(naam + (uitleg ? " — " + uitleg : ""));
+      }
+      else if(p.status !== "na") open++;
+    });
+
+    Object.keys(GROUPS).forEach(function(key){
+      GROUPS[key].items.forEach(function(it){
+        total++;
+        var v = state.checks[it.id], note = state.notes[it.id];
+        if(v === "ok"){ ok++; okList.push(it.label); }
+        else if(v === "dev"){ dev++; devList.push(it.label + (note ? " — " + note : "")); }
+        else if(v === "bad"){ err++; errList.push(it.label + (note ? " — " + note : "")); }
+        else if(v !== "na") open++;
+      });
+    });
+
+    if(state.pos[state.hoofd].niveau === "hotel"){
+      err++; errList.push("Foto " + (state.hoofd+1) + " is het hoofdbeeld maar staat op hotelniveau");
+    }
+    dubbeleNamen().forEach(function(naam){
+      err++; errList.push("Hoofdfoto " + naam + " staat bij meerdere arrangementen van dit hotel");
+    });
+
+    var typen = 0, hotels = 0, lvH = 0, lvA = 0, lvOpen = 0;
+    state.pos.forEach(function(p,i){
+      if(p.cat) typen++;
+      if(i < 4 && p.cat && heeftTag(p.cat,"hotel")) hotels++;
+      if(p.niveau === "hotel") lvH++; else if(p.niveau === "arrangement") lvA++; else lvOpen++;
+    });
+    if(typen === 5 && hotels < 3) devList.push("Slechts " + hotels + " van de eerste 4 foto's is hotelgerelateerd");
+    if(state.count < 8) devList.push("Reeks telt " + state.count + " foto's, richtlijn is minimaal 8");
+    if(state.count > 14) devList.push("Reeks telt " + state.count + " foto's, richtlijn is maximaal 14");
+
+    return {ok:ok,dev:dev,err:err,open:open,total:total,typen:typen,hotels:hotels,
+            lvH:lvH,lvA:lvA,lvOpen:lvOpen,okList:okList,devList:devList,errList:errList};
+  }
+
+  function renderSamenvatting(){
+    var t = telling(), klaar = t.total - t.open;
+    $("#prog").style.width = (t.total ? (klaar/t.total)*100 : 0) + "%";
+    $("#prog-lbl").textContent = klaar + " van " + t.total + " punten gecontroleerd";
+    $("#s-ok").textContent = t.ok;
+    $("#s-dev").textContent = t.dev;
+    $("#s-err").textContent = t.err;
+
+    var v;
+    if(t.err > 0) v = "<b>Eerst aanpassen.</b> " + t.err + (t.err===1?" punt voldoet":" punten voldoen") + " niet aan een harde eis.";
+    else if(t.typen < 5) v = "<b>Nog " + (5-t.typen) + (5-t.typen===1?" type":" typen") + " kiezen.</b> Daarna rekent de tool de rest van het advies uit.";
+    else if(t.open > 0) v = "<b>Nog " + t.open + (t.open===1?" punt":" punten") + " te bekijken.</b>";
+    else if(t.dev > 0) v = "<b>Klaar om live te zetten.</b> Met " + t.dev + (t.dev===1?" bewuste afwijking":" bewuste afwijkingen") + ", en dat mag.";
+    else v = "<b>Klaar om live te zetten.</b> Alles volgt de richtlijn.";
+    $("#verdict").innerHTML = v;
+
+    var cT = $("#chip-typen");
+    cT.innerHTML = "<b>" + t.typen + " / 5</b> typen gekozen";
+    cT.className = "chip" + (t.typen === 5 ? " ok" : "");
+
+    var cH = $("#chip-hotel");
+    cH.innerHTML = "<b>" + t.hotels + " / 4</b> hotelgerelateerd";
+    cH.className = "chip " + (t.hotels >= 3 ? "ok" : (t.typen === 5 ? "dev" : ""));
+
+    var cN = $("#chip-niveau");
+    cN.innerHTML = "<b>" + t.lvH + "</b> hotelniveau · <b>" + t.lvA + "</b> arrangementniveau"
+      + (t.lvOpen ? " · " + t.lvOpen + " open" : "");
+    cN.className = "chip" + (t.lvOpen === 0 ? " ok" : "");
+
+    var hint = $("#bar-hint");
+    if(t.typen === 5 && t.hotels < 3){
+      hint.className = "barhint dev";
+      hint.textContent = "Deze opbouw wijkt af van de richtlijn. Controleer of dit bewust is.";
+    } else if(t.typen < 5){
+      hint.className = "barhint";
+      var nx = volgendeLeeg();
+      hint.textContent = "Volgende stap: foto " + (nx+1) + " — advies is " + advies(nx).titel.toLowerCase() + ".";
+    } else {
+      hint.className = "barhint";
+      hint.textContent = "De opbouw van de eerste vijf volgt de richtlijn.";
+    }
+
+    renderOverzicht(t);
+  }
+
+  function lijst(sel, items, leeg){
+    $(sel).innerHTML = items.length
+      ? '<ul class="ov-list">' + items.map(function(x){
+          var d = String(x).split(" — ");
+          return "<li><em>" + esc(d[0]) + "</em>" + (d[1] ? " — " + esc(d.slice(1).join(" — ")) : "") + "</li>";
+        }).join("") + '</ul>'
+      : '<p class="ov-empty">' + leeg + '</p>';
+  }
+  function renderOverzicht(t){
+    t = t || telling();
+    $("#ov-ok-n").textContent = t.okList.length;
+    $("#ov-dev-n").textContent = t.devList.length;
+    $("#ov-err-n").textContent = t.errList.length;
+    lijst("#ov-ok", t.okList, "Nog niets afgevinkt.");
+    lijst("#ov-dev", t.devList, "Geen afwijkingen.");
+    lijst("#ov-err", t.errList, "Niets dat aangepast moet worden.");
+  }
+
+  function renderAlles(){
+    renderCards(); renderStrip(); renderPills(); renderSamenvatting();
+  }
+
+  /* ---------- meta ---------- */
+  each(document.querySelectorAll("[data-meta]"), function(el){
+    el.addEventListener("input", function(){ state.meta[el.getAttribute("data-meta")] = el.value; save(); });
+  });
+  function vulMeta(){
+    each(document.querySelectorAll("[data-meta]"), function(el){
+      el.value = state.meta[el.getAttribute("data-meta")] || el.value;
+    });
+  }
+
+  /* ---------- knoppen ---------- */
+  function toast(msg){
+    var el = $("#toast"); el.textContent = msg; el.hidden = false;
+    clearTimeout(toast._t); toast._t = setTimeout(function(){ el.hidden = true; }, 2600);
+  }
+  $("#btn-copy").addEventListener("click", function(){
+    var t = telling(), L = [];
+    L.push("Fotocheck arrangement");
+    L.push((state.meta.hotel || "Hotel onbekend") + " — " + (state.meta.arrangement || "Arrangement onbekend"));
+    L.push("Medewerker: " + (state.meta.medewerker || "-") + " · Datum: " + (state.meta.datum || "-") + " · Seizoen: " + state.meta.seizoen);
+    L.push("Aantal foto's: " + state.count + " / 14");
+    L.push("");
+    L.push("Eerste 5");
+    state.pos.forEach(function(p,i){
+      var n = p.niveau === "hotel" ? "hotelniveau" : p.niveau === "arrangement" ? "arrangementniveau" : "niveau onbekend";
+      L.push("  " + (i+1) + ". " + (p.cat ? lbl(p.cat) + (p.anders ? " (" + p.anders + ")" : "") : "nog geen type")
+        + " · " + n + (i === state.hoofd ? " · hoofdbeeld" : ""));
+    });
+    L.push("");
+    L.push("Hoofdbeelden van dit hotel");
+    state.arrangementen.forEach(function(a,i){
+      L.push("  " + (a.naam || ("Arrangement "+(i+1))) + ": " + (a.foto || "nog niet ingevuld"));
+    });
+    L.push("");
+    L.push("Volgens richtlijn (" + t.okList.length + ")");
+    t.okList.forEach(function(x){ L.push("  + " + x); });
+    L.push("Bewuste afwijkingen (" + t.devList.length + ")");
+    t.devList.forEach(function(x){ L.push("  ~ " + x); });
+    L.push("Aanpassen voor live (" + t.errList.length + ")");
+    t.errList.forEach(function(x){ L.push("  ! " + x); });
+    var text = L.join("\n");
+    try{
+      navigator.clipboard.writeText(text).then(function(){ toast("Samenvatting gekopieerd"); }, function(){ terugvalKopie(text); });
+    }catch(e){ terugvalKopie(text); }
+  });
+  function terugvalKopie(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("Samenvatting gekopieerd"); }
+    catch(e){ toast("Kopiëren lukt niet in deze weergave"); }
+    document.body.removeChild(ta);
+  }
+  $("#btn-reset").addEventListener("click", function(){
+    state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
+    state.checks = {}; state.notes = {}; state.hoofd = 0; state.count = 10;
+    state.gebouwNiet = false; state.arrangementen = [{naam:"",foto:""}];
+    state.meta.hotel = ""; state.meta.arrangement = "";
+    try{ localStorage.removeItem(STORE); }catch(e){}
+    $("#m-hotel").value = ""; $("#m-arr").value = "";
+    renderRows(); renderReg(); renderCount(); renderAlles();
+    toast("Leeg, klaar voor het volgende arrangement");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  /* ---------- start ---------- */
+  load();
+  if(!state.meta.datum){
+    var d = new Date();
+    state.meta.datum = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  vulMeta();
+  renderRows();
+  renderReg();
+  renderCount();
+  renderAlles();
+})();
+</script>

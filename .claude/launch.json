@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fotocheck",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/private/tmp/claude-502/-Users-jessevialuxury-nl-Library-CloudStorage-OneDrive-Advalley-2--Documenten-Code-PL-014-01-FOTO-VOLGORDE/c98ca6d5-d8fc-4e02-8ca9-75650d7eb27d/scratchpad/serve.py"],
+      "port": 8014
+    }
+  ]
+}
