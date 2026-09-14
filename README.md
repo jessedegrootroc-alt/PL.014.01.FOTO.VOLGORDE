@@ -21,8 +21,10 @@ browser is genoeg.
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
   oplossen, lost hij op: comprimeren tot onder de limiet, WebP, HEIC of AVIF
   omzetten naar JPG, een beschrijvende bestandsnaam maken en een alt-tekst
-  genereren. Verkleinen gebeurt nooit onder de minimale breedte, en te kleine
-  foto's worden niet kunstmatig opgeblazen.
+  genereren. De breedte staat er als informatie bij, verkleinen gebeurt nooit
+  onder de minimale breedte en te kleine foto's worden niet opgeblazen. Het
+  onderwerp volgt de volgorde waarin je de foto's toevoegt, foto 1 t/m 5 horen
+  bij de posities uit stap 01.
 
 Het zijn richtlijnen, geen harde regels. Afwijken mag, met een toelichting.
 Alleen technische eisen en een dubbel hoofdbeeld blokkeren het afronden.

@@ -289,8 +289,10 @@ main{padding-block:var(--s5) var(--s6)}
   background:var(--ok-bg); color:var(--ok); font-weight:600}
 .ochip.bad{border-color:var(--err-line); background:var(--err-bg); color:var(--err)}
 .ochip.na{border-color:var(--na-line); background:var(--na-bg); color:var(--na)}
-.opt-velden{display:grid; grid-template-columns:minmax(0,180px) minmax(0,1fr); gap:6px; margin-top:8px}
-.opt-velden select,.opt-velden input{width:100%; border:1px solid var(--line); background:var(--surface);
+.opt-velden{margin-top:8px}
+.opt-velden label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--ink-3); font-weight:700; margin-bottom:3px}
+.opt-velden input{width:100%; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:6px 9px; font-size:13px}
 .opt-acties{display:flex; flex-direction:column; gap:5px; align-items:stretch}
 .opt-acties button,.opt-acties a{border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
@@ -464,7 +466,7 @@ main{padding-block:var(--s5) var(--s6)}
 
       <section class="block" aria-labelledby="h6a">
         <div class="block-h"><span class="step">04</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
-        <p class="lead">Voeg de foto's toe, de tool controleert ze en lost wat kan zelf op: te groot, verkeerd formaat, bestandsnaam en alt-tekst.</p>
+        <p class="lead">Voeg de foto's toe in de volgorde van de reeks. De tool controleert ze en lost zelf op wat kan: te zwaar, verkeerd formaat, bestandsnaam en een eerste beschrijving. Die beschrijving is de alt-tekst, pas hem aan zodat hij klopt met wat er te zien is.</p>
         <div class="block-b">
           <table class="spec">
             <thead><tr><th>Type</th><th>Minimale breedte</th><th>Maximale grootte</th></tr></thead>
@@ -1455,9 +1457,7 @@ main{padding-block:var(--s5) var(--s6)}
   function controle(it){
     var e = eisen(it), uit = [];
     if(it.fout){ uit.push({ok:false, tekst:it.fout, herstel:false}); return uit; }
-    uit.push(it.breedte >= e.w
-      ? {ok:true, tekst:it.breedte + " px"}
-      : {ok:false, tekst:it.breedte + " px, minimaal " + e.w + " px", herstel:false});
+    if(it.breedte) uit.push({ok:true, info:true, tekst:it.breedte + " px"});
     uit.push(kb(it.grootte) <= e.kb
       ? {ok:true, tekst:kb(it.grootte) + " KB"}
       : {ok:false, tekst:kb(it.grootte) + " KB, maximaal " + e.kb + " KB", herstel:true});
@@ -1469,8 +1469,8 @@ main{padding-block:var(--s5) var(--s6)}
       ? {ok:true, tekst:"Beschrijvende bestandsnaam"}
       : {ok:false, tekst:"Geen beschrijvende bestandsnaam", herstel:true});
     uit.push((it.alt || "").trim().length > 5
-      ? {ok:true, tekst:"Alt-tekst"}
-      : {ok:false, tekst:"Geen alt-tekst", herstel:true});
+      ? {ok:true, tekst:"Beschrijving"}
+      : {ok:false, tekst:"Geen beschrijving", herstel:true});
     return uit;
   }
   function problemen(it){ return controle(it).filter(function(c){ return !c.ok; }); }
@@ -1573,6 +1573,7 @@ main{padding-block:var(--s5) var(--s6)}
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
       OPT.push(it);
+      herindexeer();
       try{
         var img = await laadAfbeelding(url);
         it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
@@ -1585,28 +1586,20 @@ main{padding-block:var(--s5) var(--s6)}
     renderSamenvatting();
   }
 
-  var optLijst = $("#opt-lijst");
-  function opties(it){
-    var uit = '<optgroup label="Eerste 5">';
-    for(var i=0;i<5;i++){
-      var c = state.pos[i].cat;
-      var sel = (it.onderwerp.type === "pos" && it.onderwerp.v === i) ? " selected" : "";
-      uit += '<option value="pos:'+i+'"'+sel+'>Foto '+(i+1)+(i===0?" · hoofdbeeld":"")
-           + (c ? " · " + esc(lbl(c)) : "") + '</option>';
-    }
-    uit += '</optgroup><optgroup label="Overige foto">';
-    Object.keys(CATS).forEach(function(k){
-      if(isDroom(k)) return;
-      var sel = (it.onderwerp.type === "cat" && it.onderwerp.v === k) ? " selected" : "";
-      uit += '<option value="cat:'+k+'"'+sel+'>'+esc(CATS[k].label)+'</option>';
+  function herindexeer(){
+    // foto 1 t/m 5 volgen de posities uit stap 01, de rest is een aanvullende foto
+    OPT.forEach(function(it, n){
+      it.onderwerp = (n < 5) ? {type:"pos", v:n} : {type:"cat", v:"anders"};
+      if(it.autoAlt) it.alt = altVoorstel(it);
+      if(it.doelNaam){ it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,""); it.naam = it.doelNaam + "." + it.ext; }
     });
-    return uit + '</optgroup>';
   }
 
+  var optLijst = $("#opt-lijst");
   function renderOpt(){
     var bar = $("#opt-bar");
     if(!OPT.length){
-      optLijst.innerHTML = '<p class="opt-leeg">Nog geen foto’s toegevoegd. De controle op breedte, grootte, formaat, bestandsnaam en alt-tekst doet de tool zelf.</p>';
+      optLijst.innerHTML = '<p class="opt-leeg">Nog geen foto’s toegevoegd. De controle op grootte, formaat, bestandsnaam en beschrijving doet de tool zelf.</p>';
       bar.hidden = true; $("#opt-hint").textContent = "";
       return;
     }
@@ -1624,13 +1617,15 @@ main{padding-block:var(--s5) var(--s6)}
         + '<div class="opt-body">'
         +   '<p class="opt-naam">'+esc(it.naam)+'</p>'
         +   '<p class="opt-specs">'+(it.breedte ? it.breedte+" px · " : "")+kb(it.grootte)+" KB · "+esc(it.ext.toUpperCase())
-        +     (isHoofdItem(it) ? " · hoofdbeeld, 1920 px en 400 KB" : " · 1600 px en 250 KB")+'</p>'
+        +     (isHoofdItem(it) ? " · foto 1, hoofdbeeld, maximaal 400 KB" : " · maximaal 250 KB")+'</p>'
         +   '<div class="opt-chips">'
-        +     cs.map(function(c){ return '<span class="ochip'+(c.ok?"":" bad")+'">'+(c.ok?"✓ ":"! ")+esc(c.tekst)+'</span>'; }).join("")
+        +     cs.map(function(c){
+                return '<span class="ochip'+(c.info?" na":(c.ok?"":" bad"))+'">'
+                  + (c.info ? "" : (c.ok ? "✓ " : "! ")) + esc(c.tekst) + '</span>'; }).join("")
         +   '</div>'
         +   '<div class="opt-velden">'
-        +     '<select data-veld="onderwerp" aria-label="Onderwerp van deze foto">'+opties(it)+'</select>'
-        +     '<input data-veld="alt" value="'+esc(it.alt)+'" placeholder="Alt-tekst, bijvoorbeeld: '+esc(altVoorstel(it))+'" aria-label="Alt-tekst">'
+        +     '<label for="alt-'+it.id+'">Beschrijf de afbeelding</label>'
+        +     '<input id="alt-'+it.id+'" data-veld="alt" value="'+esc(it.alt)+'" placeholder="'+esc(altVoorstel(it))+'">'
         +   '</div>'
         + '</div>'
         + '<div class="opt-acties">'
@@ -1643,13 +1638,6 @@ main{padding-block:var(--s5) var(--s6)}
     each(optLijst.querySelectorAll(".opt-item"), function(rij){
       var it = OPT.filter(function(x){ return x.id === parseInt(rij.getAttribute("data-id"),10); })[0];
       if(!it) return;
-      rij.querySelector('[data-veld="onderwerp"]').addEventListener("change", function(){
-        var d = this.value.split(":");
-        it.onderwerp = {type:d[0], v:(d[0] === "pos" ? parseInt(d[1],10) : d[1])};
-        if(it.autoAlt || !(it.alt||"").trim()){ it.alt = altVoorstel(it); it.autoAlt = true; }
-        if(it.doelNaam){ it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,""); it.naam = it.doelNaam + "." + it.ext; }
-        renderOpt(); renderSamenvatting();
-      });
       var altVeld = rij.querySelector('[data-veld="alt"]');
       altVeld.addEventListener("input", function(){ it.alt = altVeld.value; it.autoAlt = false; });
       altVeld.addEventListener("change", function(){ renderOpt(); renderSamenvatting(); });
@@ -1664,7 +1652,7 @@ main{padding-block:var(--s5) var(--s6)}
         if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
         URL.revokeObjectURL(it.bronUrl);
         OPT = OPT.filter(function(x){ return x !== it; });
-        renderOpt(); renderSamenvatting();
+        herindexeer(); renderOpt(); renderSamenvatting();
       });
     });
 
