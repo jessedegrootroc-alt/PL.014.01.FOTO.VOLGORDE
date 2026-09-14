@@ -264,6 +264,52 @@ main{padding-block:var(--s5) var(--s6)}
   background:var(--ok-bg); color:var(--ok)}
 .ft.no{border-color:var(--err-line); background:var(--err-bg); color:var(--err); text-decoration:line-through}
 
+/* ---------- techniek en optimalisatie ---------- */
+.opt-hotel{margin:var(--s3) 0 var(--s2)}
+.opt-hotel label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--ink-3); font-weight:700; margin-bottom:4px}
+.opt-hotel input{width:100%; max-width:340px; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:8px 10px; font-size:14px}
+.drop{border:1px dashed var(--line); border-radius:var(--r); background:var(--surface-2); padding:18px;
+  text-align:center; cursor:pointer; margin-bottom:var(--s3)}
+.drop:hover,.drop.over{border-color:var(--accent); background:var(--dev-bg)}
+.drop b{font-weight:600}
+.drop p{font-size:13.5px; color:var(--ink-2)}
+.drop input{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none}
+.opt-bar{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3); align-items:center; margin-bottom:var(--s3)}
+.opt-bar .stand{font-size:13.5px; color:var(--ink-2); flex:1; min-width:180px}
+.opt-bar .btn{width:auto; padding:8px 16px; font-size:13.5px}
+.opt-item{display:grid; grid-template-columns:76px minmax(0,1fr) auto; gap:var(--s3);
+  border:1px solid var(--line); border-radius:var(--r); padding:12px; margin-bottom:var(--s2); align-items:start}
+.opt-item.bad{border-color:var(--err-line)}
+.opt-item.good{border-color:var(--ok-line)}
+.opt-thumb{width:76px; height:76px; object-fit:cover; border-radius:var(--r); background:var(--na-bg); display:block}
+.opt-naam{font-size:13.5px; font-weight:600; word-break:break-all}
+.opt-specs{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-top:2px}
+.opt-chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px}
+.ochip{font-size:11.5px; border-radius:var(--r); padding:2px 7px; border:1px solid var(--ok-line);
+  background:var(--ok-bg); color:var(--ok); font-weight:600}
+.ochip.bad{border-color:var(--err-line); background:var(--err-bg); color:var(--err)}
+.ochip.na{border-color:var(--na-line); background:var(--na-bg); color:var(--na)}
+.opt-velden{display:grid; grid-template-columns:minmax(0,180px) minmax(0,1fr); gap:6px; margin-top:8px}
+.opt-velden select,.opt-velden input{width:100%; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:6px 9px; font-size:13px}
+.opt-acties{display:flex; flex-direction:column; gap:5px; align-items:stretch}
+.opt-acties button,.opt-acties a{border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer; text-align:center;
+  text-decoration:none; color:var(--ink); white-space:nowrap}
+.opt-acties .doe{background:var(--accent); border-color:var(--accent); color:#fff}
+.opt-acties .doe:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
+.opt-acties button:hover{border-color:var(--ink)}
+.opt-leeg{font-size:13.5px; color:var(--ink-3); margin-bottom:var(--s2)}
+.opt-hint{font-size:12.5px; color:var(--ink-3); margin-top:var(--s2)}
+@media (max-width:680px){
+  .opt-item{grid-template-columns:56px minmax(0,1fr)}
+  .opt-thumb{width:56px; height:56px}
+  .opt-acties{grid-column:1 / -1; flex-direction:row; flex-wrap:wrap}
+  .opt-velden{grid-template-columns:minmax(0,1fr)}
+}
+
 /* ---------- samenvatting ---------- */
 .side{position:sticky; top:16px; display:flex; flex-direction:column; gap:var(--s3)}
 .sum{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); padding:18px}
@@ -429,6 +475,7 @@ main{padding-block:var(--s5) var(--s6)}
 
       <section class="block" aria-labelledby="h6a">
         <div class="block-h"><span class="step">05</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
+        <p class="lead">Voeg de foto's toe, de tool controleert ze en lost wat kan zelf op: te groot, verkeerd formaat, bestandsnaam en alt-tekst.</p>
         <div class="block-b">
           <table class="spec">
             <thead><tr><th>Type</th><th>Minimale breedte</th><th>Maximale grootte</th></tr></thead>
@@ -441,6 +488,24 @@ main{padding-block:var(--s5) var(--s6)}
             <span class="ft">JPG</span><span class="ft">JPEG</span><span class="ft">PNG</span>
             <span class="ft no">WebP</span><span class="ft no">HEIC</span><span class="ft no">AVIF</span>
           </div>
+
+          <div class="opt-hotel">
+            <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
+            <input id="hotelnaam" placeholder="Hotel Winselerhof">
+          </div>
+
+          <div class="drop" id="drop" role="button" tabindex="0" aria-label="Foto's toevoegen">
+            <p><b>Sleep de foto's hierheen</b> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</p>
+            <input type="file" id="files" multiple accept="image/*,.heic,.avif">
+          </div>
+
+          <div class="opt-bar" id="opt-bar" hidden>
+            <span class="stand" id="opt-stand"></span>
+            <button class="btn btn-primary" id="opt-alles" type="button">Alles optimaliseren</button>
+          </div>
+          <div id="opt-lijst"></div>
+          <p class="opt-hint" id="opt-hint"></p>
+
           <div class="rows" data-rows="techniek"></div>
         </div>
       </section>
@@ -572,12 +637,7 @@ main{padding-block:var(--s5) var(--s6)}
       {id:"sz2", label:"De opbouw van de eerste 5 is behouden"}
     ]},
     techniek:{kind:"tech", items:[
-      {id:"tc1", label:"Hoofdbeeld is minimaal 1920 px breed en maximaal 400 KB"},
-      {id:"tc2", label:"Overige foto's zijn minimaal 1600 px breed en maximaal 250 KB"},
-      {id:"tc3", label:"Alle bestanden zijn JPG, JPEG of PNG", sub:"WebP, HEIC en AVIF worden niet ondersteund."},
-      {id:"tc4", label:"Beschrijvende bestandsnaam"},
-      {id:"tc5", label:"Alt-tekst ingevuld"},
-      {id:"tc6", label:"Commercieel gebruik toegestaan"}
+      {id:"tc6", label:"Commercieel gebruik van alle foto's is toegestaan", sub:"Een foto uit een persmap mag niet vanzelf in advertenties."}
     ]}
   };
 
@@ -1197,6 +1257,11 @@ main{padding-block:var(--s5) var(--s6)}
       if(p.niveau === "hotel") lvH++; else if(p.niveau === "arrangement") lvA++; else lvOpen++;
     });
     if(typen === 5 && hotels < 3) devList.push("Slechts " + hotels + " van de eerste 4 foto's is hotelgerelateerd");
+    OPT.forEach(function(it, n){
+      problemen(it).forEach(function(pb){
+        err++; errList.push("Foto " + (n+1) + " (" + it.naam + ") — " + pb.tekst);
+      });
+    });
     if(state.pos[0].cat && !isDroom(state.pos[0].cat) && state.pos[0].cat !== "anders"){
       devList.push("Foto 1 is het hoofdbeeld, dat is bij voorkeur een droombeeld");
     }
@@ -1278,6 +1343,311 @@ main{padding-block:var(--s5) var(--s6)}
   function renderAlles(){
     renderCards(); renderStrip(); renderUsp(); renderSamenvatting();
   }
+
+  /* ---------- foto's optimaliseren ---------- */
+  var ONDERWERP = {
+    "droom-hotel":{slug:"hotel",            alt:"{h} van buiten"},
+    "droom-kamer":{slug:"kamer",            alt:"Kamer van {h}"},
+    "droom-wellness":{slug:"wellness",      alt:"Wellness van {h}"},
+    "droom-zwembad":{slug:"zwembad",        alt:"Zwembad van {h}"},
+    "droom-omgeving":{slug:"omgeving",      alt:"Omgeving van {h}"},
+    "droom-natuur":{slug:"natuur",          alt:"Natuur rond {h}"},
+    "droom-zee":{slug:"zee-strand",         alt:"Zee en strand bij {h}"},
+    "droom-stad":{slug:"stad",              alt:"De stad bij {h}"},
+    "droom-wandelen":{slug:"wandelen",      alt:"Wandelen in de omgeving van {h}"},
+    "droom-fietsen":{slug:"fietsen",        alt:"Fietsen in de omgeving van {h}"},
+    "gebouw":{slug:"gebouw",                alt:"Vooraanzicht van {h}"},
+    "kamer":{slug:"kamer",                  alt:"Kamer van {h}"},
+    "suite":{slug:"suite",                  alt:"Suite van {h}"},
+    "jacuzzi":{slug:"kamer-jacuzzi",        alt:"Kamer met jacuzzi van {h}"},
+    "interieur":{slug:"interieur",          alt:"Interieur van {h}"},
+    "tuin":{slug:"tuin-terras",             alt:"Tuin en terras van {h}"},
+    "diner":{slug:"diner-restaurant",       alt:"Diner in het restaurant van {h}"},
+    "ontbijt":{slug:"ontbijt",              alt:"Ontbijt bij {h}"},
+    "wellness":{slug:"wellness",            alt:"Wellness van {h}"},
+    "zwembad":{slug:"zwembad",              alt:"Zwembad van {h}"},
+    "fietsen":{slug:"fietsroute",           alt:"Fietsroute in de omgeving van {h}"},
+    "activiteit":{slug:"activiteit",        alt:"Activiteit tijdens het verblijf bij {h}"},
+    "omgeving":{slug:"omgeving",            alt:"Omgeving van {h}"},
+    "natuur":{slug:"natuur",                alt:"Natuur rond {h}"},
+    "zee":{slug:"zee-strand",               alt:"Zee en strand bij {h}"},
+    "stad":{slug:"stad",                    alt:"De stad bij {h}"},
+    "bezienswaardigheid":{slug:"bezienswaardigheid", alt:"Bezienswaardigheid in de omgeving van {h}"},
+    "anders":{slug:"foto",                  alt:"Foto van {h}"}
+  };
+  var OPT = [], optId = 0, hotelNaam = "";
+  var SLECHTE_NAAM = /^(img|dsc|dscn|foto|image|photo|pxl|screenshot|schermafbeelding|untitled|final)[\s_\-]*\d*$/i;
+
+  function slug(t){
+    return (t||"").toLowerCase()
+      .replace(/[àáâäã]/g,"a").replace(/[èéêë]/g,"e").replace(/[ìíîï]/g,"i")
+      .replace(/[òóôöõ]/g,"o").replace(/[ùúûü]/g,"u").replace(/ç/g,"c").replace(/ß/g,"ss")
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  }
+  function kb(n){ return Math.round(n/1024); }
+  function extVan(naam){ return (naam.split(".").pop()||"").toLowerCase(); }
+  function isHoofdItem(it){ return it.onderwerp.type === "pos" && it.onderwerp.v === 0; }
+  function eisen(it){ return isHoofdItem(it) ? {w:1920, kb:400} : {w:1600, kb:250}; }
+  function catVan(it){
+    if(it.onderwerp.type === "pos") return state.pos[it.onderwerp.v].cat || "anders";
+    return it.onderwerp.v;
+  }
+  function onderwerpVan(it){ return ONDERWERP[catVan(it)] || ONDERWERP["anders"]; }
+
+  function naamVoorstel(it){
+    var o = onderwerpVan(it);
+    var h = slug(hotelNaam);
+    var voor = h ? (/^hotel(-|$)/.test(h) ? h : "hotel-" + h) : "hotel";
+    var basis = [voor, o.slug].join("-");
+    var zelfde = OPT.filter(function(x){ return x !== it && x.doelNaam && x.doelNaam.indexOf(basis) === 0; });
+    var nr = zelfde.length ? "-" + (zelfde.length + 1) : "";
+    return basis + nr + "." + (it.doelExt || "jpg");
+  }
+  function altVoorstel(it){
+    return onderwerpVan(it).alt.replace("{h}", hotelNaam || "dit hotel");
+  }
+
+  function controle(it){
+    var e = eisen(it), uit = [];
+    if(it.fout){ uit.push({ok:false, tekst:it.fout, herstel:false}); return uit; }
+    uit.push(it.breedte >= e.w
+      ? {ok:true, tekst:it.breedte + " px"}
+      : {ok:false, tekst:it.breedte + " px, minimaal " + e.w + " px", herstel:false});
+    uit.push(kb(it.grootte) <= e.kb
+      ? {ok:true, tekst:kb(it.grootte) + " KB"}
+      : {ok:false, tekst:kb(it.grootte) + " KB, maximaal " + e.kb + " KB", herstel:true});
+    uit.push(["jpg","jpeg","png"].indexOf(it.ext) !== -1
+      ? {ok:true, tekst:it.ext.toUpperCase()}
+      : {ok:false, tekst:it.ext.toUpperCase() + " niet toegestaan", herstel:true});
+    var kaal = it.naam.replace(/\.[^.]+$/,"");
+    uit.push((!SLECHTE_NAAM.test(kaal) && kaal.length > 8)
+      ? {ok:true, tekst:"Beschrijvende bestandsnaam"}
+      : {ok:false, tekst:"Geen beschrijvende bestandsnaam", herstel:true});
+    uit.push((it.alt || "").trim().length > 5
+      ? {ok:true, tekst:"Alt-tekst"}
+      : {ok:false, tekst:"Geen alt-tekst", herstel:true});
+    return uit;
+  }
+  function problemen(it){ return controle(it).filter(function(c){ return !c.ok; }); }
+
+  function laadAfbeelding(url){
+    return new Promise(function(res, rej){
+      var img = new Image();
+      img.onload = function(){ res(img); };
+      img.onerror = function(){ rej(new Error("kan niet worden gelezen")); };
+      img.src = url;
+    });
+  }
+  function heeftTransparantie(img){
+    try{
+      var c = document.createElement("canvas");
+      var n = 64;
+      c.width = n; c.height = n;
+      var x = c.getContext("2d");
+      x.drawImage(img, 0, 0, n, n);
+      var d = x.getImageData(0,0,n,n).data;
+      for(var i=3;i<d.length;i+=4){ if(d[i] < 250) return true; }
+    }catch(e){}
+    return false;
+  }
+  function tekenNaar(img, breedte){
+    var schaal = breedte / img.naturalWidth;
+    var c = document.createElement("canvas");
+    c.width = Math.round(breedte);
+    c.height = Math.round(img.naturalHeight * schaal);
+    var x = c.getContext("2d");
+    x.imageSmoothingQuality = "high";
+    x.drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
+  function naarBlob(canvas, type, kwaliteit){
+    return new Promise(function(res){ canvas.toBlob(function(b){ res(b); }, type, kwaliteit); });
+  }
+
+  async function optimaliseer(it){
+    if(it.fout) return;
+    var e = eisen(it);
+    it.doelExt = it.alpha ? "png" : "jpg";
+    var img;
+    try{ img = await laadAfbeelding(it.url); }
+    catch(err){ it.fout = "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan"; renderOpt(); return; }
+
+    var startBreedte = Math.max(e.w, Math.min(img.naturalWidth, isHoofdItem(it) ? 2400 : 2000));
+    if(img.naturalWidth < e.w) startBreedte = img.naturalWidth;   // nooit kunstmatig opblazen
+
+    var type = it.alpha ? "image/png" : "image/jpeg";
+    var beste = null, breedte = startBreedte;
+
+    for(var ronde = 0; ronde < 4 && !beste; ronde++){
+      var canvas = tekenNaar(img, breedte);
+      if(type === "image/png"){
+        var b = await naarBlob(canvas, type);
+        if(b && (kb(b.size) <= e.kb || breedte <= e.w)) beste = {blob:b, breedte:canvas.width};
+      } else {
+        var laag = 0.5, hoog = 0.94, gevonden = null;
+        for(var i=0;i<6;i++){
+          var q = (laag + hoog) / 2;
+          var blob = await naarBlob(canvas, type, q);
+          if(!blob) break;
+          if(kb(blob.size) <= e.kb){ gevonden = blob; laag = q; } else { hoog = q; }
+        }
+        if(gevonden) beste = {blob:gevonden, breedte:canvas.width};
+        else if(breedte <= e.w){
+          var laatste = await naarBlob(canvas, type, 0.5);
+          if(laatste) beste = {blob:laatste, breedte:canvas.width};
+        }
+      }
+      if(!beste) breedte = Math.max(e.w, Math.round(breedte * 0.85));
+    }
+
+    if(beste){
+      if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+      it.blob = beste.blob;
+      it.url = URL.createObjectURL(beste.blob);
+      it.grootte = beste.blob.size;
+      it.breedte = beste.breedte;
+      it.ext = it.doelExt;
+      it.geoptimaliseerd = true;
+    }
+    if(!(it.alt || "").trim()){ it.alt = altVoorstel(it); it.autoAlt = true; }
+    var kaal = it.naam.replace(/\.[^.]+$/,"");
+    if(SLECHTE_NAAM.test(kaal) || kaal.length <= 8 || extVan(it.naam) !== it.ext){
+      it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,"");
+      it.naam = it.doelNaam + "." + it.ext;
+    }
+    renderOpt();
+  }
+
+  async function voegToe(lijst){
+    var bestanden = Array.prototype.slice.call(lijst);
+    for(var i=0;i<bestanden.length;i++){
+      var f = bestanden[i];
+      if(!/^image\//.test(f.type) && ["heic","avif","webp"].indexOf(extVan(f.name)) === -1) continue;
+      var url = URL.createObjectURL(f);
+      var it = {id:++optId, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
+                url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
+                onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
+      OPT.push(it);
+      try{
+        var img = await laadAfbeelding(url);
+        it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
+        it.alpha = (it.ext === "png") && heeftTransparantie(img);
+      }catch(e){
+        it.fout = "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+      }
+      renderOpt();
+    }
+    renderSamenvatting();
+  }
+
+  var optLijst = $("#opt-lijst");
+  function opties(it){
+    var uit = '<optgroup label="Eerste 5">';
+    for(var i=0;i<5;i++){
+      var c = state.pos[i].cat;
+      var sel = (it.onderwerp.type === "pos" && it.onderwerp.v === i) ? " selected" : "";
+      uit += '<option value="pos:'+i+'"'+sel+'>Foto '+(i+1)+(i===0?" · hoofdbeeld":"")
+           + (c ? " · " + esc(lbl(c)) : "") + '</option>';
+    }
+    uit += '</optgroup><optgroup label="Overige foto">';
+    Object.keys(CATS).forEach(function(k){
+      if(isDroom(k)) return;
+      var sel = (it.onderwerp.type === "cat" && it.onderwerp.v === k) ? " selected" : "";
+      uit += '<option value="cat:'+k+'"'+sel+'>'+esc(CATS[k].label)+'</option>';
+    });
+    return uit + '</optgroup>';
+  }
+
+  function renderOpt(){
+    var bar = $("#opt-bar");
+    if(!OPT.length){
+      optLijst.innerHTML = '<p class="opt-leeg">Nog geen foto’s toegevoegd. De controle op breedte, grootte, formaat, bestandsnaam en alt-tekst doet de tool zelf.</p>';
+      bar.hidden = true; $("#opt-hint").textContent = "";
+      return;
+    }
+    bar.hidden = false;
+    var teDoen = OPT.filter(function(it){ return problemen(it).length; }).length;
+    $("#opt-stand").textContent = teDoen
+      ? teDoen + (teDoen===1 ? " foto heeft nog een technisch punt." : " foto's hebben nog technische punten.")
+      : OPT.length + (OPT.length===1 ? " foto voldoet." : " foto's voldoen aan de eisen.");
+    $("#opt-alles").textContent = teDoen ? "Alles optimaliseren" : "Opnieuw controleren";
+
+    optLijst.innerHTML = OPT.map(function(it){
+      var pr = problemen(it), cs = controle(it);
+      return '<div class="opt-item '+(pr.length ? "bad" : "good")+'" data-id="'+it.id+'">'
+        + '<img class="opt-thumb" src="'+it.url+'" alt="">'
+        + '<div class="opt-body">'
+        +   '<p class="opt-naam">'+esc(it.naam)+'</p>'
+        +   '<p class="opt-specs">'+(it.breedte ? it.breedte+" px · " : "")+kb(it.grootte)+" KB · "+esc(it.ext.toUpperCase())
+        +     (isHoofdItem(it) ? " · hoofdbeeld, 1920 px en 400 KB" : " · 1600 px en 250 KB")+'</p>'
+        +   '<div class="opt-chips">'
+        +     cs.map(function(c){ return '<span class="ochip'+(c.ok?"":" bad")+'">'+(c.ok?"✓ ":"! ")+esc(c.tekst)+'</span>'; }).join("")
+        +   '</div>'
+        +   '<div class="opt-velden">'
+        +     '<select data-veld="onderwerp" aria-label="Onderwerp van deze foto">'+opties(it)+'</select>'
+        +     '<input data-veld="alt" value="'+esc(it.alt)+'" placeholder="Alt-tekst, bijvoorbeeld: '+esc(altVoorstel(it))+'" aria-label="Alt-tekst">'
+        +   '</div>'
+        + '</div>'
+        + '<div class="opt-acties">'
+        +   (pr.length ? '<button type="button" class="doe" data-act="opt">'+(pr.length===1 ? "Los op" : pr.length+" punten oplossen")+'</button>' : '')
+        +   (it.blob ? '<a download="'+esc(it.naam)+'" href="'+it.url+'">Downloaden</a>' : '')
+        +   '<button type="button" data-act="weg">Verwijderen</button>'
+        + '</div></div>';
+    }).join("");
+
+    each(optLijst.querySelectorAll(".opt-item"), function(rij){
+      var it = OPT.filter(function(x){ return x.id === parseInt(rij.getAttribute("data-id"),10); })[0];
+      if(!it) return;
+      rij.querySelector('[data-veld="onderwerp"]').addEventListener("change", function(){
+        var d = this.value.split(":");
+        it.onderwerp = {type:d[0], v:(d[0] === "pos" ? parseInt(d[1],10) : d[1])};
+        if(it.autoAlt || !(it.alt||"").trim()){ it.alt = altVoorstel(it); it.autoAlt = true; }
+        if(it.doelNaam){ it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,""); it.naam = it.doelNaam + "." + it.ext; }
+        renderOpt(); renderSamenvatting();
+      });
+      var altVeld = rij.querySelector('[data-veld="alt"]');
+      altVeld.addEventListener("input", function(){ it.alt = altVeld.value; it.autoAlt = false; });
+      altVeld.addEventListener("change", function(){ renderOpt(); renderSamenvatting(); });
+      var doe = rij.querySelector('[data-act="opt"]');
+      if(doe) doe.addEventListener("click", async function(){
+        doe.textContent = "Bezig…"; doe.disabled = true;
+        await optimaliseer(it); renderSamenvatting();
+      });
+      rij.querySelector('[data-act="weg"]').addEventListener("click", function(){
+        if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+        URL.revokeObjectURL(it.bronUrl);
+        OPT = OPT.filter(function(x){ return x !== it; });
+        renderOpt(); renderSamenvatting();
+      });
+    });
+
+    $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
+      ? "Geoptimaliseerde foto's download je met de knop ernaast. Dat werkt in de browser, niet in een ingesloten voorbeeldvenster."
+      : "";
+  }
+
+  $("#opt-alles").addEventListener("click", async function(){
+    var b = this; b.disabled = true; b.textContent = "Bezig…";
+    for(var i=0;i<OPT.length;i++){ if(problemen(OPT[i]).length) await optimaliseer(OPT[i]); }
+    b.disabled = false; renderOpt(); renderSamenvatting();
+  });
+
+  var drop = $("#drop"), bestandVeld = $("#files");
+  drop.addEventListener("click", function(){ bestandVeld.click(); });
+  drop.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); bestandVeld.click(); } });
+  bestandVeld.addEventListener("change", function(){
+    if(!bestandVeld.files.length) return;
+    var kopie = Array.prototype.slice.call(bestandVeld.files);
+    bestandVeld.value = "";
+    voegToe(kopie);
+  });
+  drop.addEventListener("dragover", function(e){ e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", function(){ drop.classList.remove("over"); });
+  drop.addEventListener("drop", function(e){
+    e.preventDefault(); drop.classList.remove("over");
+    if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files);
+  });
+  $("#hotelnaam").addEventListener("input", function(){ hotelNaam = this.value; renderOpt(); });
 
   /* ---------- seizoen ---------- */
   var MAANDEN = ["januari","februari","maart","april","mei","juni","juli","augustus",
@@ -1376,6 +1746,7 @@ main{padding-block:var(--s5) var(--s6)}
   zetSeizoen();
   renderSeizoen();
   renderRows();
+  renderOpt();
   renderCount();
   renderFilters();
   renderAlles();
