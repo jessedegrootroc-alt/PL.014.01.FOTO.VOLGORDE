@@ -38,6 +38,17 @@ button,input,textarea,select{font:inherit; color:inherit}
 .dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
 .topbar h1{font-size:25px; line-height:1.1}
 .topbar .sub{font-size:14px; color:var(--ink-2); margin-top:2px}
+.kop-acties{display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s3)}
+.seizoen .fg-lbl{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--ink-3); font-weight:700; margin-bottom:4px}
+.seg2{display:inline-flex; gap:4px}
+.seg2 button{border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
+  padding:7px 14px; font-size:13.5px; cursor:pointer; color:var(--ink-2)}
+.seg2 button:hover{border-color:var(--ink-3); color:var(--ink)}
+.seg2 button[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg);
+  color:var(--accent-hover); font-weight:600}
+.seizoen-hint{font-size:12px; color:var(--ink-3); margin-top:4px}
+.btn-reset{width:auto; padding:8px 16px; font-size:13.5px}
 .meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3)}
 .field{display:flex; flex-direction:column; gap:3px}
 .field label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:600}
@@ -359,14 +370,16 @@ main{padding-block:var(--s5) var(--s6)}
       <h1>Fotocheck arrangement</h1>
       <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
     </div>
-    <div class="meta">
-      <div class="field"><label for="m-hotel">Hotel</label><input id="m-hotel" data-meta="hotel" placeholder="Naam hotel"></div>
-      <div class="field"><label for="m-arr">Arrangement</label><input id="m-arr" data-meta="arrangement" placeholder="Naam arrangement"></div>
-      <div class="field"><label for="m-med">Medewerker</label><input id="m-med" data-meta="medewerker" placeholder="Naam"></div>
-      <div class="field"><label for="m-seizoen">Seizoen</label>
-        <select id="m-seizoen" data-meta="seizoen"><option>Lente / zomer</option><option>Herfst / winter</option></select>
+    <div class="kop-acties">
+      <div class="seizoen">
+        <span class="fg-lbl" id="seizoen-lbl">Seizoen</span>
+        <div class="seg2" role="group" aria-labelledby="seizoen-lbl">
+          <button type="button" data-s="Lente / zomer">Lente / zomer</button>
+          <button type="button" data-s="Herfst / winter">Herfst / winter</button>
+        </div>
+        <p class="seizoen-hint" id="seizoen-hint"></p>
       </div>
-      <div class="field"><label for="m-datum">Datum</label><input id="m-datum" type="date" data-meta="datum"></div>
+      <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
     </div>
   </div>
 </header>
@@ -502,7 +515,6 @@ main{padding-block:var(--s5) var(--s6)}
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" id="btn-copy" type="button">Kopieer samenvatting</button>
-        <button class="btn" id="btn-reset" type="button">Leegmaken voor volgend arrangement</button>
       </div>
     </aside>
   </div>
@@ -630,10 +642,10 @@ main{padding-block:var(--s5) var(--s6)}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v7";
+  var STORE = "vialuxury-fotocheck-v8";
   function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
   var state = {
-    meta:{hotel:"",arrangement:"",medewerker:"",seizoen:"Lente / zomer",datum:""},
+    seizoen:null, seizoenHand:false, seizoenAuto:null,
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
     gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{},
@@ -650,7 +662,9 @@ main{padding-block:var(--s5) var(--s6)}
     try{
       var raw = localStorage.getItem(STORE); if(!raw) return;
       var d = JSON.parse(raw); if(!d) return;
-      if(d.meta) state.meta = Object.assign(state.meta, d.meta);
+      if(d.seizoen) state.seizoen = d.seizoen;
+      state.seizoenHand = !!d.seizoenHand;
+      state.seizoenAuto = d.seizoenAuto || null;
       if(typeof d.count === "number") state.count = d.count;
       state.gebouwNiet = !!d.gebouwNiet;
       if(d.checks) state.checks = d.checks;
@@ -1405,15 +1419,41 @@ main{padding-block:var(--s5) var(--s6)}
     renderCards(); renderStrip(); renderPills(); renderUsp(); renderSamenvatting();
   }
 
-  /* ---------- meta ---------- */
-  each(document.querySelectorAll("[data-meta]"), function(el){
-    el.addEventListener("input", function(){ state.meta[el.getAttribute("data-meta")] = el.value; save(); });
-  });
-  function vulMeta(){
-    each(document.querySelectorAll("[data-meta]"), function(el){
-      el.value = state.meta[el.getAttribute("data-meta")] || el.value;
-    });
+  /* ---------- seizoen ---------- */
+  var MAANDEN = ["januari","februari","maart","april","mei","juni","juli","augustus",
+                 "september","oktober","november","december"];
+  function autoSeizoen(d){
+    var m = d.getMonth() + 1;                 // maart t/m augustus is lente en zomer
+    return (m >= 3 && m <= 8) ? "Lente / zomer" : "Herfst / winter";
   }
+  function vandaagNL(){
+    var d = new Date();
+    return d.getDate() + " " + MAANDEN[d.getMonth()] + " " + d.getFullYear();
+  }
+  function zetSeizoen(){
+    var nu = autoSeizoen(new Date());
+    // een handmatige keuze blijft staan tot het seizoen zelf omslaat
+    if(!state.seizoen || !state.seizoenHand || state.seizoenAuto !== nu){
+      state.seizoen = nu; state.seizoenHand = false;
+    }
+    state.seizoenAuto = nu;
+  }
+  function renderSeizoen(){
+    each(document.querySelectorAll(".seg2 button"), function(b){
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-s") === state.seizoen));
+    });
+    $("#seizoen-hint").textContent = state.seizoenHand
+      ? "Zelf gekozen. Automatisch zou het " + state.seizoenAuto.toLowerCase() + " zijn."
+      : "Automatisch gekozen op " + vandaagNL() + ".";
+  }
+  each(document.querySelectorAll(".seg2 button"), function(b){
+    b.addEventListener("click", function(){
+      var v = b.getAttribute("data-s");
+      state.seizoen = v;
+      state.seizoenHand = (v !== state.seizoenAuto);
+      renderSeizoen(); save();
+    });
+  });
 
   /* ---------- knoppen ---------- */
   function toast(msg){
@@ -1423,8 +1463,7 @@ main{padding-block:var(--s5) var(--s6)}
   $("#btn-copy").addEventListener("click", function(){
     var t = telling(), L = [];
     L.push("Fotocheck arrangement");
-    L.push((state.meta.hotel || "Hotel onbekend") + " — " + (state.meta.arrangement || "Arrangement onbekend"));
-    L.push("Medewerker: " + (state.meta.medewerker || "-") + " · Datum: " + (state.meta.datum || "-") + " · Seizoen: " + state.meta.seizoen);
+    L.push(vandaagNL() + " · Seizoen: " + state.seizoen);
     L.push("Aantal foto's: " + state.count + " / 14");
     var tops = state.filters.filter(function(f){ return f.top; }).map(function(f){ return FILTERS[f.id].label; });
     var rest = state.filters.filter(function(f){ return !f.top; }).map(function(f){ return FILTERS[f.id].label; });
@@ -1469,9 +1508,9 @@ main{padding-block:var(--s5) var(--s6)}
     state.checks = {}; state.notes = {}; state.hoofd = 0; state.count = 10;
     state.gebouwNiet = false; state.arrangementen = [{naam:"",foto:""}];
     state.filters = []; state.eigen = [];
-    state.meta.hotel = ""; state.meta.arrangement = "";
+    state.seizoenHand = false;
     try{ localStorage.removeItem(STORE); }catch(e){}
-    $("#m-hotel").value = ""; $("#m-arr").value = "";
+    zetSeizoen(); renderSeizoen();
     renderRows(); renderReg(); renderCount(); renderFilters(); renderAlles();
     toast("Leeg, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
@@ -1479,11 +1518,8 @@ main{padding-block:var(--s5) var(--s6)}
 
   /* ---------- start ---------- */
   load();
-  if(!state.meta.datum){
-    var d = new Date();
-    state.meta.datum = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-  }
-  vulMeta();
+  zetSeizoen();
+  renderSeizoen();
   renderRows();
   renderReg();
   renderCount();
