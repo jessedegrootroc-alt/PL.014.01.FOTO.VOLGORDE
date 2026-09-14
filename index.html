@@ -1590,7 +1590,7 @@ main{padding-block:var(--s5) var(--s6)}
         + '</div>'
         + '<div class="opt-acties">'
         +   (pr.length ? '<button type="button" class="doe" data-act="opt">'+(pr.length===1 ? "Los op" : pr.length+" punten oplossen")+'</button>' : '')
-        +   (it.blob ? '<a download="'+esc(it.naam)+'" href="'+it.url+'">Downloaden</a>' : '')
+        +   (it.blob ? '<button type="button" data-act="dl">Downloaden</button>' : '')
         +   '<button type="button" data-act="weg">Verwijderen</button>'
         + '</div></div>';
     }).join("");
@@ -1613,6 +1613,8 @@ main{padding-block:var(--s5) var(--s6)}
         doe.textContent = "Bezig…"; doe.disabled = true;
         await optimaliseer(it); renderSamenvatting();
       });
+      var dl = rij.querySelector('[data-act="dl"]');
+      if(dl) dl.addEventListener("click", function(){ bewaar(it, dl); });
       rij.querySelector('[data-act="weg"]').addEventListener("click", function(){
         if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
         URL.revokeObjectURL(it.bronUrl);
@@ -1622,8 +1624,30 @@ main{padding-block:var(--s5) var(--s6)}
     });
 
     $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
-      ? "Geoptimaliseerde foto's download je met de knop ernaast. Dat werkt in de browser, niet in een ingesloten voorbeeldvenster."
+      ? "Geoptimaliseerde foto's sla je op met de knop ernaast. In de artifact-weergave vraagt de browser eerst om bevestiging."
       : "";
+  }
+
+  var DOWNLOADS = null;
+  if(window.claude && typeof window.claude.use === "function"){
+    window.claude.use("downloads").then(function(d){ DOWNLOADS = d; }, function(){});
+  }
+  async function bewaar(it, knop){
+    if(!it.blob) return;
+    if(DOWNLOADS){
+      try{
+        await DOWNLOADS.save({filename:it.naam, data:it.blob});
+        toast("Opgeslagen als " + it.naam);
+      }catch(e){
+        if(e && e.code === "declined") return;
+        toast("Opslaan lukt niet in deze weergave");
+      }
+      return;
+    }
+    var a = document.createElement("a");
+    a.href = it.url; a.download = it.naam;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    if(knop) knop.textContent = "Downloaden";
   }
 
   $("#opt-alles").addEventListener("click", async function(){
