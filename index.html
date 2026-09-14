@@ -31,14 +31,14 @@ button,input,textarea,select{font:inherit; color:inherit}
 .wrap{max-width:1137px; margin:0 auto; padding-inline:24px}
 
 /* ---------- kop ---------- */
-.topbar{position:sticky; top:0; z-index:20; background:var(--bg); border-bottom:1px solid var(--line); padding-block:var(--s3)}
-.topbar .wrap{display:flex; flex-wrap:wrap; gap:var(--s3) var(--s4); align-items:flex-end; justify-content:space-between}
+.paginakop{padding-bottom:var(--s4)}
 .brandline{display:flex; align-items:center; gap:var(--s2); font-size:11px; letter-spacing:2px;
   text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-bottom:var(--s1)}
 .dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
-.topbar h1{font-size:25px; line-height:1.1}
-.topbar .sub{font-size:14px; color:var(--ink-2); margin-top:2px}
-.kop-acties{display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s3)}
+.paginakop h1{font-size:27px; line-height:1.1}
+.paginakop .sub{font-size:14px; color:var(--ink-2); margin-top:3px}
+.kop-acties{display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s3);
+  padding-bottom:var(--s3); margin-bottom:var(--s3); border-bottom:1px solid var(--line-soft)}
 .seizoen .fg-lbl{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
   color:var(--ink-3); font-weight:700; margin-bottom:4px}
 .seg2{display:inline-flex; gap:4px}
@@ -48,7 +48,7 @@ button,input,textarea,select{font:inherit; color:inherit}
 .seg2 button[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg);
   color:var(--accent-hover); font-weight:600}
 .seizoen-hint{font-size:12px; color:var(--ink-3); margin-top:4px}
-.btn-reset{width:auto; padding:8px 16px; font-size:13.5px}
+
 .meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3)}
 .field{display:flex; flex-direction:column; gap:3px}
 .field label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:600}
@@ -297,7 +297,7 @@ main{padding-block:var(--s5) var(--s6)}
 .ft.no{border-color:var(--err-line); background:var(--err-bg); color:var(--err); text-decoration:line-through}
 
 /* ---------- samenvatting ---------- */
-.side{position:sticky; top:116px; display:flex; flex-direction:column; gap:var(--s3)}
+.side{position:sticky; top:16px; display:flex; flex-direction:column; gap:var(--s3)}
 .sum{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); padding:18px}
 .sum h2{font-size:17px; margin-bottom:var(--s2)}
 .progress{height:8px; border-radius:var(--r); background:var(--na-bg); overflow:hidden; margin:var(--s2) 0 6px}
@@ -318,6 +318,7 @@ main{padding-block:var(--s5) var(--s6)}
 .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
 .btn-primary:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
 .btn-row{display:flex; flex-direction:column; gap:var(--s2)}
+.kop-acties .btn-reset{width:auto; padding:8px 16px; font-size:13.5px; margin-left:auto}
 
 .overview{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); margin-top:var(--s5)}
 .ov-h{padding:16px 20px 4px}
@@ -352,7 +353,7 @@ main{padding-block:var(--s5) var(--s6)}
 }
 @media (max-width:760px){ .strip{grid-template-columns:repeat(2,minmax(0,1fr))} .levels{grid-template-columns:minmax(0,1fr)} .usp{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:560px){
-  .topbar h1{font-size:21px}
+  .paginakop h1{font-size:22px}
   .strip{grid-template-columns:minmax(0,1fr)}
   .row{flex-wrap:wrap}
   .row .mini{width:100%}
@@ -363,28 +364,14 @@ main{padding-block:var(--s5) var(--s6)}
 @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
 </style>
 
-<header class="topbar">
-  <div class="wrap">
-    <div>
-      <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
-      <h1>Fotocheck arrangement</h1>
-      <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
-    </div>
-    <div class="kop-acties">
-      <div class="seizoen">
-        <span class="fg-lbl" id="seizoen-lbl">Seizoen</span>
-        <div class="seg2" role="group" aria-labelledby="seizoen-lbl">
-          <button type="button" data-s="Lente / zomer">Lente / zomer</button>
-          <button type="button" data-s="Herfst / winter">Herfst / winter</button>
-        </div>
-        <p class="seizoen-hint" id="seizoen-hint"></p>
-      </div>
-      <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
-    </div>
-  </div>
-</header>
-
 <main class="wrap">
+  <div class="paginakop">
+    <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
+    <h1>Fotocheck arrangement</h1>
+    <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
+  </div>
+
+
 
   <section class="block" aria-labelledby="h-usp" style="margin-bottom:var(--s4)">
     <div class="block-h">
@@ -394,6 +381,17 @@ main{padding-block:var(--s5) var(--s6)}
     </div>
     <p class="lead">Waarom zou iemand dit arrangement boeken? Kies de filters die eraan gekoppeld zijn. Markeer daarna maximaal drie kenmerken als belangrijkste, die wegen het zwaarst in het advies voor de eerste 5 foto's.</p>
     <div class="block-b">
+      <div class="kop-acties">
+        <div class="seizoen">
+          <span class="fg-lbl" id="seizoen-lbl">Seizoen</span>
+          <div class="seg2" role="group" aria-labelledby="seizoen-lbl">
+            <button type="button" data-s="Lente / zomer">Lente / zomer</button>
+            <button type="button" data-s="Herfst / winter">Herfst / winter</button>
+          </div>
+          <p class="seizoen-hint" id="seizoen-hint"></p>
+        </div>
+        <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
+      </div>
       <div id="filters"></div>
       <div id="topkeuze"></div>
       <div class="eigen">
