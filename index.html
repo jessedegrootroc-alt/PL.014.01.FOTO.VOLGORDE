@@ -237,38 +237,6 @@ main{padding-block:var(--s5) var(--s6)}
   padding:6px 9px; font-size:13px}
 .row[data-status="bad"] .note input{border-color:var(--err-line); background:var(--err-bg)}
 
-/* ---------- fotoniveau + register ---------- */
-.levels{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s2); padding-bottom:var(--s3)}
-.level{border:1px solid var(--line); border-radius:var(--r); padding:12px 14px; background:var(--surface-2)}
-.level h3{font-family:var(--font-body); font-size:11px; letter-spacing:1px; text-transform:uppercase;
-  font-weight:700; color:var(--ink-3); margin-bottom:3px}
-.level p{font-size:13px; color:var(--ink-2); line-height:1.45}
-.level.mark{border-color:var(--dev-line); background:var(--dev-bg)}
-.level.mark h3{color:var(--dev)}
-.reg-title{font-size:13.5px; color:var(--ink-2); margin-bottom:var(--s2)}
-.reg-title b{color:var(--ink); font-weight:600}
-.reg-head,.reg-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) 32px; gap:6px; align-items:center}
-.reg-head{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700; margin-bottom:4px}
-.reg{display:flex; flex-direction:column; gap:6px}
-.reg-row input{width:100%; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
-  padding:7px 9px; font-size:13.5px}
-.reg-row.dupe input{border-color:var(--err); background:var(--err-bg)}
-.reg-del{height:32px; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
-  cursor:pointer; color:var(--ink-3); font-size:15px; line-height:1}
-.reg-del:hover{border-color:var(--err); color:var(--err)}
-.reg-add{margin-top:var(--s2); align-self:flex-start; border:1px dashed var(--line); background:none;
-  border-radius:var(--r); padding:7px 12px; font-size:13px; cursor:pointer; color:var(--ink-2)}
-.reg-add:hover{border-color:var(--accent); color:var(--accent-hover)}
-#reg-msg{font-size:13px; color:var(--ink-2); margin-top:var(--s2)}
-#reg-msg.bad{color:var(--err); font-weight:500}
-#reg-msg.good{color:var(--ok)}
-.pills{display:flex; flex-wrap:wrap; gap:6px; padding-bottom:var(--s2)}
-.pill{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:5px 11px;
-  font-size:13px; cursor:pointer}
-.pill:hover{border-color:var(--ink-3)}
-.pill[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg); color:var(--accent-hover); font-weight:600}
-.pills-lbl{font-size:12.5px; color:var(--ink-3); padding-bottom:6px}
-
 /* ---------- teller ---------- */
 .counter{display:flex; align-items:center; gap:var(--s4); flex-wrap:wrap; padding-bottom:var(--s2)}
 .bignum{font-family:var(--font-head); font-size:32px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
@@ -426,29 +394,8 @@ main{padding-block:var(--s5) var(--s6)}
   <div class="cols">
     <div class="stack">
 
-      <section class="block" aria-labelledby="h2a">
-        <div class="block-h"><span class="step">02</span><h2 id="h2a">Fotoniveau en hoofdbeeld</h2><span class="tag sp">Richtlijn</span></div>
-        <p class="lead">Een foto op hotelniveau komt terug bij <b>elk pakket</b> van dit hotel. Een foto op arrangementniveau geldt alleen hier, die upload je per arrangement opnieuw.</p>
-        <div class="block-b">
-          <div class="levels">
-            <div class="level"><h3>Hotelniveau</h3><p>Komt terug op alle pakketten van dit hotel. Gebruik dit voor beelden die bij elk arrangement kloppen.</p></div>
-            <div class="level mark"><h3>Arrangementniveau</h3><p>Geldt alleen voor dit arrangement en is eenmalig. Het hoofdbeeld hoort altijd hier.</p></div>
-          </div>
-          <p class="pills-lbl">Het hoofdbeeld is altijd foto 1, en altijd een droombeeld. Het soort droombeeld bepaal je bij stap 01, de andere foto's houden daar rekening mee.</p>
-          <div class="pills" id="hoofdpills" role="group" aria-label="Positie van het hoofdbeeld"></div>
-          <div class="rows" data-rows="hoofdbeeld"></div>
-        </div>
-        <div class="barline col">
-          <p class="reg-title"><b>Hoofdbeelden van dit hotel</b> — drie arrangementen betekent drie verschillende droombeelden. Zet ze hier naast elkaar, dan zie je meteen of er een dubbel staat.</p>
-          <div class="reg-head"><span>Arrangement</span><span>Bestandsnaam hoofdfoto</span><span></span></div>
-          <div class="reg" id="reg"></div>
-          <button class="reg-add" id="reg-add" type="button">+ Arrangement toevoegen</button>
-          <p id="reg-msg"></p>
-        </div>
-      </section>
-
       <section class="block" aria-labelledby="h3a">
-        <div class="block-h"><span class="step">03</span><h2 id="h3a">Rest van de fotoreeks</h2><span class="tag sp">Richtlijn</span></div>
+        <div class="block-h"><span class="step">02</span><h2 id="h3a">Rest van de fotoreeks</h2><span class="tag sp">Richtlijn</span></div>
         <p class="lead">Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden. Eindig waar mogelijk met omgeving.</p>
         <div class="block-b">
           <div class="counter">
@@ -469,19 +416,19 @@ main{padding-block:var(--s5) var(--s6)}
       </section>
 
       <section class="block" aria-labelledby="h4a">
-        <div class="block-h"><span class="step">04</span><h2 id="h4a">Visuele kwaliteit</h2><span class="tag sp">Richtlijn</span></div>
+        <div class="block-h"><span class="step">03</span><h2 id="h4a">Visuele kwaliteit</h2><span class="tag sp">Richtlijn</span></div>
         <p class="lead">Een bewuste opbouw van dag naar avond mag wel.</p>
         <div class="block-b"><div class="rows" data-rows="visueel"></div></div>
       </section>
 
       <section class="block" aria-labelledby="h5a">
-        <div class="block-h"><span class="step">05</span><h2 id="h5a">Seizoen</h2><span class="tag sp">Richtlijn</span></div>
+        <div class="block-h"><span class="step">04</span><h2 id="h5a">Seizoen</h2><span class="tag sp">Richtlijn</span></div>
         <p class="lead">Kijk de beelden na begin lente en begin herfst. Houd de opbouw van de eerste 5 zoveel mogelijk gelijk.</p>
         <div class="block-b"><div class="rows" data-rows="seizoen"></div></div>
       </section>
 
       <section class="block" aria-labelledby="h6a">
-        <div class="block-h"><span class="step">06</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
+        <div class="block-h"><span class="step">05</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
         <div class="block-b">
           <table class="spec">
             <thead><tr><th>Type</th><th>Minimale breedte</th><th>Maximale grootte</th></tr></thead>
@@ -607,12 +554,6 @@ main{padding-block:var(--s5) var(--s6)}
   function heeftTag(c, t){ return !!(CATS[c] && CATS[c].tags.indexOf(t) !== -1); }
 
   var GROUPS = {
-    hoofdbeeld:{kind:"guide", items:[
-      {id:"hb1", label:"Het hoofdbeeld is op arrangementniveau geüpload", sub:"Op hotelniveau komt dezelfde foto terug bij elk pakket van dit hotel."},
-      {id:"hb2", label:"Geen ander arrangement van dit hotel gebruikt deze foto als hoofdbeeld"},
-      {id:"hb3", label:"Het hoofdbeeld staat niet ook tussen de hotelniveau-foto's", sub:"Anders verschijnt dezelfde foto dubbel."},
-      {id:"hb4", label:"Foto's die per arrangement verschillen staan op arrangementniveau"}
-    ]},
     reeks:{kind:"guide", items:[
       {id:"rs1", label:"Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden"},
       {id:"rs2", label:"De reeks eindigt waar mogelijk met omgevingsbeelden"},
@@ -640,14 +581,13 @@ main{padding-block:var(--s5) var(--s6)}
     ]}
   };
 
-  var STORE = "vialuxury-fotocheck-v8";
+  var STORE = "vialuxury-fotocheck-v9";
   function leegPos(){ return {cat:null, anders:"", status:null, note:"", niveau:null}; }
   var state = {
     seizoen:null, seizoenHand:false, seizoenAuto:null,
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
-    gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{},
-    arrangementen:[{naam:"",foto:""}]
+    gebouwNiet:false, hoofd:0, count:10, checks:{}, notes:{}
   };
 
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
@@ -667,7 +607,6 @@ main{padding-block:var(--s5) var(--s6)}
       state.gebouwNiet = !!d.gebouwNiet;
       if(d.checks) state.checks = d.checks;
       if(d.notes) state.notes = d.notes;
-      if(Array.isArray(d.arrangementen) && d.arrangementen.length) state.arrangementen = d.arrangementen;
       if(Array.isArray(d.filters)) state.filters = d.filters;
       if(Array.isArray(d.eigen)) state.eigen = d.eigen;
       if(Array.isArray(d.pos)) d.pos.forEach(function(p,i){
@@ -1197,80 +1136,6 @@ main{padding-block:var(--s5) var(--s6)}
     });
   }
 
-  /* ---------- hoofdbeeld ---------- */
-  var pills = $("#hoofdpills");
-  function renderPills(){
-    var c = state.pos[0].cat;
-    pills.innerHTML = '<span class="chip' + (c ? " ok" : "") + '"><b>Foto 1</b> is het hoofdbeeld · '
-      + esc(c ? lbl(c) : "nog geen droombeeld gekozen") + '</span>';
-  }
-
-  /* ---------- register ---------- */
-  function dubbeleIndex(){
-    var seen = {}, out = [];
-    state.arrangementen.forEach(function(a,i){
-      var k = (a.foto||"").trim().toLowerCase(); if(!k) return;
-      if(seen[k] !== undefined){ if(out.indexOf(seen[k]) === -1) out.push(seen[k]); out.push(i); }
-      else seen[k] = i;
-    });
-    return out;
-  }
-  function dubbeleNamen(){
-    var seen = {}, out = [];
-    state.arrangementen.forEach(function(a){
-      var k = (a.foto||"").trim().toLowerCase(); if(!k) return;
-      if(seen[k]){ if(out.indexOf(a.foto.trim()) === -1) out.push(a.foto.trim()); } else seen[k] = true;
-    });
-    return out;
-  }
-  var reg = $("#reg");
-  function renderReg(){
-    reg.innerHTML = state.arrangementen.map(function(a,i){
-      return '<div class="reg-row" data-i="'+i+'">'
-        + '<input data-f="naam" id="reg-naam-'+i+'" value="'+esc(a.naam)+'" placeholder="Arrangement '+(i+1)+'" aria-label="Naam arrangement '+(i+1)+'">'
-        + '<input data-f="foto" id="reg-foto-'+i+'" value="'+esc(a.foto)+'" placeholder="droombeeld-tuin.jpg" aria-label="Bestandsnaam hoofdfoto '+(i+1)+'">'
-        + '<button type="button" class="reg-del" aria-label="Regel '+(i+1)+' verwijderen">×</button></div>';
-    }).join("");
-    each(reg.querySelectorAll(".reg-row"), function(row){
-      var i = parseInt(row.getAttribute("data-i"),10);
-      each(row.querySelectorAll("input"), function(inp){
-        inp.addEventListener("input", function(){
-          state.arrangementen[i][inp.getAttribute("data-f")] = inp.value;
-          markReg(); renderSamenvatting(); save();
-        });
-      });
-      row.querySelector(".reg-del").addEventListener("click", function(){
-        if(state.arrangementen.length === 1) state.arrangementen = [{naam:"",foto:""}];
-        else state.arrangementen.splice(i,1);
-        renderReg(); renderSamenvatting(); save();
-      });
-    });
-    markReg();
-  }
-  function markReg(){
-    var dup = dubbeleIndex();
-    each(reg.querySelectorAll(".reg-row"), function(row){
-      row.classList.toggle("dupe", dup.indexOf(parseInt(row.getAttribute("data-i"),10)) !== -1);
-    });
-    var n = state.arrangementen.length;
-    var vol = state.arrangementen.filter(function(a){ return (a.foto||"").trim(); }).length;
-    var msg = $("#reg-msg");
-    if(dup.length){
-      msg.className = "bad";
-      msg.textContent = "Dezelfde hoofdfoto staat bij meerdere arrangementen. Elk arrangement heeft een eigen droombeeld nodig.";
-    } else if(vol < n){
-      msg.className = "";
-      msg.textContent = n + (n===1?" arrangement":" arrangementen")+" van dit hotel, dus "+n+(n===1?" hoofdfoto":" verschillende hoofdfoto's")+" nodig. Nog "+(n-vol)+" in te vullen.";
-    } else {
-      msg.className = "good";
-      msg.textContent = n + (n===1?" arrangement met een eigen hoofdfoto.":" arrangementen, allemaal met een eigen hoofdfoto.");
-    }
-  }
-  $("#reg-add").addEventListener("click", function(){
-    state.arrangementen.push({naam:"",foto:""});
-    renderReg(); renderSamenvatting(); save();
-  });
-
   /* ---------- teller ---------- */
   var cnt = $("#cnt");
   function renderCount(){
@@ -1324,9 +1189,6 @@ main{padding-block:var(--s5) var(--s6)}
     if(state.pos[state.hoofd].niveau === "hotel"){
       err++; errList.push("Foto " + (state.hoofd+1) + " is het hoofdbeeld maar staat op hotelniveau");
     }
-    dubbeleNamen().forEach(function(naam){
-      err++; errList.push("Hoofdfoto " + naam + " staat bij meerdere arrangementen van dit hotel");
-    });
 
     var typen = 0, hotels = 0, lvH = 0, lvA = 0, lvOpen = 0;
     state.pos.forEach(function(p,i){
@@ -1414,7 +1276,7 @@ main{padding-block:var(--s5) var(--s6)}
   }
 
   function renderAlles(){
-    renderCards(); renderStrip(); renderPills(); renderUsp(); renderSamenvatting();
+    renderCards(); renderStrip(); renderUsp(); renderSamenvatting();
   }
 
   /* ---------- seizoen ---------- */
@@ -1477,11 +1339,6 @@ main{padding-block:var(--s5) var(--s6)}
         + " · " + n + (i === state.hoofd ? " · hoofdbeeld" : ""));
     });
     L.push("");
-    L.push("Hoofdbeelden van dit hotel");
-    state.arrangementen.forEach(function(a,i){
-      L.push("  " + (a.naam || ("Arrangement "+(i+1))) + ": " + (a.foto || "nog niet ingevuld"));
-    });
-    L.push("");
     L.push("Volgens richtlijn (" + t.okList.length + ")");
     t.okList.forEach(function(x){ L.push("  + " + x); });
     L.push("Bewuste afwijkingen (" + t.devList.length + ")");
@@ -1504,12 +1361,12 @@ main{padding-block:var(--s5) var(--s6)}
   $("#btn-reset").addEventListener("click", function(){
     state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
     state.checks = {}; state.notes = {}; state.hoofd = 0; state.count = 10;
-    state.gebouwNiet = false; state.arrangementen = [{naam:"",foto:""}];
+    state.gebouwNiet = false;
     state.filters = []; state.eigen = [];
     state.seizoenHand = false;
     try{ localStorage.removeItem(STORE); }catch(e){}
     zetSeizoen(); renderSeizoen();
-    renderRows(); renderReg(); renderCount(); renderFilters(); renderAlles();
+    renderRows(); renderCount(); renderFilters(); renderAlles();
     toast("Leeg, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
   });
@@ -1519,7 +1376,6 @@ main{padding-block:var(--s5) var(--s6)}
   zetSeizoen();
   renderSeizoen();
   renderRows();
-  renderReg();
   renderCount();
   renderFilters();
   renderAlles();
