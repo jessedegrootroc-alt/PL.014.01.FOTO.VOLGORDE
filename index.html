@@ -73,6 +73,14 @@ main{padding-block:var(--s5) var(--s6)}
 .fchip[data-state="aan"]{border-color:var(--ink); color:var(--ink); font-weight:600; background:var(--na-bg)}
 .fchip[data-state="top"]{border-color:var(--accent); background:var(--dev-bg); color:var(--accent-hover); font-weight:600}
 .fchip .star{font-size:11px}
+.topbox{border:1px solid var(--line-warm); background:var(--surface-2); border-radius:var(--r);
+  padding:12px 14px; margin:var(--s2) 0 var(--s3)}
+.topbox .fg-lbl{margin-bottom:6px}
+.tchip{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:6px 12px;
+  font-size:13px; cursor:pointer; color:var(--ink-2); display:inline-flex; align-items:center; gap:6px}
+.tchip:hover{border-color:var(--ink-3); color:var(--ink)}
+.tchip[aria-pressed="true"]{border-color:var(--accent); background:var(--dev-bg); color:var(--accent-hover); font-weight:600}
+.tchip .star{font-size:11px}
 .eigen{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:var(--s2)}
 .eigen input{border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
   padding:7px 10px; font-size:13.5px; min-width:210px}
@@ -371,9 +379,10 @@ main{padding-block:var(--s5) var(--s6)}
       <h2 id="h-usp">Kenmerken en USP's</h2>
       <span class="tag sp">Eerst dit</span>
     </div>
-    <p class="lead">Waarom zou iemand dit arrangement boeken? Kies de filters die eraan gekoppeld zijn. Klik een kenmerk <b>nog een keer</b> om het als belangrijkste te markeren, maximaal drie. Het advies voor de eerste 5 foto's rekent daarop mee.</p>
+    <p class="lead">Waarom zou iemand dit arrangement boeken? Kies de filters die eraan gekoppeld zijn. Markeer daarna maximaal drie kenmerken als belangrijkste, die wegen het zwaarst in het advies voor de eerste 5 foto's.</p>
     <div class="block-b">
       <div id="filters"></div>
+      <div id="topkeuze"></div>
       <div class="eigen">
         <input id="eigen-in" placeholder="Eigen kenmerk, bijvoorbeeld uitzicht op zee" aria-label="Eigen kenmerk toevoegen">
         <button type="button" id="eigen-add">+ Toevoegen</button>
@@ -1006,8 +1015,7 @@ main{padding-block:var(--s5) var(--s6)}
       return '<div class="fgroep"><p class="fg-lbl">'+esc(groep)+'</p><div class="fchips">'
         + ids.map(function(k){
             var st = filterStaat(k);
-            return '<button type="button" class="fchip" data-id="'+k+'" data-state="'+st+'" aria-pressed="'+(st!=="uit")+'">'
-              + (st === "top" ? '<span class="star" aria-hidden="true">★</span>' : '')
+            return '<button type="button" class="fchip" data-id="'+k+'" data-state="'+(st==="uit"?"uit":"aan")+'" aria-pressed="'+(st!=="uit")+'">'
               + esc(FILTERS[k].label) + '</button>';
           }).join("")
         + '</div></div>';
@@ -1015,22 +1023,35 @@ main{padding-block:var(--s5) var(--s6)}
 
     each(fHost.querySelectorAll(".fchip"), function(b){
       b.addEventListener("click", function(){
-        var id = b.getAttribute("data-id"), st = filterStaat(id);
-        if(st === "uit"){
-          state.filters.push({id:id, top:false});
-        } else if(st === "aan"){
-          if(aantalTop() >= 3){
-            state.filters = state.filters.filter(function(f){ return f.id !== id; });
-            toast("Maximaal 3 belangrijkste kenmerken, dit kenmerk is losgelaten");
-          } else {
-            state.filters.forEach(function(f){ if(f.id === id) f.top = true; });
-          }
-        } else {
-          state.filters = state.filters.filter(function(f){ return f.id !== id; });
-        }
+        var id = b.getAttribute("data-id");
+        if(filterStaat(id) === "uit") state.filters.push({id:id, top:false});
+        else state.filters = state.filters.filter(function(f){ return f.id !== id; });
         renderFilters(); renderAlles(); save();
       });
     });
+
+    var tHost = $("#topkeuze");
+    if(!state.filters.length){ tHost.innerHTML = ""; }
+    else {
+      tHost.innerHTML = '<div class="topbox"><p class="fg-lbl">Belangrijkste kenmerken · maximaal 3</p>'
+        + '<div class="fchips">'
+        + state.filters.map(function(f){
+            return '<button type="button" class="tchip" data-id="'+f.id+'" aria-pressed="'+(!!f.top)+'">'
+              + '<span class="star" aria-hidden="true">'+(f.top ? "★" : "☆")+'</span>'
+              + esc(FILTERS[f.id].label) + '</button>';
+          }).join("")
+        + '</div></div>';
+      each(tHost.querySelectorAll(".tchip"), function(b){
+        b.addEventListener("click", function(){
+          var id = b.getAttribute("data-id");
+          var f = state.filters.filter(function(x){ return x.id === id; })[0];
+          if(!f) return;
+          if(!f.top && aantalTop() >= 3){ toast("Maximaal 3 belangrijkste kenmerken"); return; }
+          f.top = !f.top;
+          renderFilters(); renderAlles(); save();
+        });
+      });
+    }
 
     var lijst = $("#eigenlijst");
     lijst.innerHTML = state.eigen.map(function(t,i){
@@ -1047,7 +1068,7 @@ main{padding-block:var(--s5) var(--s6)}
     var tops = state.filters.filter(function(f){ return f.top; }).map(function(f){ return FILTERS[f.id].label; });
     var regels = [];
     if(tops.length) regels.push("<b>Belangrijkste kenmerken:</b> " + esc(tops.join(", ")) + ".");
-    else if(state.filters.length) regels.push("Markeer maximaal 3 kenmerken als belangrijkste, die wegen het zwaarst in het advies.");
+    else if(state.filters.length) regels.push("Markeer hierboven maximaal 3 kenmerken als belangrijkste, die wegen het zwaarst in het advies.");
     else regels.push("Nog geen kenmerken gekozen. Zonder kenmerken volgt het advies de standaardopbouw.");
     sf.forEach(function(d){ regels.push("<b>" + esc(d.label) + ":</b> " + esc(d.sfeer)); });
     $("#fhint").innerHTML = regels.join("<br>");
