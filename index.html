@@ -526,47 +526,69 @@ main{padding-block:var(--s5) var(--s6)}
 
   /* ---------- categorieën ---------- */
   var CATS = {
-    "droom-hotel":    {label:"Droombeeld hotel",    groep:"Droombeeld", tags:["droom","hotel"],  dekt:["gebouw"]},
-    "droom-kamer":    {label:"Droombeeld kamer",    groep:"Droombeeld", tags:["droom","hotel"],  dekt:["kamer"]},
-    "droom-wellness": {label:"Droombeeld wellness", groep:"Droombeeld", tags:["droom","hotel"],  dekt:["wellness"]},
-    "droom-omgeving": {label:"Droombeeld omgeving", groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving"]},
-    "droom-natuur":   {label:"Droombeeld natuur",   groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving"]},
-    "droom-wandelen": {label:"Droombeeld wandelen", groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit"]},
-    "droom-fietsen":  {label:"Droombeeld fietsen",  groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit"]},
-    "gebouw":         {label:"Gebouw",              groep:"Hotel",      tags:["hotel"]},
-    "kamer":          {label:"Kamer",               groep:"Hotel",      tags:["hotel"]},
-    "diner":          {label:"Diner",               groep:"Package include", tags:["package"]},
-    "ontbijt":        {label:"Ontbijt",             groep:"Package include", tags:["package"]},
-    "wellness":       {label:"Wellness",            groep:"Package include", tags:["package","hotel"]},
-    "activiteit":     {label:"Activiteit",          groep:"Package include", tags:["package","activiteit"]},
-    "omgeving":       {label:"Omgeving",            groep:"Omgeving",   tags:["omgeving"]},
-    "anders":         {label:"Anders",              groep:"Overig",     tags:[]}
+    "droom-hotel":    {label:"Droombeeld hotel",        groep:"Droombeeld", tags:["droom","hotel"], dekt:["gebouw"]},
+    "droom-kamer":    {label:"Droombeeld kamer",        groep:"Droombeeld", tags:["droom","hotel"], dekt:["kamer"]},
+    "droom-wellness": {label:"Droombeeld wellness",     groep:"Droombeeld", tags:["droom","hotel"], dekt:["wellness"]},
+    "droom-zwembad":  {label:"Droombeeld zwembad",      groep:"Droombeeld", tags:["droom","hotel"], dekt:["zwembad"]},
+    "droom-omgeving": {label:"Droombeeld omgeving",     groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving"]},
+    "droom-natuur":   {label:"Droombeeld natuur",       groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving","natuur"]},
+    "droom-zee":      {label:"Droombeeld zee of strand",groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving","zee"]},
+    "droom-stad":     {label:"Droombeeld stad",         groep:"Droombeeld", tags:["droom","omgeving"], dekt:["omgeving","stad"]},
+    "droom-wandelen": {label:"Droombeeld wandelen",     groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit"]},
+    "droom-fietsen":  {label:"Droombeeld fietsen",      groep:"Droombeeld", tags:["droom","omgeving","activiteit"], dekt:["omgeving","activiteit","fietsen"]},
+
+    "gebouw":         {label:"Gebouw",                  groep:"Hotel", tags:["hotel"]},
+    "kamer":          {label:"Kamer",                   groep:"Hotel", tags:["hotel"]},
+    "suite":          {label:"Suite of bijzondere kamer", groep:"Hotel", tags:["hotel"], dekt:["kamer"]},
+    "jacuzzi":        {label:"Jacuzzi op kamer",        groep:"Hotel", tags:["hotel"], dekt:["kamer"]},
+    "interieur":      {label:"Interieur of lobby",      groep:"Hotel", tags:["hotel"]},
+    "tuin":           {label:"Tuin of terras",          groep:"Hotel", tags:["hotel"]},
+
+    "diner":          {label:"Diner",                   groep:"Package include", tags:["package"]},
+    "ontbijt":        {label:"Ontbijt",                 groep:"Package include", tags:["package"]},
+    "wellness":       {label:"Wellness of spa",         groep:"Package include", tags:["package","hotel"]},
+    "zwembad":        {label:"Zwembad",                 groep:"Package include", tags:["package","hotel"]},
+    "fietsen":        {label:"Fietsen of fietsroute",   groep:"Package include", tags:["package","activiteit","omgeving"]},
+    "activiteit":     {label:"Activiteit",              groep:"Package include", tags:["package","activiteit"]},
+
+    "omgeving":       {label:"Omgeving",                groep:"Omgeving", tags:["omgeving"]},
+    "natuur":         {label:"Natuur",                  groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
+    "zee":            {label:"Zee of strand",           groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
+    "stad":           {label:"Stad",                    groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
+    "bezienswaardigheid":{label:"Bezienswaardigheid",   groep:"Omgeving", tags:["omgeving"], dekt:["omgeving"]},
+
+    "anders":         {label:"Anders",                  groep:"Overig", tags:[]}
   };
   var GROEPEN = ["Droombeeld","Hotel","Package include","Omgeving","Overig"];
   var FILTERS = {
-    "nieuw":        {label:"Nieuwe hotels",           groep:"Hotel",       cats:[], sfeer:"Laat zien dat het hotel nieuw en fris is."},
-    "kasteel":      {label:"Kasteelhotel",            groep:"Hotel",       cats:["droom-hotel","gebouw"]},
-    "5sterren":     {label:"5 sterren",               groep:"Hotel",       cats:[], sfeer:"Hoeft geen eigen foto, maar alle beelden moeten luxe uitstralen."},
-    "wellnesshotel":{label:"Wellnesshotel",           groep:"Hotel",       cats:["wellness"]},
-    "hotelwellness":{label:"Hotel met wellness",      groep:"Hotel",       cats:["wellness"]},
-    "bijzonder":    {label:"Bijzondere overnachting", groep:"Hotel",       cats:["kamer","droom-hotel"]},
-    "fiets":        {label:"Fietsarrangement",        groep:"Arrangement", cats:["droom-fietsen","activiteit"]},
-    "diner":        {label:"Met diner",               groep:"Arrangement", cats:["diner"]},
-    "mini":         {label:"Mini vakantie",           groep:"Arrangement", cats:[], sfeer:"Kort verblijf, houd de reeks compact en sterk."},
-    "zee":          {label:"Aan zee",                 groep:"Locatie",     cats:["droom-natuur","omgeving"]},
-    "natuur":       {label:"In de natuur",            groep:"Locatie",     cats:["droom-natuur","omgeving"]},
-    "stedentrip":   {label:"Stedentrip",              groep:"Locatie",     cats:["omgeving"]},
-    "frankrijk":    {label:"Frankrijk",               groep:"Locatie",     cats:["omgeving"]},
-    "belgie":       {label:"Belgi\u00eb",                groep:"Locatie",     cats:["omgeving"]},
-    "jacuzzi":      {label:"Jacuzzi op kamer",        groep:"Extra",       cats:["kamer","wellness"]},
-    "zwembad":      {label:"Zwembad",                 groep:"Extra",       cats:["wellness"]},
-    "hond":         {label:"Hond mee",                groep:"Extra",       cats:["omgeving"], sfeer:"Alleen prominent tonen als dit echt de reden is om te boeken."},
-    "exclusief":    {label:"Exclusief bij ViaLuxury", groep:"Extra",       cats:[], sfeer:"Geen eigen foto nodig, laat het zien in de kwaliteit van de beelden."}
+    "nieuw":        {label:"Nieuwe hotels",             groep:"Hotel",       cats:[], sfeer:"Laat zien dat het hotel nieuw en fris is."},
+    "kasteel":      {label:"Kasteelhotels",             groep:"Hotel",       cats:["droom-hotel","gebouw"]},
+    "5sterren":     {label:"5 sterren",                 groep:"Hotel",       cats:[], sfeer:"Hoeft geen eigen foto, maar alle beelden moeten luxe uitstralen."},
+    "wellnesshotel":{label:"Wellnesshotels",            groep:"Hotel",       cats:["wellness"]},
+    "hotelwellness":{label:"Hotels met wellness",       groep:"Hotel",       cats:["wellness"]},
+    "bijzonder":    {label:"Bijzondere overnachtingen", groep:"Hotel",       cats:["droom-kamer","suite"]},
+    "fiets":        {label:"Fietsarrangement",          groep:"Arrangement", cats:["droom-fietsen","fietsen"]},
+    "diner":        {label:"Met diner",                 groep:"Arrangement", cats:["diner"]},
+    "mini":         {label:"Mini vakanties",            groep:"Arrangement", cats:[], sfeer:"Kort verblijf, houd de reeks compact en sterk."},
+    "zee":          {label:"Aan zee",                   groep:"Locatie",     cats:["droom-zee","zee"]},
+    "natuur":       {label:"In de natuur",              groep:"Locatie",     cats:["droom-natuur","natuur"]},
+    "stedentrip":   {label:"Stedentrips",               groep:"Locatie",     cats:["droom-stad","stad"]},
+    "frankrijk":    {label:"Hotels in Frankrijk",       groep:"Locatie",     cats:["omgeving"]},
+    "belgie":       {label:"Hotels in Belgi\u00eb",        groep:"Locatie",     cats:["omgeving"]},
+    "jacuzzi":      {label:"Jacuzzi op kamer",          groep:"Extra",       cats:["jacuzzi"]},
+    "zwembad":      {label:"Zwembad",                   groep:"Extra",       cats:["zwembad"]},
+    "hond":         {label:"Hond mee",                  groep:"Extra",       cats:["natuur"], sfeer:"Alleen prominent tonen als dit echt de reden is om te boeken."},
+    "exclusief":    {label:"Exclusief bij ViaLuxury",   groep:"Extra",       cats:[], sfeer:"Geen eigen foto nodig, laat het zien in de kwaliteit van de beelden."}
   };
   var FGROEPEN = ["Hotel","Arrangement","Locatie","Extra"];
-  var PACKAGES = ["diner","ontbijt","wellness","activiteit"];
-  var DROOM = ["droom-hotel","droom-kamer","droom-wellness","droom-omgeving","droom-natuur","droom-wandelen","droom-fietsen"];
-  var DROOMVAN = {"omgeving":"droom-omgeving","gebouw":"droom-hotel","kamer":"droom-kamer","wellness":"droom-wellness","activiteit":"droom-wandelen"};
+  var PACKAGES = ["diner","ontbijt","wellness","zwembad","fietsen","activiteit"];
+  var HOTELBEELD = ["gebouw","kamer","suite","jacuzzi","interieur","tuin"];
+  var DROOM = ["droom-hotel","droom-kamer","droom-wellness","droom-zwembad","droom-omgeving",
+               "droom-natuur","droom-zee","droom-stad","droom-wandelen","droom-fietsen"];
+  var DROOMVAN = {"gebouw":"droom-hotel","kamer":"droom-kamer","suite":"droom-kamer","jacuzzi":"droom-kamer",
+                  "interieur":"droom-hotel","tuin":"droom-hotel","wellness":"droom-wellness","zwembad":"droom-zwembad",
+                  "omgeving":"droom-omgeving","natuur":"droom-natuur","zee":"droom-zee","stad":"droom-stad",
+                  "bezienswaardigheid":"droom-stad","fietsen":"droom-fietsen","activiteit":"droom-wandelen"};
   function isDroom(c){ return DROOM.indexOf(c) !== -1; }
   function naarDroom(c){ return isDroom(c) ? c : (DROOMVAN[c] || null); }
   function dekt(c){ return [c].concat((CATS[c] && CATS[c].dekt) || []); }
@@ -658,6 +680,13 @@ main{padding-block:var(--s5) var(--s6)}
     return -1;
   }
   function vrij(i, lijst){ return lijst.filter(function(c){ return !gebruikt(i,c); }); }
+  function posMet(cat){
+    for(var j=0;j<5;j++){
+      var c = state.pos[j].cat;
+      if(c && dekt(c).indexOf(cat) !== -1) return j;
+    }
+    return -1;
+  }
   function uniek(lijst){
     var out = [];
     lijst.forEach(function(c){ if(c && out.indexOf(c) === -1) out.push(c); });
@@ -728,24 +757,32 @@ main{padding-block:var(--s5) var(--s6)}
         a.titel = "Kamer";
         a.waarom = "Het gebouw is niet aantrekkelijk genoeg, gebruik dan een sterk kamerbeeld.";
         a.primair = vrij(i,["kamer"]);
-        a.alt = uniek(wens.concat(vrij(i,["wellness","diner"]))).filter(function(c){ return c !== "kamer" && c !== "gebouw"; }).slice(0,3);
+        a.alt = vrij(i, uniek(wens.concat(["suite","jacuzzi","interieur","wellness"])))
+                  .filter(function(c){ return c !== "kamer" && c !== "gebouw"; }).slice(0,3);
       } else if(gebruikt(i,"gebouw")){
+        var pg = posMet("gebouw");
         a.titel = "Kamer";
-        a.waarom = "Het gebouw staat al op foto " + (alleCats().indexOf("gebouw") >= 0 ? (state.pos.map(function(p){return p.cat;}).indexOf("gebouw")+1) : "") + ".";
-        a.primair = vrij(i,["kamer"]);
-        a.alt = uniek(wens.concat(vrij(i,["wellness","diner"]))).filter(function(c){ return c !== "kamer"; }).slice(0,3);
-      } else if(wens.indexOf("kamer") !== -1 && wens.indexOf("gebouw") === -1){
-        a.titel = "Kamer";
-        a.waarom = reden("kamer", "Laat de kamer zien, dat is hier belangrijker dan het gebouw.");
-        a.primair = ["kamer"];
-        a.alt = vrij(i,["gebouw","wellness"]);
+        a.waarom = "Het gebouw zit al in foto " + (pg+1) + " (" + lbl(state.pos[pg].cat) + "). Laat hier het verblijf zien.";
+        a.primair = vrij(i, uniek(wens.concat(["kamer","suite","jacuzzi"])).filter(function(c){
+          return HOTELBEELD.indexOf(c) !== -1; })).slice(0,1);
+        a.alt = vrij(i, uniek(wens.concat(HOTELBEELD, ["wellness","zwembad"]))).filter(function(c){
+          return a.primair.indexOf(c) === -1 && c !== "gebouw"; }).slice(0,3);
+      } else if(wens.filter(function(c){ return ["kamer","suite","jacuzzi"].indexOf(c) !== -1; }).length
+                && wens.indexOf("gebouw") === -1){
+        var kamerWens = wens.filter(function(c){ return ["kamer","suite","jacuzzi"].indexOf(c) !== -1; })[0];
+        a.titel = lbl(kamerWens);
+        a.waarom = reden(kamerWens, "Laat het verblijf zien, dat is hier belangrijker dan het gebouw.");
+        a.primair = [kamerWens];
+        a.alt = vrij(i, uniek(["gebouw","kamer","suite","interieur"].concat(wens)))
+                  .filter(function(c){ return c !== kamerWens; }).slice(0,3);
       } else {
         a.titel = "Gebouw of kamer";
         a.waarom = wens.indexOf("gebouw") !== -1
           ? reden("gebouw", "Laat het gebouw goed zien, dat verkoopt dit arrangement.")
           : "Bij voorkeur het gebouw. Niet aantrekkelijk genoeg? Geef dat hieronder aan.";
         a.primair = vrij(i,["gebouw"]);
-        a.alt = vrij(i,["kamer","wellness"]);
+        a.alt = vrij(i, uniek(wens.filter(function(c){ return HOTELBEELD.indexOf(c) !== -1; })
+                  .concat(["kamer","suite","interieur","tuin"]))).slice(0,3);
       }
       if(!a.primair.length){ a.primair = a.alt.slice(0,1); a.alt = a.alt.slice(1); }
       return a;
@@ -767,8 +804,8 @@ main{padding-block:var(--s5) var(--s6)}
       } else {
         a.titel = "Aanvullend hotelbeeld";
         a.waarom = "Alle package includes staan al in de reeks.";
-        a.primair = vrij(i,["kamer","gebouw"]).slice(0,1);
-        a.alt = vrij(i,["kamer","gebouw","omgeving"]).slice(1,3);
+        a.primair = vrij(i, HOTELBEELD).slice(0,1);
+        a.alt = vrij(i, HOTELBEELD.concat(["omgeving","natuur"])).slice(1,4);
       }
       return a;
     }
@@ -776,7 +813,7 @@ main{padding-block:var(--s5) var(--s6)}
     var omg = eersteMet(i, "omgeving");
     if(omg !== -1){
       var mist = uniek(wens.filter(function(c){ return !heeftTag(c,"omgeving"); })
-                  .concat(vrij(i,["kamer","diner","ontbijt","wellness","activiteit","gebouw"])));
+                  .concat(vrij(i, PACKAGES.concat(HOTELBEELD))));
       a.titel = mist.length ? lbl(mist[0]) : "Aanvullend hotelbeeld";
       a.waarom = "Omgeving is al sterk vertegenwoordigd in foto " + (omg+1) + " (" + lbl(state.pos[omg].cat) + "). "
                + (mist.length && bron[mist[0]]
@@ -789,9 +826,11 @@ main{padding-block:var(--s5) var(--s6)}
       a.waarom = bron["omgeving"]
         ? reden("omgeving", "Laat zien waar de gast terechtkomt.")
         : "Laat zien waar de gast terechtkomt. Parijs, Veluwe, kust, stad of natuur.";
-      a.primair = vrij(i,["omgeving"]);
-      a.alt = uniek(wens.concat(vrij(i,["droom-natuur","kamer","gebouw"])))
-                .filter(function(c){ return c !== "omgeving"; }).slice(0,3);
+      var omgWens = wens.filter(function(c){ return heeftTag(c,"omgeving") && !isDroom(c); });
+      a.primair = omgWens.length ? omgWens.slice(0,1) : vrij(i,["omgeving"]);
+      a.alt = vrij(i, uniek(omgWens.concat(["omgeving","natuur","zee","stad","bezienswaardigheid"])))
+                .filter(function(c){ return a.primair.indexOf(c) === -1; }).slice(0,3);
+      if(omgWens.length) a.titel = lbl(omgWens[0]);
     }
     return a;
   }
