@@ -66,6 +66,21 @@ ophalen niet, bijvoorbeeld zonder internet, dan blijft de foto staan met de
 melding dat het bestand nog naar JPG moet en kun je het later opnieuw proberen
 met `Los op`.
 
+## Beschrijvingen en bestandsnamen
+
+De beschrijving die de tool genereert is gericht op vindbaarheid. Hij begint met
+wat er op de foto staat, noemt de hotelnaam, en bij het hoofdbeeld komt de
+context uit de gekozen kenmerken erbij, bijvoorbeeld "Vooraanzicht van Kasteel
+Winselerhof, een kasteelhotel in de natuur". Foto's van de omgeving krijgen de
+locatie erbij, de rest blijft kort en beschrijvend, zodat er geen zoekwoorden
+worden gestapeld.
+
+Elk onderwerp heeft meerdere formuleringen. Staan er twee kamerbeelden in de
+reeks, dan krijgt de tweede een andere zin, zodat geen twee foto's dezelfde
+beschrijving hebben. Hetzelfde geldt voor de bestandsnaam, die telt door als
+`-2`. Wijzigt de hotelnaam, een kenmerk of het type beeld, dan lopen de
+beschrijvingen en de namen meteen mee.
+
 ## Iconen
 
 De iconen komen uit de set in `MAZUREL/assets/iconen` en staan als `<symbol>`

@@ -283,6 +283,8 @@ main{padding-block:var(--s5) var(--s6)}
   color:var(--ink-3); font-weight:700; margin-bottom:4px}
 .opt-hotel input{width:100%; max-width:340px; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:8px 10px; font-size:14px}
+.hotel-hint{font-size:12.5px; color:var(--dev); margin-top:4px}
+.hotel-hint:empty{display:none}
 .drop .ic{color:var(--ink-3); margin-bottom:6px}
 .drop{border:1px dashed var(--line); border-radius:var(--r); background:var(--surface-2); padding:18px;
   text-align:center; cursor:pointer; margin-bottom:var(--s3)}
@@ -707,6 +709,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
           <div class="opt-hotel">
             <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
             <input id="hotelnaam" placeholder="Hotel Winselerhof">
+            <p class="hotel-hint" id="hotel-hint"></p>
           </div>
 
           <div class="drop" id="drop" role="button" tabindex="0" aria-label="Foto's toevoegen">
@@ -1151,14 +1154,14 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       if(j !== -1) state.pos[j].fotoId = null;      // een foto staat op maximaal één positie
       state.pos[i].fotoId = id;
     }
-    herindexeer(); renderAlles(); renderBib(); renderOpt(); save();
+    herindexeer(); renderAlles(); renderBib(); save();
   }
   function verwijderFoto(it){
     for(var i=0;i<5;i++){ if(state.pos[i].fotoId === it.id) state.pos[i].fotoId = null; }
     if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
     URL.revokeObjectURL(it.bronUrl);
     OPT = OPT.filter(function(x){ return x !== it; });
-    herindexeer(); renderOpt(); renderBib(); renderAlles(); save();
+    herindexeer(); renderBib(); renderAlles(); save();
   }
 
   function isHeic(ext){ return ext === "heic" || ext === "heif"; }
@@ -1855,42 +1858,51 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   function renderAlles(){
-    renderCards(); renderStrip(); renderMozaiek(); renderUsp(); renderSamenvatting();
+    renderCards(); renderStrip(); renderMozaiek(); renderUsp(); renderOpt(); renderSamenvatting();
   }
 
   /* ---------- foto's optimaliseren ---------- */
+  // per onderwerp meerdere formuleringen, zodat twee foto's van hetzelfde soort
+  // niet dezelfde beschrijving krijgen. {h} is de hotelnaam.
   var ONDERWERP = {
-    "droom-hotel":{slug:"hotel",            alt:"{h} van buiten"},
-    "droom-kamer":{slug:"kamer",            alt:"Kamer van {h}"},
-    "droom-wellness":{slug:"wellness",      alt:"Wellness van {h}"},
-    "droom-zwembad":{slug:"zwembad",        alt:"Zwembad van {h}"},
-    "droom-omgeving":{slug:"omgeving",      alt:"Omgeving van {h}"},
-    "droom-natuur":{slug:"natuur",          alt:"Natuur rond {h}"},
-    "droom-zee":{slug:"zee-strand",         alt:"Zee en strand bij {h}"},
-    "droom-stad":{slug:"stad",              alt:"De stad bij {h}"},
-    "droom-wandelen":{slug:"wandelen",      alt:"Wandelen in de omgeving van {h}"},
-    "droom-fietsen":{slug:"fietsen",        alt:"Fietsen in de omgeving van {h}"},
-    "gebouw":{slug:"gebouw",                alt:"Vooraanzicht van {h}"},
-    "kamer":{slug:"kamer",                  alt:"Kamer van {h}"},
-    "suite":{slug:"suite",                  alt:"Suite van {h}"},
-    "jacuzzi":{slug:"kamer-jacuzzi",        alt:"Kamer met jacuzzi van {h}"},
-    "interieur":{slug:"interieur",          alt:"Interieur van {h}"},
-    "tuin":{slug:"tuin-terras",             alt:"Tuin en terras van {h}"},
-    "diner":{slug:"diner-restaurant",       alt:"Diner in het restaurant van {h}"},
-    "ontbijt":{slug:"ontbijt",              alt:"Ontbijt bij {h}"},
-    "wellness":{slug:"wellness",            alt:"Wellness van {h}"},
-    "zwembad":{slug:"zwembad",              alt:"Zwembad van {h}"},
-    "fietsen":{slug:"fietsroute",           alt:"Fietsroute in de omgeving van {h}"},
-    "activiteit":{slug:"activiteit",        alt:"Activiteit tijdens het verblijf bij {h}"},
-    "omgeving":{slug:"omgeving",            alt:"Omgeving van {h}"},
-    "natuur":{slug:"natuur",                alt:"Natuur rond {h}"},
-    "zee":{slug:"zee-strand",               alt:"Zee en strand bij {h}"},
-    "stad":{slug:"stad",                    alt:"De stad bij {h}"},
-    "bezienswaardigheid":{slug:"bezienswaardigheid", alt:"Bezienswaardigheid in de omgeving van {h}"},
-    "evenement":{slug:"concert",            alt:"Concert tijdens het verblijf bij {h}"},
-    "museum":{slug:"museum",                alt:"Museum in de omgeving van {h}"},
-    "anders":{slug:"foto",                  alt:"Foto van {h}"}
+    "droom-hotel":{slug:"vooraanzicht", alts:["Vooraanzicht van {h}","{h} van buiten gezien","Het gebouw van {h}"]},
+    "droom-kamer":{slug:"kamer", alts:["Tweepersoonskamer in {h}","Hotelkamer met zithoek in {h}"]},
+    "droom-wellness":{slug:"wellness", alts:["Wellness met sauna in {h}","Spa van {h}"]},
+    "droom-zwembad":{slug:"zwembad", alts:["Zwembad van {h}","Zwembad om te ontspannen in {h}"]},
+    "droom-omgeving":{slug:"omgeving", alts:["Omgeving van {h}","Uitzicht op de omgeving van {h}"]},
+    "droom-natuur":{slug:"natuur", alts:["Natuur rond {h}","Wandelgebied rond {h}"]},
+    "droom-zee":{slug:"zee-strand", alts:["Strand en zee vlak bij {h}","Kust in de omgeving van {h}"]},
+    "droom-stad":{slug:"stad", alts:["Stadsgezicht vlak bij {h}","Het centrum op loopafstand van {h}"]},
+    "droom-wandelen":{slug:"wandelen", alts:["Wandelroute vanaf {h}","Wandelen in de omgeving van {h}"]},
+    "droom-fietsen":{slug:"fietsen", alts:["Fietsroute vanaf {h}","Fietsen door de omgeving van {h}"]},
+    "gebouw":{slug:"gebouw", alts:["Vooraanzicht van {h}","Buitenaanzicht van {h}","De entree van {h}"]},
+    "kamer":{slug:"kamer", alts:["Tweepersoonskamer in {h}","Hotelkamer met zithoek in {h}","Ruime kamer in {h}"]},
+    "suite":{slug:"suite", alts:["Suite met eigen zitgedeelte in {h}","Ruime suite in {h}"]},
+    "jacuzzi":{slug:"kamer-jacuzzi", alts:["Kamer met eigen jacuzzi in {h}","Jacuzzi op de kamer in {h}"]},
+    "interieur":{slug:"interieur", alts:["Lobby van {h}","Interieur en zitgedeelte van {h}"]},
+    "tuin":{slug:"tuin-terras", alts:["Tuin en terras van {h}","Terras in de tuin van {h}"]},
+    "diner":{slug:"diner-restaurant", alts:["Diner in het restaurant van {h}","Gedekte tafel in het restaurant van {h}"]},
+    "ontbijt":{slug:"ontbijt", alts:["Ontbijt in {h}","Ontbijtbuffet van {h}"]},
+    "wellness":{slug:"wellness", alts:["Wellness met sauna in {h}","Spa van {h}","Ontspannen in de wellness van {h}"]},
+    "zwembad":{slug:"zwembad", alts:["Zwembad van {h}","Zwembad om te ontspannen in {h}"]},
+    "fietsen":{slug:"fietsroute", alts:["Fietsroute vanaf {h}","Fietsen door de omgeving van {h}"]},
+    "activiteit":{slug:"activiteit", alts:["Activiteit tijdens het verblijf in {h}","Uitje in de omgeving van {h}"]},
+    "omgeving":{slug:"omgeving", alts:["Omgeving van {h}","Uitzicht op de omgeving van {h}"]},
+    "natuur":{slug:"natuur", alts:["Natuur rond {h}","Wandelgebied rond {h}"]},
+    "zee":{slug:"zee-strand", alts:["Strand en zee vlak bij {h}","Kust in de omgeving van {h}"]},
+    "stad":{slug:"stad", alts:["Stadsgezicht vlak bij {h}","Het centrum op loopafstand van {h}"]},
+    "bezienswaardigheid":{slug:"bezienswaardigheid", alts:["Bezienswaardigheid in de omgeving van {h}","Uitje vlak bij {h}"]},
+    "evenement":{slug:"concert", alts:["Concert tijdens het arrangement van {h}","Voorstelling in de omgeving van {h}"]},
+    "museum":{slug:"museum", alts:["Museum in de omgeving van {h}","Tentoonstelling vlak bij {h}"]},
+    "anders":{slug:"foto", alts:["Beeld van {h}"]}
   };
+  // context uit de gekozen kenmerken, voor de beschrijving van het hoofdbeeld
+  var SEO_SOORT = {kasteel:"een kasteelhotel", "5sterren":"een vijfsterrenhotel",
+                   wellnesshotel:"een wellnesshotel", hotelwellness:"een hotel met wellness",
+                   bijzonder:"een bijzondere overnachting", nieuw:"een nieuw hotel"};
+  var SEO_PLEK = {zee:{t:"aan zee", w:"zee"}, natuur:{t:"in de natuur", w:"natuur"},
+                  stedentrip:{t:"in de stad", w:"stad"}, frankrijk:{t:"in Frankrijk", w:"Frankrijk"},
+                  belgie:{t:"in Belgi\u00eb", w:"Belgi\u00eb"}};
   var OPT = [], optId = 0, hotelNaam = "";
   var SLECHTE_NAAM = /^(img|dsc|dscn|foto|image|photo|pxl|screenshot|schermafbeelding|untitled|final)[\s_\-]*\d*$/i;
 
@@ -1910,17 +1922,51 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
   function onderwerpVan(it){ return ONDERWERP[catVan(it)] || ONDERWERP["anders"]; }
 
-  function naamVoorstel(it){
+  function naamBasis(it){
     var o = onderwerpVan(it);
     var h = slug(hotelNaam);
     var voor = h ? (/^hotel(-|$)/.test(h) ? h : "hotel-" + h) : "hotel";
-    var basis = [voor, o.slug].join("-");
-    var zelfde = OPT.filter(function(x){ return x !== it && x.doelNaam && x.doelNaam.indexOf(basis) === 0; });
-    var nr = zelfde.length ? "-" + (zelfde.length + 1) : "";
-    return basis + nr + "." + (it.doelExt || "jpg");
+    var delen = voor.split("-");
+    // het onderwerp niet herhalen, anders wordt het hotel-kasteel-winselerhof-hotel
+    return delen.indexOf(o.slug) !== -1 ? voor : voor + "-" + o.slug;
+  }
+  function naamVoorstel(it){
+    var basis = naamBasis(it), nr = 0;
+    for(var i=0;i<OPT.length;i++){          // tellen op volgorde, zo blijft de naam gelijk bij hertekenen
+      if(OPT[i] === it) break;
+      if(naamBasis(OPT[i]) === basis) nr++;
+    }
+    return basis + (nr ? "-" + (nr+1) : "") + "." + (it.doelExt || "jpg");
+  }
+  function uitKenmerken(kaart){
+    // belangrijkste kenmerken eerst, die zegt het meest over dit hotel
+    var lijst = state.filters.slice().sort(function(a,b){ return (b.top?1:0) - (a.top?1:0); });
+    for(var i=0;i<lijst.length;i++){ if(kaart[lijst[i].id]) return kaart[lijst[i].id]; }
+    return "";
   }
   function altVoorstel(it){
-    return onderwerpVan(it).alt.replace("{h}", hotelNaam || "dit hotel");
+    var o = onderwerpVan(it), cat = catVan(it);
+    var zelfde = 0;
+    for(var i=0;i<OPT.length;i++){
+      if(OPT[i] === it) break;
+      if(catVan(OPT[i]) === cat) zelfde++;
+    }
+    var vormen = o.alts || [o.alt || "Beeld van {h}"];
+    var zin = vormen[zelfde % vormen.length].replace(/\{h\}/g, hotelNaam || "het hotel");
+
+    // het hoofdbeeld krijgt de context erbij, de rest blijft kort en beschrijvend
+    var extra = "";
+    var plek = uitKenmerken(SEO_PLEK);
+    var alGenoemd = plek && zin.toLowerCase().indexOf(plek.w.toLowerCase()) !== -1;
+    if(isHoofdItem(it)){
+      var soort = uitKenmerken(SEO_SOORT);
+      if(soort && plek && !alGenoemd) extra = ", " + soort + " " + plek.t;
+      else if(soort) extra = ", " + soort;
+      else if(plek && !alGenoemd) extra = " " + plek.t;
+    } else if(heeftTag(cat, "omgeving") && plek && !alGenoemd){
+      extra = " " + plek.t;
+    }
+    return (zin + extra).length <= 125 ? zin + extra : zin;
   }
 
   function controle(it){
@@ -2092,6 +2138,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
   var optLijst = $("#opt-lijst");
   function renderOpt(){
+    herindexeer();                 // namen en beschrijvingen volgen de laatste stand
     var bar = $("#opt-bar");
     if(!OPT.length){
       optLijst.innerHTML = '<p class="opt-leeg">Nog geen foto’s toegevoegd. De controle op grootte, formaat, bestandsnaam en beschrijving doet de tool zelf.</p>';
@@ -2146,6 +2193,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       rij.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
     });
 
+    hotelHint();
     $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
       ? "Sla foto's los op met de knop ernaast, of alles samen met Alles als zip. In de zip zit ook alt-teksten.txt."
       : (OPT.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
@@ -2291,6 +2339,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files);
   });
   $("#hotelnaam").addEventListener("input", function(){ hotelNaam = this.value; renderOpt(); });
+  function hotelHint(){
+    var el = $("#hotel-hint");
+    el.textContent = (!hotelNaam.trim() && OPT.length)
+      ? "Vul de hotelnaam in, dan komt die in de bestandsnaam en in de beschrijving van elke foto."
+      : "";
+  }
 
   var MAANDEN = ["januari","februari","maart","april","mei","juni","juli","augustus",
                  "september","oktober","november","december"];
