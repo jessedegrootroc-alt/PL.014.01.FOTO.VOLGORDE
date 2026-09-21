@@ -401,6 +401,46 @@ main{padding-block:var(--s5) var(--s6)}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
 
+/* ---------- fotobibliotheek, alleen versie 2 ---------- */
+html[data-versie="1"] #blok-fotos{display:none}
+html[data-versie="1"] #chip-fotos{display:none}
+.bib-zones{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s3)}
+.bib-zone{border:1px solid var(--line-soft); border-radius:var(--r); padding:12px; background:var(--surface-2)}
+.bib-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3)}
+.bib-uit{font-size:12.5px; color:var(--ink-2); line-height:1.45; margin:2px 0 10px}
+.bib-zone .drop{background:var(--surface); padding:13px; margin-bottom:10px}
+.bib-zone .drop p{font-size:13px}
+.bib-grid{display:flex; flex-wrap:wrap; gap:10px}
+.bib-item{width:98px}
+.bib-item img{width:98px; height:72px; object-fit:cover; border-radius:var(--r); border:1px solid var(--line);
+  display:block; background:var(--na-bg)}
+.bib-item.gebruikt img{border-color:var(--ok)}
+.bib-naam{font-size:11px; color:var(--ink-2); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bib-rij{display:flex; align-items:center; gap:7px; margin-top:1px}
+.bib-pos{font-size:10.5px; font-weight:700; color:var(--ok)}
+.mini-link{background:none; border:0; padding:0; font-size:11px; color:var(--ink-3); text-decoration:underline; cursor:pointer}
+.mini-link:hover{color:var(--accent-hover)}
+.bib-leeg{font-size:12.5px; color:var(--ink-3)}
+.bib-hint{font-size:13px; color:var(--ink-2); margin-top:var(--s3)}
+.bib-hint b{color:var(--ink); font-weight:600}
+@media (max-width:760px){ .bib-zones{grid-template-columns:minmax(0,1fr)} }
+
+.fkies{margin-top:10px}
+.fkies-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700;
+  color:var(--ink-3); margin-bottom:5px}
+.fkies-rij{display:flex; flex-wrap:wrap; gap:7px}
+.fpick{position:relative; padding:0; border:1px solid var(--line); border-radius:var(--r);
+  background:var(--surface); cursor:pointer; line-height:0}
+.fpick img{width:66px; height:48px; object-fit:cover; border-radius:5px; display:block}
+.fpick:hover{border-color:var(--ink-3)}
+.fpick[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 2px rgba(251,134,44,.25)}
+.fpick.elders img{opacity:.4}
+.fpick .fp-b{position:absolute; top:-6px; right:-6px; background:var(--ink); color:#FFFFFF;
+  font-size:10px; font-weight:700; line-height:1; padding:3px 5px; border-radius:var(--r)}
+.fpick.waarsch .fp-b{background:var(--err)}
+.fkies-leeg{font-size:12.5px; color:var(--ink-3)}
+.tile .t-img{width:100%; height:46px; object-fit:cover; border-radius:5px; margin-top:5px; display:block}
+
 /* ---------- versieschakelaar ---------- */
 .vsw{position:fixed; left:16px; bottom:16px; z-index:70; font-family:var(--font-body)}
 .vsw-knop{display:inline-flex; align-items:center; gap:7px; background:var(--ink); color:#FFFFFF;
@@ -526,7 +566,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
   <section class="block" aria-labelledby="h-usp" style="margin-bottom:var(--s4)">
     <div class="block-h">
-      <span class="step">00</span>
+      <span class="step" data-s1="00" data-s2="00">00</span>
       <h2 id="h-usp">Kenmerken en USP's</h2>
       <span class="tag sp">Eerst dit</span>
     </div>
@@ -546,9 +586,41 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     </div>
   </section>
 
+  <section class="block" id="blok-fotos" aria-labelledby="h-fotos" style="margin-bottom:var(--s4)">
+    <div class="block-h">
+      <span class="step" data-s1="" data-s2="01">01</span>
+      <h2 id="h-fotos">Foto’s toevoegen</h2>
+      <span class="tag sp">Eerst dit</span>
+    </div>
+    <p class="lead">Zet de foto’s klaar op het juiste niveau. Hotelniveau gebruik je bij elk pakket van dit hotel, arrangementniveau alleen bij dit pakket.</p>
+    <div class="block-b">
+      <div class="bib-zones">
+        <div class="bib-zone">
+          <p class="bib-lbl">Hotelniveau</p>
+          <p class="bib-uit">Komt terug bij elk pakket van dit hotel. Gebouw, kamers, interieur, wellness, tuin.</p>
+          <div class="drop" data-drop="hotel" role="button" tabindex="0" aria-label="Foto’s op hotelniveau toevoegen">
+            <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep hierheen</b> of klik om te kiezen</p>
+            <input type="file" multiple accept="image/*,.heic,.avif">
+          </div>
+          <div class="bib-grid" data-grid="hotel"></div>
+        </div>
+        <div class="bib-zone">
+          <p class="bib-lbl">Arrangementniveau</p>
+          <p class="bib-uit">Alleen voor dit pakket. Het hoofdbeeld hoort hier, net als beelden die per pakket verschillen.</p>
+          <div class="drop" data-drop="arrangement" role="button" tabindex="0" aria-label="Foto’s op arrangementniveau toevoegen">
+            <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep hierheen</b> of klik om te kiezen</p>
+            <input type="file" multiple accept="image/*,.heic,.avif">
+          </div>
+          <div class="bib-grid" data-grid="arrangement"></div>
+        </div>
+      </div>
+      <p class="bib-hint" id="bib-hint"></p>
+    </div>
+  </section>
+
   <section class="block hero" aria-labelledby="h-eerste5">
     <div class="block-h">
-      <span class="step">01</span>
+      <span class="step" data-s1="01" data-s2="02">01</span>
       <h2 id="h-eerste5">De eerste 5 foto's</h2>
       <span class="tag sp">Richtlijn</span>
     </div>
@@ -566,6 +638,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       <span class="chip" id="chip-typen"><b>0 / 5</b> typen gekozen</span>
       <span class="chip" id="chip-hotel"><b>0 / 4</b> hotelgerelateerd</span>
       <span class="chip" id="chip-niveau"><b>0</b> hotelniveau · <b>0</b> arrangementniveau</span>
+      <span class="chip" id="chip-fotos"><b>0 / 5</b> foto’s gekozen</span>
       <p class="barhint" id="bar-hint"></p>
     </div>
     <div class="barline col" id="usp-bar"></div>
@@ -575,7 +648,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     <div class="stack">
 
       <section class="block" aria-labelledby="h3a">
-        <div class="block-h"><span class="step">02</span><h2 id="h3a">Rest van de fotoreeks</h2><span class="tag sp">Richtlijn</span></div>
+        <div class="block-h"><span class="step" data-s1="02" data-s2="03">02</span><h2 id="h3a">Rest van de fotoreeks</h2><span class="tag sp">Richtlijn</span></div>
         <p class="lead">Foto 6 tot en met 14 zijn vooral aanvullende hotelbeelden. Eindig waar het kan met de omgeving.</p>
         <div class="block-b">
           <div class="counter">
@@ -596,13 +669,13 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       </section>
 
       <section class="block" aria-labelledby="h4a">
-        <div class="block-h"><span class="step">03</span><h2 id="h4a">Visuele kwaliteit</h2><span class="tag sp">Richtlijn</span></div>
+        <div class="block-h"><span class="step" data-s1="03" data-s2="04">03</span><h2 id="h4a">Visuele kwaliteit</h2><span class="tag sp">Richtlijn</span></div>
         <p class="lead">Kijk of de reeks als één geheel voelt. Een opbouw van dag naar avond mag, licht dat willekeurig wisselt niet.</p>
         <div class="block-b"><div class="rows" data-rows="visueel"></div></div>
       </section>
 
       <section class="block" aria-labelledby="h6a">
-        <div class="block-h"><span class="step">04</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
+        <div class="block-h"><span class="step" data-s1="04" data-s2="05">04</span><h2 id="h6a">Techniek</h2><span class="tag hard sp">Harde eis</span></div>
         <p class="lead">Voeg de foto's toe in de volgorde van de reeks. De tool meet ze en lost zelf op wat kan: te zwaar, verkeerd formaat, naam en beschrijving.</p>
         <div class="block-b">
           <table class="spec">
@@ -666,7 +739,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       <div class="ov-col err"><h3>Aanpassen voor live <span id="ov-err-n">0</span></h3><div id="ov-err"></div></div>
     </div>
   </section>
-  <p class="foot">Je invoer blijft in deze browser bewaard tot je op leegmaken klikt.</p>
+  <p class="foot">Je invoer blijft in deze browser bewaard tot je op leegmaken klikt. Toegevoegde foto’s blijven alleen tijdens deze sessie staan.</p>
 </main>
 
 <div class="vsw" id="versieschakelaar">
@@ -793,7 +866,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   };
 
   var STORE = "vialuxury-fotocheck-v12";
-  function leegPos(){ return {cat:null, anders:"", status:null, niveau:null}; }
+  function leegPos(){ return {cat:null, anders:"", status:null, niveau:null, fotoId:null}; }
   var state = {
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
@@ -1043,6 +1116,97 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     return -1;
   }
 
+  /* ---------- fotobibliotheek, alleen versie 2 ---------- */
+  function v2(){ return document.documentElement.getAttribute("data-versie") === "2"; }
+  function fotoVan(i){
+    var id = state.pos[i].fotoId; if(!id) return null;
+    return OPT.filter(function(x){ return x.id === id; })[0] || null;
+  }
+  function posVanFoto(id){
+    for(var i=0;i<5;i++){ if(state.pos[i].fotoId === id) return i; }
+    return -1;
+  }
+  function aantalGekozen(){
+    return state.pos.filter(function(p){ return !!p.fotoId && fotoVan(state.pos.indexOf(p)) !== null; }).length;
+  }
+  function kiesFoto(i, id){
+    if(state.pos[i].fotoId === id){
+      state.pos[i].fotoId = null;
+    } else {
+      var j = posVanFoto(id);
+      if(j !== -1) state.pos[j].fotoId = null;      // een foto staat op maximaal één positie
+      state.pos[i].fotoId = id;
+      var f = fotoVan(i);
+      if(f && f.niveau) state.pos[i].niveau = f.niveau;
+    }
+    herindexeer(); renderAlles(); renderBib(); renderOpt(); save();
+  }
+  function verwijderFoto(it){
+    for(var i=0;i<5;i++){ if(state.pos[i].fotoId === it.id) state.pos[i].fotoId = null; }
+    if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+    URL.revokeObjectURL(it.bronUrl);
+    OPT = OPT.filter(function(x){ return x !== it; });
+    herindexeer(); renderOpt(); renderBib(); renderAlles(); save();
+  }
+
+  function renderBib(){
+    var blok = $("#blok-fotos"); if(!blok) return;
+    ["hotel","arrangement"].forEach(function(nv){
+      var grid = blok.querySelector('[data-grid="'+nv+'"]');
+      var items = OPT.filter(function(it){ return (it.niveau || "arrangement") === nv; });
+      grid.innerHTML = items.length ? items.map(function(it){
+        var pos = posVanFoto(it.id);
+        var naar = (nv === "hotel") ? "arrangement" : "hotel";
+        return '<div class="bib-item'+(pos !== -1 ? " gebruikt" : "")+'" data-id="'+it.id+'">'
+          + '<img src="'+it.url+'" alt="">'
+          + '<p class="bib-naam" title="'+esc(it.naam)+'">'+esc(it.naam)+'</p>'
+          + '<div class="bib-rij">'
+          +   (pos !== -1 ? '<span class="bib-pos">Foto '+(pos+1)+'</span>' : '')
+          +   '<button type="button" class="mini-link" data-act="wissel" title="Naar '+naar+'niveau">verplaats</button>'
+          +   '<button type="button" class="mini-link" data-act="weg" title="Foto verwijderen">weg</button>'
+          + '</div></div>';
+      }).join("") : '<p class="bib-leeg">Nog geen foto\u2019s op dit niveau.</p>';
+
+      each(grid.querySelectorAll(".bib-item"), function(el){
+        var it = OPT.filter(function(x){ return x.id === parseInt(el.getAttribute("data-id"),10); })[0];
+        if(!it) return;
+        el.querySelector('[data-act="wissel"]').addEventListener("click", function(){
+          it.niveau = (it.niveau === "hotel") ? "arrangement" : "hotel";
+          var p = posVanFoto(it.id);
+          if(p !== -1) state.pos[p].niveau = it.niveau;
+          renderBib(); renderAlles(); save();
+        });
+        el.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
+      });
+    });
+
+    var h = OPT.filter(function(it){ return it.niveau === "hotel"; }).length;
+    var a = OPT.length - h;
+    $("#bib-hint").innerHTML = OPT.length
+      ? "<b>" + h + " op hotelniveau \u00b7 " + a + " op arrangementniveau.</b> Kies ze in de volgende stap. "
+        + "Dezelfde foto\u2019s staan in het blok Techniek, daar controleert de tool de bestanden."
+      : "Voeg de foto\u2019s toe die je voor dit pakket kunt gebruiken. Staat een foto op het verkeerde niveau, "
+        + "dan zet je hem later met \u00e9\u00e9n klik om.";
+  }
+
+  each(document.querySelectorAll("#blok-fotos .drop"), function(dz){
+    var nv = dz.getAttribute("data-drop"), inp = dz.querySelector("input");
+    dz.addEventListener("click", function(){ inp.click(); });
+    dz.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); inp.click(); } });
+    inp.addEventListener("change", function(){
+      if(!inp.files.length) return;
+      var kopie = Array.prototype.slice.call(inp.files);
+      inp.value = "";
+      voegToe(kopie, nv);
+    });
+    dz.addEventListener("dragover", function(e){ e.preventDefault(); dz.classList.add("over"); });
+    dz.addEventListener("dragleave", function(){ dz.classList.remove("over"); });
+    dz.addEventListener("drop", function(e){
+      e.preventDefault(); dz.classList.remove("over");
+      if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files, nv);
+    });
+  });
+
   /* ---------- kaarten ---------- */
   var cardsHost = $("#cards"), stripHost = $("#strip"), dragFrom = null;
 
@@ -1094,6 +1258,27 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
           + (gebruikt(i, p.cat) ? '<p class="c-sub" style="color:var(--dev)">Dit type staat ook op een andere positie. Kijk of meer variatie mogelijk is.</p>' : "");
       }
 
+      var fkies = "";
+      if(v2()){
+        fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
+          + (OPT.length ? '<div class="fkies-rij">' + OPT.map(function(it){
+              var elders = posVanFoto(it.id), hier = (state.pos[i].fotoId === it.id);
+              var waarsch = (i === 0 && it.niveau === "hotel");
+              var titel = it.naam + (it.niveau === "hotel" ? " \u00b7 hotelniveau" : " \u00b7 arrangementniveau")
+                + (elders !== -1 && elders !== i ? " \u00b7 staat al op foto " + (elders+1) : "")
+                + (waarsch ? " \u00b7 het hoofdbeeld mag niet op elk pakket terugkomen" : "");
+              return '<button type="button" class="fpick'
+                + (elders !== -1 && elders !== i ? " elders" : "") + (waarsch ? " waarsch" : "") + '"'
+                + ' data-foto="'+it.id+'" aria-pressed="'+hier+'" title="'+esc(titel)+'">'
+                + '<img src="'+it.url+'" alt="">'
+                + (elders !== -1 && elders !== i ? '<span class="fp-b">'+(elders+1)+'</span>'
+                   : (waarsch ? '<span class="fp-b">!</span>' : ''))
+                + '</button>';
+            }).join("") + '</div>'
+            : '<p class="fkies-leeg">Nog geen foto\u2019s toegevoegd in stap 01.</p>')
+          + '</div>';
+      }
+
       return '<div class="card'+(i===nxt?" next":"")+'" data-i="'+i+'"'+(p.status?' data-status="'+p.status+'"':'')+'>'
         + '<div class="c-num">'
         +   '<span class="num">'+(i+1)+'</span>'
@@ -1106,6 +1291,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         +     (isHoofd ? '<span class="badge">Hoofdbeeld · arrangementniveau</span>' : '')+'</p>'
         +   (p.cat ? '<p class="c-sub">Positie '+(i+1)+' in de reeks</p>' : '')
         +   advBlok
+        +   fkies
         + '</div>'
         + '<div class="c-side">'
         +   '<div class="pick"><label for="cat-'+i+'">Wat voor soort beeld is dit?</label>'
@@ -1129,6 +1315,10 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
     each(cardsHost.querySelectorAll(".card"), function(card){
       var i = parseInt(card.getAttribute("data-i"),10);
+
+      each(card.querySelectorAll("[data-foto]"), function(b){
+        b.addEventListener("click", function(){ kiesFoto(i, parseInt(b.getAttribute("data-foto"),10)); });
+      });
 
       each(card.querySelectorAll("[data-set]"), function(b){
         b.addEventListener("click", function(){ kiesCat(i, b.getAttribute("data-set")); });
@@ -1215,12 +1405,13 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   function renderStrip(){
     var nxt = volgendeLeeg();
     stripHost.innerHTML = state.pos.map(function(p,i){
-      var a = advies(i);
+      var a = advies(i), f = fotoVan(i);
       return '<button type="button" class="tile'+(i===nxt?" next":"")+'" data-i="'+i+'"'
         + (p.status?' data-status="'+p.status+'"':'')+'>'
         + '<span class="t-n">Foto '+(i+1)+(i===state.hoofd?" · hoofdbeeld":"")+'</span>'
         + (p.cat ? '<div class="t-c">'+esc(lbl(p.cat))+'</div>'
                  : '<div class="t-e">Advies: '+esc(a.titel)+'</div>')
+        + (v2() && f ? '<img class="t-img" src="'+f.url+'" alt="">' : '')
         + '</button>';
     }).join("");
     each(stripHost.children, function(b){
@@ -1497,6 +1688,11 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       + (t.lvOpen ? " · " + t.lvOpen + " open" : "");
     cN.className = "chip" + (t.lvOpen === 0 ? " ok" : "");
 
+    var gekozenN = aantalGekozen();
+    var cF = $("#chip-fotos");
+    cF.innerHTML = "<b>" + gekozenN + " / 5</b> foto\u2019s gekozen";
+    cF.className = "chip" + (gekozenN === 5 ? " ok" : (OPT.length && t.typen === 5 ? " dev" : ""));
+
     var hint = $("#bar-hint");
     if(t.typen === 5 && t.hotels < 3){
       hint.className = "barhint dev";
@@ -1505,6 +1701,9 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       hint.className = "barhint";
       var nx = volgendeLeeg();
       hint.textContent = "Volgende stap: foto " + (nx+1) + " — advies is " + advies(nx).titel.toLowerCase() + ".";
+    } else if(v2() && OPT.length && gekozenN < 5){
+      hint.className = "barhint";
+      hint.textContent = "Nog " + (5-gekozenN) + (5-gekozenN === 1 ? " foto kiezen" : " foto\u2019s kiezen") + " bij de eerste vijf.";
     } else {
       hint.className = "barhint";
       hint.textContent = "De opbouw van de eerste vijf volgt de richtlijn.";
@@ -1709,7 +1908,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     renderOpt();
   }
 
-  async function voegToe(lijst){
+  async function voegToe(lijst, niveau){
     var bestanden = Array.prototype.slice.call(lijst);
     for(var i=0;i<bestanden.length;i++){
       var f = bestanden[i];
@@ -1717,6 +1916,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       var url = URL.createObjectURL(f);
       var it = {id:++optId, bestand:f, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
+                niveau:(niveau || "arrangement"),
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
       OPT.push(it);
       herindexeer();
@@ -1727,15 +1927,18 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       }catch(e){
         it.fout = "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
       }
-      renderOpt();
+      renderOpt(); renderBib();
     }
-    renderSamenvatting();
+    renderAlles();
   }
 
   function herindexeer(){
-    // foto 1 t/m 5 volgen de posities uit stap 01, de rest is een aanvullende foto
+    // heeft iemand foto's aan posities gekoppeld, dan volgt de indeling die keuze,
+    // anders volgen foto 1 t/m 5 gewoon de volgorde van toevoegen
+    var handmatig = state.pos.some(function(p){ return !!p.fotoId; });
     OPT.forEach(function(it, n){
-      it.onderwerp = (n < 5) ? {type:"pos", v:n} : {type:"cat", v:"anders"};
+      var pos = handmatig ? posVanFoto(it.id) : (n < 5 ? n : -1);
+      it.onderwerp = (pos !== -1) ? {type:"pos", v:pos} : {type:"cat", v:"anders"};
       if(it.autoAlt) it.alt = altVoorstel(it);
       if(it.doelNaam){ it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,""); it.naam = it.doelNaam + "." + it.ext; }
     });
@@ -1794,12 +1997,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       });
       var dl = rij.querySelector('[data-act="dl"]');
       if(dl) dl.addEventListener("click", function(){ bewaar(it); });
-      rij.querySelector('[data-act="weg"]').addEventListener("click", function(){
-        if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
-        URL.revokeObjectURL(it.bronUrl);
-        OPT = OPT.filter(function(x){ return x !== it; });
-        herindexeer(); renderOpt(); renderSamenvatting();
-      });
+      rij.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
     });
 
     $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
@@ -2003,8 +2201,13 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     state.checks = {}; state.hoofd = 0; state.count = 10;
     state.gebouwNiet = false;
     state.filters = []; state.eigen = [];
+    OPT.forEach(function(it){
+      if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+      URL.revokeObjectURL(it.bronUrl);
+    });
+    OPT = [];
     try{ localStorage.removeItem(STORE); }catch(e){}
-    renderRows(); renderCount(); renderFilters(); renderAlles();
+    renderRows(); renderCount(); renderFilters(); renderOpt(); renderBib(); renderAlles();
     toast("Leeg, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
   });
@@ -2071,6 +2274,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
+  var gestart = false;
   var vswEl = $("#versieschakelaar"), vswKnop = $("#vsw-knop"),
       vswLijst = $("#vsw-lijst"), vswNu = $("#vsw-nu");
 
@@ -2088,6 +2292,14 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     document.documentElement.setAttribute("data-versie", id);
     if(onthoud !== false){ try{ localStorage.setItem(VERSIE_STORE, id); }catch(e){} }
     renderVersie(id);
+    renderStapnummers();
+    if(gestart){ herindexeer(); renderBib(); renderOpt(); renderAlles(); }
+  }
+  function renderStapnummers(){
+    each(document.querySelectorAll(".step"), function(el){
+      var s = el.getAttribute(v2() ? "data-s2" : "data-s1");
+      if(s !== null) el.textContent = s;
+    });
   }
   function renderVersie(id){
     var nu = VERSIES[0];
@@ -2131,9 +2343,11 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   load();
   renderRows();
   renderOpt();
+  renderBib();
   renderCount();
   renderFilters();
   renderAlles();
   maakInklapbaar();
+  gestart = true;
 })();
 </script>
