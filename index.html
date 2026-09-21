@@ -411,6 +411,12 @@ html[data-versie="1"] #chip-fotos{display:none}
 .bib-item.gebruikt img{border-color:var(--ok)}
 .bib-item .niveau{margin-top:5px}
 .bib-item .niveau button{font-size:11px; padding:4px 6px}
+.geenbeeld{display:grid; place-items:center; background:var(--na-bg); border:1px dashed var(--na-line);
+  border-radius:var(--r); color:var(--ink-3); font-size:10.5px; font-weight:700; letter-spacing:1px}
+.bib-item .geenbeeld{width:160px; height:104px}
+.fpick .geenbeeld{width:66px; height:48px; font-size:9px; letter-spacing:.5px; border-radius:5px}
+.opt-thumb.geenbeeld{width:76px; height:76px}
+.bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
 .bib-naam{font-size:11px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bib-rij{display:flex; align-items:center; gap:8px; margin-top:2px}
 .bib-pos{font-size:10.5px; font-weight:700; color:var(--ok)}
@@ -1129,13 +1135,54 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     herindexeer(); renderOpt(); renderBib(); renderAlles(); save();
   }
 
+  function isHeic(ext){ return ext === "heic" || ext === "heif"; }
+  function beeldHTML(it, klasse){
+    if(it.kanTonen === false){
+      return '<div class="geenbeeld'+(klasse ? " "+klasse : "")+'" aria-hidden="true">'
+        + esc((it.ext || "?").toUpperCase()) + '</div>';
+    }
+    return '<img'+(klasse ? ' class="'+klasse+'"' : '')+' src="'+it.url+'" alt="">';
+  }
+  function bitmapVan(bron){
+    if(typeof createImageBitmap !== "function") return Promise.resolve(null);
+    try{
+      return createImageBitmap(bron).then(function(bm){ return bm; }, function(){ return null; });
+    }catch(e){ return Promise.resolve(null); }
+  }
+  // lukt het decoderen alleen via createImageBitmap, zet de foto dan direct om naar jpg
+  async function naarJpgViaBitmap(it){
+    if(!it.bestand) return false;
+    var bm = await bitmapVan(it.bestand);
+    if(!bm) return false;
+    var c = document.createElement("canvas");
+    c.width = bm.width; c.height = bm.height;
+    c.getContext("2d").drawImage(bm, 0, 0);
+    var blob = await naarBlob(c, "image/jpeg", 0.92);
+    if(!blob) return false;
+    if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+    URL.revokeObjectURL(it.bronUrl);
+    it.blob = blob;
+    it.url = URL.createObjectURL(blob);
+    it.bronUrl = it.url;
+    it.grootte = blob.size;
+    it.breedte = bm.width; it.hoogte = bm.height;
+    it.ext = "jpg";
+    it.naam = it.naam.replace(/\.[^.]+$/, "") + ".jpg";
+    it.alpha = false;
+    it.kanTonen = true;
+    it.fout = null;
+    return true;
+  }
+
   function renderBib(){
     var grid = $("#bib-grid"); if(!grid) return;
     grid.innerHTML = OPT.length ? OPT.map(function(it){
       var pos = posVanFoto(it.id), nv = it.niveau || "hotel";
       return '<div class="bib-item'+(pos !== -1 ? " gebruikt" : "")+'" data-id="'+it.id+'">'
-        + '<img src="'+it.url+'" alt="">'
+        + beeldHTML(it)
         + '<p class="bib-naam" title="'+esc(it.naam)+'">'+esc(it.naam)+'</p>'
+        + (it.kanTonen === false
+            ? '<p class="bib-fout">'+(isHeic(it.ext) ? "HEIC, omzetten naar JPG" : "Kan niet worden getoond")+'</p>' : '')
         + '<div class="niveau" role="group" aria-label="Niveau van '+esc(it.naam)+'">'
         +   '<button type="button" data-n="hotel" aria-pressed="'+(nv === "hotel")+'">Hotel</button>'
         +   '<button type="button" data-n="arrangement" aria-pressed="'+(nv === "arrangement")+'">Arrangement</button>'
@@ -1162,10 +1209,15 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
     var h = OPT.filter(function(it){ return (it.niveau || "hotel") === "hotel"; }).length;
     var a = OPT.length - h;
+    var stil = OPT.filter(function(it){ return it.kanTonen === false; });
     $("#bib-hint").innerHTML = OPT.length
       ? "<b>" + OPT.length + (OPT.length === 1 ? " foto \u00b7 " : " foto\u2019s \u00b7 ") + h + " op hotelniveau \u00b7 "
         + a + " op arrangementniveau.</b> Hotelniveau komt terug bij elk pakket van dit hotel, arrangementniveau "
         + "alleen bij dit pakket, zoals het hoofdbeeld. Kies ze in de volgende stap."
+        + (stil.length ? "<br>" + stil.length + (stil.length === 1 ? " foto kan deze browser niet tonen"
+              : " foto\u2019s kunnen deze browser niet tonen")
+              + ". Kiezen op een positie kan wel, maar zet het bestand voor live om naar JPG. "
+              + "Op een Mac gaat dat met rechtermuisklik, Snelle acties, Converteer afbeelding." : "")
       : "Nieuwe foto\u2019s komen op hotelniveau te staan. Zet de foto\u2019s die alleen bij dit pakket horen, "
         + "zoals het hoofdbeeld, daarna op arrangementniveau.";
   }
@@ -1252,7 +1304,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
               return '<button type="button" class="fpick'
                 + (elders !== -1 && elders !== i ? " elders" : "") + (waarsch ? " waarsch" : "") + '"'
                 + ' data-foto="'+it.id+'" aria-pressed="'+hier+'" title="'+esc(titel)+'">'
-                + '<img src="'+it.url+'" alt="">'
+                + beeldHTML(it)
                 + (elders !== -1 && elders !== i ? '<span class="fp-b">'+(elders+1)+'</span>'
                    : (waarsch ? '<span class="fp-b">!</span>' : ''))
                 + '</button>';
@@ -1393,7 +1445,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         + '<span class="t-n">Foto '+(i+1)+(i===state.hoofd?" · hoofdbeeld":"")+'</span>'
         + (p.cat ? '<div class="t-c">'+esc(lbl(p.cat))+'</div>'
                  : '<div class="t-e">Advies: '+esc(a.titel)+'</div>')
-        + (v2() && f ? '<img class="t-img" src="'+f.url+'" alt="">' : '')
+        + (v2() && f && f.kanTonen !== false ? '<img class="t-img" src="'+f.url+'" alt="">' : '')
         + '</button>';
     }).join("");
     each(stripHost.children, function(b){
@@ -1837,12 +1889,22 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   async function optimaliseer(it){
-    if(it.fout) return;
+    if(it.fout){
+      var alsnog = await naarJpgViaBitmap(it);    // tweede kans, bijvoorbeeld na een browserupdate
+      if(!alsnog){ renderOpt(); return; }
+      renderBib();
+    }
     var e = eisen(it);
     it.doelExt = it.alpha ? "png" : "jpg";
     var img;
     try{ img = await laadAfbeelding(it.url); }
-    catch(err){ it.fout = "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan"; renderOpt(); return; }
+    catch(err){
+      it.kanTonen = false;
+      it.fout = isHeic(it.ext)
+        ? "HEIC kan deze browser niet openen. Zet de foto om naar JPG, op een Mac met rechtermuisklik, Snelle acties, Converteer afbeelding"
+        : "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+      renderOpt(); renderBib(); return;
+    }
 
     var startBreedte = Math.max(e.w, Math.min(img.naturalWidth, isHoofdItem(it) ? 2400 : 2000));
     if(img.naturalWidth < e.w) startBreedte = img.naturalWidth;   // nooit kunstmatig opblazen
@@ -1906,8 +1968,15 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         var img = await laadAfbeelding(url);
         it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
         it.alpha = (it.ext === "png") && heeftTransparantie(img);
+        it.kanTonen = true;
       }catch(e){
-        it.fout = "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+        var gelukt = await naarJpgViaBitmap(it);   // sommige browsers lezen meer formaten dan een img
+        if(!gelukt){
+          it.kanTonen = false;
+          it.fout = isHeic(it.ext)
+            ? "HEIC kan deze browser niet openen. Zet de foto om naar JPG, op een Mac met rechtermuisklik, Snelle acties, Converteer afbeelding"
+            : "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+        }
       }
       renderOpt(); renderBib();
     }
@@ -1944,7 +2013,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     optLijst.innerHTML = OPT.map(function(it){
       var pr = problemen(it), cs = controle(it);
       return '<div class="opt-item '+(pr.length ? "bad" : "good")+'" data-id="'+it.id+'">'
-        + '<img class="opt-thumb" src="'+it.url+'" alt="">'
+        + beeldHTML(it, "opt-thumb")
         + '<div class="opt-body">'
         +   '<p class="opt-naam">'+esc(it.naam)+'</p>'
         +   '<p class="opt-specs">'+(it.breedte ? it.breedte+" px · " : "")+kb(it.grootte)+" KB · "+esc(it.ext.toUpperCase())
