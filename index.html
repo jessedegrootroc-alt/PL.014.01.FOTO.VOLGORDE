@@ -400,7 +400,82 @@ main{padding-block:var(--s5) var(--s6)}
   .reg-row input:first-child{grid-column:1 / -1}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+
+/* ---------- versieschakelaar ---------- */
+.vsw{position:fixed; left:16px; bottom:16px; z-index:70; font-family:var(--font-body)}
+.vsw-knop{display:inline-flex; align-items:center; gap:7px; background:var(--ink); color:#FFFFFF;
+  border:1px solid var(--ink); border-radius:var(--r); padding:6px 10px; font-size:12.5px; cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.vsw-knop .vsw-k{color:#9A958E; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:600}
+.vsw-knop b{font-weight:600}
+.vsw-knop .ic{color:#9A958E; transition:transform .18s ease}
+.vsw.open .vsw-knop .ic{transform:rotate(180deg)}
+.vsw-knop:hover{background:#000000}
+.vsw-lijst{display:none; position:absolute; left:0; bottom:calc(100% + 6px); min-width:238px;
+  background:var(--ink); border:1px solid #2E2E2E; border-radius:var(--r); padding:4px;
+  box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.vsw.open .vsw-lijst{display:block}
+.vsw-lijst button{display:flex; align-items:flex-start; gap:8px; width:100%; background:none; border:0;
+  border-radius:4px; padding:6px 8px; text-align:left; color:#FFFFFF; cursor:pointer}
+.vsw-lijst button:hover{background:#242424}
+.vsw-lijst button[aria-checked="true"]{background:#2E2E2E}
+.vsw-lijst .k{flex:none; width:15px; color:#8E8A84; font-size:11px; font-variant-numeric:tabular-nums; line-height:1.5}
+.vsw-lijst .n{display:block; font-size:12.5px; font-weight:600; line-height:1.35}
+.vsw-lijst .d{display:block; font-size:11.5px; color:#9A958E; line-height:1.35}
+.vsw-uitleg{padding:4px 8px 2px; font-size:10.5px; color:#77726C}
+
+/* ---------- versie 2: compacte werkweergave ---------- */
+html[data-versie="2"] .cols{grid-template-columns:minmax(0,1fr); gap:var(--s4)}
+html[data-versie="2"] .side{order:-1; position:static; flex-direction:row; align-items:stretch; gap:var(--s3)}
+html[data-versie="2"] .sum{flex:1; display:grid; grid-template-columns:minmax(200px,1fr) minmax(0,1.4fr);
+  column-gap:var(--s4); row-gap:4px; padding:14px 18px; align-content:center}
+html[data-versie="2"] .sum h2{grid-column:1; font-size:15px; margin-bottom:0}
+html[data-versie="2"] .sum .progress{grid-column:1; margin:6px 0 4px}
+html[data-versie="2"] .sum .prog-lbl{grid-column:1}
+html[data-versie="2"] .stats{grid-column:2; grid-row:1 / span 3; flex-direction:row; align-items:center; margin-top:0}
+html[data-versie="2"] .stat{flex:1; font-size:12.5px; padding:6px 9px}
+html[data-versie="2"] .stat b{font-size:16px}
+html[data-versie="2"] .verdict{grid-column:1 / -1; margin-top:6px; font-size:13px}
+html[data-versie="2"] .btn-row{flex:none; justify-content:center}
+html[data-versie="2"] .btn-row .btn{width:auto; white-space:nowrap}
+
+html[data-versie="2"] .block-h{padding:12px 20px 8px}
+html[data-versie="2"] .lead{padding-bottom:10px; font-size:13px}
+html[data-versie="2"] .block-b{padding:0 20px 14px}
+html[data-versie="2"] .cards{gap:6px}
+html[data-versie="2"] .card{grid-template-columns:auto minmax(0,1fr) minmax(0,430px); gap:var(--s3);
+  padding:10px 12px; align-items:center}
+html[data-versie="2"] .c-num{flex-direction:row; align-items:center; gap:3px}
+html[data-versie="2"] .num{width:26px; height:26px; font-size:13px}
+html[data-versie="2"] .c-role{font-size:14.5px}
+html[data-versie="2"] .c-role + .c-sub{display:none}
+html[data-versie="2"] .advice{margin-top:6px; padding:8px 10px}
+html[data-versie="2"] .advice .a-main{font-size:13.5px}
+html[data-versie="2"] .advice .a-why{font-size:12px}
+html[data-versie="2"] .verdictline{margin-top:4px}
+html[data-versie="2"] .c-side{flex-direction:row; flex-wrap:wrap; align-items:flex-end; gap:var(--s2)}
+html[data-versie="2"] .pick{flex:1 1 150px; min-width:140px}
+html[data-versie="2"] .pick label{font-size:9.5px; margin-bottom:2px}
+html[data-versie="2"] .pick select{padding:6px 8px; font-size:13px}
+html[data-versie="2"] .niveau button{padding:6px 7px; font-size:11.5px}
+html[data-versie="2"] .seg{grid-template-columns:repeat(3,auto)}
+html[data-versie="2"] .seg button{padding:6px 9px; font-size:11.5px}
+html[data-versie="2"] .c-note{flex:1 1 100%}
+
+@media (max-width:1100px){
+  html[data-versie="2"] .card{grid-template-columns:auto minmax(0,1fr)}
+  html[data-versie="2"] .c-side{grid-column:2}
+}
+@media (max-width:980px){
+  html[data-versie="2"] .side{flex-direction:column}
+  html[data-versie="2"] .btn-row .btn{width:100%}
+}
+@media (max-width:760px){
+  html[data-versie="2"] .sum{grid-template-columns:minmax(0,1fr)}
+  html[data-versie="2"] .stats{grid-column:1; grid-row:auto; flex-direction:column; margin-top:var(--s2)}
+}
 </style>
+<script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"1");}catch(e){document.documentElement.setAttribute("data-versie","1");}</script>
 
 <svg class="iconset" aria-hidden="true" focusable="false">
 <symbol id="ic-nieuw" viewBox="0 0 24 24" fill="none"><g clip-path="url(#clip0_8041_6220)"> <path d="M17.85 15.15L16.5 12L15.15 15.15L12 16.5L15.15 17.85L16.5 21L17.85 17.85L21 16.5L17.85 15.15Z" stroke="currentColor" stroke-width="2"/> <path d="M8.85 6.15L7.5 3L6.15 6.15L3 7.5L6.15 8.85L7.5 12L8.85 8.85L12 7.5L8.85 6.15Z" stroke="currentColor" stroke-width="2"/> <path d="M20.2 3.8L19 1L17.8 3.8L15 5L17.8 6.2L19 9L20.2 6.2L23 5L20.2 3.8Z" fill="currentColor"/> <path d="M6.2 17.8L5 15L3.8 17.8L1 19L3.8 20.2L5 23L6.2 20.2L9 19L6.2 17.8Z" fill="currentColor"/> </g> <defs> <clipPath id="clip0_8041_6220"> <rect width="24" height="24" fill="white"/> </clipPath> </defs></symbol>
@@ -593,6 +668,13 @@ main{padding-block:var(--s5) var(--s6)}
   </section>
   <p class="foot">Je invoer blijft in deze browser bewaard tot je op leegmaken klikt.</p>
 </main>
+
+<div class="vsw" id="versieschakelaar">
+  <div class="vsw-lijst" id="vsw-lijst" role="radiogroup" aria-label="Weergave kiezen"></div>
+  <button class="vsw-knop" type="button" id="vsw-knop" aria-expanded="false" aria-haspopup="true">
+    <span class="vsw-k">Weergave</span><b id="vsw-nu">Versie 1</b><svg class="ic ic-sm" aria-hidden="true"><use href="#ic-omhoog"></use></svg>
+  </button>
+</div>
 
 <div class="toast" id="toast" hidden></div>
 
@@ -1983,7 +2065,69 @@ main{padding-block:var(--s5) var(--s6)}
     knop.setAttribute("aria-label", (open ? "Sluit " : "Open ") + (titel ? titel.textContent : "dit blok"));
   }
 
+  /* ---------- versieschakelaar ---------- */
+  var VERSIES = [
+    {id:"1", naam:"Versie 1", uitleg:"Hoge kaarten, zijpaneel rechts"},
+    {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"}
+  ];
+  var VERSIE_STORE = "vialuxury-fotocheck-versie";
+  var vswEl = $("#versieschakelaar"), vswKnop = $("#vsw-knop"),
+      vswLijst = $("#vsw-lijst"), vswNu = $("#vsw-nu");
+
+  function geldigeVersie(id){
+    for(var i=0;i<VERSIES.length;i++){ if(VERSIES[i].id === id) return true; }
+    return false;
+  }
+  function bewaardeVersie(){
+    var id = null;
+    try{ id = localStorage.getItem(VERSIE_STORE); }catch(e){}
+    return geldigeVersie(id) ? id : VERSIES[0].id;
+  }
+  function zetVersie(id, onthoud){
+    if(!geldigeVersie(id)) id = VERSIES[0].id;
+    document.documentElement.setAttribute("data-versie", id);
+    if(onthoud !== false){ try{ localStorage.setItem(VERSIE_STORE, id); }catch(e){} }
+    renderVersie(id);
+  }
+  function renderVersie(id){
+    var nu = VERSIES[0];
+    for(var i=0;i<VERSIES.length;i++){ if(VERSIES[i].id === id) nu = VERSIES[i]; }
+    vswNu.textContent = nu.naam;
+    vswLijst.innerHTML = VERSIES.map(function(v){
+      return '<button type="button" role="radio" data-versie="'+v.id+'" aria-checked="'+(v.id === id)+'">'
+        + '<span class="k">'+esc(v.id)+'</span>'
+        + '<span><span class="n">'+esc(v.naam)+'</span><span class="d">'+esc(v.uitleg)+'</span></span>'
+        + '</button>';
+    }).join("") + '<p class="vsw-uitleg">Wisselen kan ook met de cijfertoetsen.</p>';
+    each(vswLijst.querySelectorAll("[data-versie]"), function(b){
+      b.addEventListener("click", function(){
+        zetVersie(b.getAttribute("data-versie"));
+        toonVersielijst(false);
+        vswKnop.focus();
+      });
+    });
+  }
+  function toonVersielijst(open){
+    vswEl.classList.toggle("open", open);
+    vswKnop.setAttribute("aria-expanded", String(open));
+  }
+  vswKnop.addEventListener("click", function(e){
+    e.stopPropagation();
+    toonVersielijst(!vswEl.classList.contains("open"));
+  });
+  document.addEventListener("click", function(e){
+    if(!vswEl.contains(e.target)) toonVersielijst(false);
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ toonVersielijst(false); return; }
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target, tag = t && t.tagName;
+    if(tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || (t && t.isContentEditable)) return;
+    if(geldigeVersie(e.key)){ zetVersie(e.key); toonVersielijst(false); }
+  });
+
   /* ---------- start ---------- */
+  zetVersie(bewaardeVersie(), false);
   load();
   renderRows();
   renderOpt();
