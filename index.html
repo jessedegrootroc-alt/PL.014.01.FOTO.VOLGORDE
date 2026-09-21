@@ -292,11 +292,12 @@ main{padding-block:var(--s5) var(--s6)}
 .opt-bar{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3); align-items:center; margin-bottom:var(--s3)}
 .opt-bar .stand{font-size:13.5px; color:var(--ink-2); flex:1; min-width:180px}
 .opt-bar .btn{width:auto; padding:8px 16px; font-size:13.5px}
-.opt-item{display:grid; grid-template-columns:76px minmax(0,1fr) auto; gap:var(--s3);
+.opt-item{display:grid; grid-template-columns:96px minmax(0,1fr) auto; gap:var(--s3);
   border:1px solid var(--line); border-radius:var(--r); padding:12px; margin-bottom:var(--s2); align-items:start}
 .opt-item.bad{border-color:var(--err-line)}
 .opt-item.good{border-color:var(--ok-line)}
-.opt-thumb{width:76px; height:76px; object-fit:cover; border-radius:var(--r); background:var(--na-bg); display:block}
+.opt-thumb{width:96px; aspect-ratio:16/9; max-width:100%; object-fit:cover; border-radius:var(--r);
+  background:var(--na-bg); display:block}
 .opt-naam{font-size:13.5px; font-weight:600; word-break:break-all}
 .opt-specs{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-top:2px}
 .opt-chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px}
@@ -321,8 +322,8 @@ main{padding-block:var(--s5) var(--s6)}
 .opt-leeg{font-size:13.5px; color:var(--ink-3); margin-bottom:var(--s2)}
 .opt-hint{font-size:12.5px; color:var(--ink-3); margin-top:var(--s2)}
 @media (max-width:680px){
-  .opt-item{grid-template-columns:56px minmax(0,1fr)}
-  .opt-thumb{width:56px; height:56px}
+  .opt-item{grid-template-columns:76px minmax(0,1fr)}
+  .opt-thumb{width:76px}
   .opt-acties{grid-column:1 / -1; flex-direction:row; flex-wrap:wrap}
   .opt-velden{grid-template-columns:minmax(0,1fr)}
 }
@@ -399,14 +400,14 @@ html[data-versie="1"] #blok-fotos{display:none}
 html[data-versie="1"] #chip-fotos{display:none}
 .bib-grid{display:flex; flex-wrap:wrap; gap:12px}
 .bib-item{width:160px}
-.bib-item img{width:160px; height:104px; object-fit:cover; border-radius:var(--r); border:1px solid var(--line);
-  display:block; background:var(--na-bg)}
+.bib-item img{width:160px; aspect-ratio:16/9; max-width:100%; object-fit:cover; border-radius:var(--r);
+  border:1px solid var(--line); display:block; background:var(--na-bg)}
 .bib-item.gebruikt img{border-color:var(--ok)}
 .geenbeeld{display:grid; place-items:center; background:var(--na-bg); border:1px dashed var(--na-line);
   border-radius:var(--r); color:var(--ink-3); font-size:10.5px; font-weight:700; letter-spacing:1px}
-.bib-item .geenbeeld{width:160px; height:104px}
-.fpick .geenbeeld{width:66px; height:48px; font-size:9px; letter-spacing:.5px; border-radius:5px}
-.opt-thumb.geenbeeld{width:76px; height:76px}
+.bib-item .geenbeeld{width:160px; aspect-ratio:16/9; max-width:100%}
+.fpick .geenbeeld{width:82px; aspect-ratio:16/9; font-size:9px; letter-spacing:.5px; border-radius:5px}
+.opt-thumb.geenbeeld{width:96px; aspect-ratio:16/9; max-width:100%}
 .bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
 .bib-fout.bezig{color:var(--dev)}
 .bib-naam{font-size:11px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
@@ -424,14 +425,14 @@ html[data-versie="1"] #chip-fotos{display:none}
 .fkies-rij{display:flex; flex-wrap:wrap; gap:7px}
 .fpick{position:relative; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
-.fpick img{width:66px; height:48px; object-fit:cover; border-radius:5px; display:block}
+.fpick img{width:82px; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
 .fpick:hover{border-color:var(--ink-3)}
 .fpick[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 2px rgba(251,134,44,.25)}
 .fpick.elders img{opacity:.4}
 .fpick .fp-b{position:absolute; top:-6px; right:-6px; background:var(--ink); color:#FFFFFF;
   font-size:10px; font-weight:700; line-height:1; padding:3px 5px; border-radius:var(--r)}
 .fkies-leeg{font-size:12.5px; color:var(--ink-3)}
-.tile .t-img{width:100%; height:46px; object-fit:cover; border-radius:5px; margin-top:5px; display:block}
+.tile .t-img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; margin-top:5px; display:block}
 
 /* ---------- versieschakelaar ---------- */
 .vsw{position:fixed; left:16px; bottom:16px; z-index:70; font-family:var(--font-body)}
