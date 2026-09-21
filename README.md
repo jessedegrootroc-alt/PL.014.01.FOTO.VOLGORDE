@@ -57,8 +57,9 @@ Foto's sla je los op, of samen als zip met `Alles als zip`. In die zip zit ook
 gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
 gecomprimeerd.
 
-HEIC wordt ook omgezet naar JPG. Browsers kunnen HEIC zelf niet uitpakken, dus
-daarvoor haalt de tool eenmalig `libheif` op bij jsDelivr, en alleen zodra er
+WebP, AVIF en HEIC worden meteen bij het toevoegen omgezet naar JPG, of naar PNG
+als er transparantie in zit. Voor WebP en AVIF is de browser genoeg. Voor HEIC
+niet: browsers kunnen dat formaat niet uitpakken, dus daarvoor haalt de tool eenmalig `libheif` op bij jsDelivr, en alleen zodra er
 echt een HEIC-bestand wordt toegevoegd. Het is een bestand van ongeveer 1,2 MB
 met de decoder erin, er gaat dus nog steeds geen foto naar buiten. Lukt het
 ophalen niet, bijvoorbeeld zonder internet, dan blijft de foto staan met de

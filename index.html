@@ -275,6 +275,7 @@ main{padding-block:var(--s5) var(--s6)}
   background:var(--ok-bg); color:var(--ok)}
 .ft.no{border-color:var(--err-line); background:var(--err-bg); color:var(--err); text-decoration:line-through}
 .ft.auto{border-color:var(--dev-line); background:var(--dev-bg); color:var(--dev)}
+.ft-hint{font-size:12.5px; color:var(--ink-2); padding-bottom:var(--s3); margin-top:-8px}
 
 /* ---------- techniek en optimalisatie ---------- */
 .opt-hotel{margin:var(--s3) 0 var(--s2)}
@@ -699,8 +700,9 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
           </table>
           <div class="filetypes">
             <span class="ft">JPG</span><span class="ft">JPEG</span><span class="ft">PNG</span>
-            <span class="ft no">WebP</span><span class="ft auto">HEIC wordt omgezet</span><span class="ft no">AVIF</span>
+            <span class="ft auto">WebP</span><span class="ft auto">HEIC</span><span class="ft auto">AVIF</span>
           </div>
+          <p class="ft-hint">JPG, JPEG en PNG gaan zo de reeks in. WebP, HEIC en AVIF worden bij het toevoegen omgezet naar JPG, of naar PNG als er transparantie in zit.</p>
 
           <div class="opt-hotel">
             <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
@@ -1218,11 +1220,17 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     }catch(e){ return Promise.resolve(null); }
   }
   // formaten die de browser zelf niet in een img kan tonen, zoals heic, worden hier jpg
-  async function zetOmNaarJpg(it){
+  async function zetOmNaarJpg(it, gereed){
     if(!it.bestand) return false;
     var res = null;
     it.omzetFout = null;
-    if(isHeic(it.ext)){
+    if(gereed && gereed.naturalWidth){          // het beeld staat al klaar, opnieuw decoderen hoeft niet
+      var cg = document.createElement("canvas");
+      cg.width = gereed.naturalWidth; cg.height = gereed.naturalHeight;
+      cg.getContext("2d").drawImage(gereed, 0, 0);
+      res = {canvas:cg, w:cg.width, h:cg.height};
+    }
+    if(!res && isHeic(it.ext)){
       try{
         var uit = await heicNaarVlak(it.bestand);
         res = {canvas:uit.canvas, w:uit.w, h:uit.h};
@@ -1238,7 +1246,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       }
     }
     if(!res) return false;
-    var blob = await naarBlob(res.canvas, "image/jpeg", 0.92);
+    var doel = it.alpha ? "png" : "jpg";        // transparantie overleeft alleen in png
+    var blob = await naarBlob(res.canvas, it.alpha ? "image/png" : "image/jpeg", 0.92);
     if(!blob) return false;
     if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
     URL.revokeObjectURL(it.bronUrl);
@@ -1247,9 +1256,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     it.bronUrl = it.url;
     it.grootte = blob.size;
     it.breedte = res.w; it.hoogte = res.h;
-    it.ext = "jpg";
-    it.naam = it.naam.replace(/\.[^.]+$/, "") + ".jpg";
-    it.alpha = false;
+    it.ext = doel;
+    it.naam = it.naam.replace(/\.[^.]+$/, "") + "." + doel;
     it.kanTonen = true;
     it.fout = null;
     return true;
@@ -2049,8 +2057,14 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       try{
         var img = await laadAfbeelding(url);
         it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
-        it.alpha = (it.ext === "png") && heeftTransparantie(img);
+        it.alpha = (["png","webp","avif"].indexOf(it.ext) !== -1) && heeftTransparantie(img);
         it.kanTonen = true;
+        if(["jpg","jpeg","png"].indexOf(it.ext) === -1){   // webp en avif meteen omzetten
+          it.bezig = "Omzetten\u2026";
+          renderBib(); renderOpt();
+          await zetOmNaarJpg(it, img);
+          it.bezig = null;
+        }
       }catch(e){
         it.kanTonen = false;
         it.bezig = isHeic(it.ext) ? "HEIC omzetten\u2026" : "Omzetten\u2026";
