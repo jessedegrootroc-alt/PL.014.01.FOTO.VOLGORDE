@@ -282,6 +282,7 @@ main{padding-block:var(--s5) var(--s6)}
 .ft{font-size:12px; font-weight:600; padding:3px 9px; border-radius:var(--r); border:1px solid var(--ok-line);
   background:var(--ok-bg); color:var(--ok)}
 .ft.no{border-color:var(--err-line); background:var(--err-bg); color:var(--err); text-decoration:line-through}
+.ft.auto{border-color:var(--dev-line); background:var(--dev-bg); color:var(--dev)}
 
 /* ---------- techniek en optimalisatie ---------- */
 .opt-hotel{margin:var(--s3) 0 var(--s2)}
@@ -417,6 +418,7 @@ html[data-versie="1"] #chip-fotos{display:none}
 .fpick .geenbeeld{width:66px; height:48px; font-size:9px; letter-spacing:.5px; border-radius:5px}
 .opt-thumb.geenbeeld{width:76px; height:76px}
 .bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
+.bib-fout.bezig{color:var(--dev)}
 .bib-naam{font-size:11px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bib-rij{display:flex; align-items:center; gap:8px; margin-top:2px}
 .bib-pos{font-size:10.5px; font-weight:700; color:var(--ok)}
@@ -673,7 +675,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
           </table>
           <div class="filetypes">
             <span class="ft">JPG</span><span class="ft">JPEG</span><span class="ft">PNG</span>
-            <span class="ft no">WebP</span><span class="ft no">HEIC</span><span class="ft no">AVIF</span>
+            <span class="ft no">WebP</span><span class="ft auto">HEIC wordt omgezet</span><span class="ft no">AVIF</span>
           </div>
 
           <div class="opt-hotel">
@@ -1136,28 +1138,85 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   function isHeic(ext){ return ext === "heic" || ext === "heif"; }
+  function foutTekst(it){
+    if(isHeic(it.ext)){
+      return it.omzetFout === "laden"
+        ? "De omzetter voor HEIC kon niet geladen worden. Controleer de internetverbinding en klik daarna op Los op"
+        : "Dit HEIC-bestand kan de tool niet uitpakken. Lever de foto als JPG aan";
+    }
+    return "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+  }
   function beeldHTML(it, klasse){
     if(it.kanTonen === false){
       return '<div class="geenbeeld'+(klasse ? " "+klasse : "")+'" aria-hidden="true">'
-        + esc((it.ext || "?").toUpperCase()) + '</div>';
+        + esc(it.bezig ? it.bezig : (it.ext || "?").toUpperCase()) + '</div>';
     }
     return '<img'+(klasse ? ' class="'+klasse+'"' : '')+' src="'+it.url+'" alt="">';
   }
+  // libheif, alleen opgehaald zodra er echt een heic-bestand binnenkomt
+  var HEIC_SCRIPT = "https://cdn.jsdelivr.net/npm/libheif-js@1.18.2/libheif-wasm/libheif-bundle.js";
+  var heicMod = null, heicBezig = null;
+  function heicDecoder(){
+    if(heicMod) return Promise.resolve(heicMod);
+    if(heicBezig) return heicBezig;
+    heicBezig = new Promise(function(res, rej){
+      var sc = document.createElement("script");
+      sc.src = HEIC_SCRIPT;
+      sc.onload = function(){ res(); };
+      sc.onerror = function(){ rej(new Error("laden")); };
+      document.head.appendChild(sc);
+    }).then(function(){
+      if(typeof window.libheif !== "function") throw new Error("laden");
+      return window.libheif();
+    }).then(function(mod){ heicMod = mod; return mod; });
+    heicBezig.catch(function(){ heicBezig = null; });   // een volgende poging mag opnieuw
+    return heicBezig;
+  }
+  async function heicNaarVlak(bestand){
+    var mod;
+    try{ mod = await heicDecoder(); }catch(e){ throw new Error("laden"); }
+    var buf = await bestand.arrayBuffer();
+    var beelden = new mod.HeifDecoder().decode(new Uint8Array(buf));
+    if(!beelden || !beelden.length) throw new Error("uitpakken");
+    var im = beelden[0], w = im.get_width(), h = im.get_height();
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var ctx = c.getContext("2d"), vlak = ctx.createImageData(w, h);
+    await new Promise(function(res, rej){
+      im.display(vlak, function(uit){ uit ? res() : rej(new Error("uitpakken")); });
+    });
+    ctx.putImageData(vlak, 0, 0);
+    return {canvas:c, w:w, h:h};
+  }
+
   function bitmapVan(bron){
     if(typeof createImageBitmap !== "function") return Promise.resolve(null);
     try{
       return createImageBitmap(bron).then(function(bm){ return bm; }, function(){ return null; });
     }catch(e){ return Promise.resolve(null); }
   }
-  // lukt het decoderen alleen via createImageBitmap, zet de foto dan direct om naar jpg
-  async function naarJpgViaBitmap(it){
+  // formaten die de browser zelf niet in een img kan tonen, zoals heic, worden hier jpg
+  async function zetOmNaarJpg(it){
     if(!it.bestand) return false;
-    var bm = await bitmapVan(it.bestand);
-    if(!bm) return false;
-    var c = document.createElement("canvas");
-    c.width = bm.width; c.height = bm.height;
-    c.getContext("2d").drawImage(bm, 0, 0);
-    var blob = await naarBlob(c, "image/jpeg", 0.92);
+    var res = null;
+    it.omzetFout = null;
+    if(isHeic(it.ext)){
+      try{
+        var uit = await heicNaarVlak(it.bestand);
+        res = {canvas:uit.canvas, w:uit.w, h:uit.h};
+      }catch(e){ it.omzetFout = (e && e.message === "laden") ? "laden" : "uitpakken"; }
+    }
+    if(!res){
+      var bm = await bitmapVan(it.bestand);
+      if(bm){
+        var cb = document.createElement("canvas");
+        cb.width = bm.width; cb.height = bm.height;
+        cb.getContext("2d").drawImage(bm, 0, 0);
+        res = {canvas:cb, w:bm.width, h:bm.height};
+      }
+    }
+    if(!res) return false;
+    var blob = await naarBlob(res.canvas, "image/jpeg", 0.92);
     if(!blob) return false;
     if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
     URL.revokeObjectURL(it.bronUrl);
@@ -1165,7 +1224,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     it.url = URL.createObjectURL(blob);
     it.bronUrl = it.url;
     it.grootte = blob.size;
-    it.breedte = bm.width; it.hoogte = bm.height;
+    it.breedte = res.w; it.hoogte = res.h;
     it.ext = "jpg";
     it.naam = it.naam.replace(/\.[^.]+$/, "") + ".jpg";
     it.alpha = false;
@@ -1182,7 +1241,9 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         + beeldHTML(it)
         + '<p class="bib-naam" title="'+esc(it.naam)+'">'+esc(it.naam)+'</p>'
         + (it.kanTonen === false
-            ? '<p class="bib-fout">'+(isHeic(it.ext) ? "HEIC, omzetten naar JPG" : "Kan niet worden getoond")+'</p>' : '')
+            ? '<p class="bib-fout'+(it.bezig ? " bezig" : "")+'">'
+              + (it.bezig ? "Bezig met omzetten" : (isHeic(it.ext) ? "HEIC, niet omgezet" : "Kan niet worden getoond"))
+              + '</p>' : '')
         + '<div class="niveau" role="group" aria-label="Niveau van '+esc(it.naam)+'">'
         +   '<button type="button" data-n="hotel" aria-pressed="'+(nv === "hotel")+'">Hotel</button>'
         +   '<button type="button" data-n="arrangement" aria-pressed="'+(nv === "arrangement")+'">Arrangement</button>'
@@ -1214,10 +1275,10 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       ? "<b>" + OPT.length + (OPT.length === 1 ? " foto \u00b7 " : " foto\u2019s \u00b7 ") + h + " op hotelniveau \u00b7 "
         + a + " op arrangementniveau.</b> Hotelniveau komt terug bij elk pakket van dit hotel, arrangementniveau "
         + "alleen bij dit pakket, zoals het hoofdbeeld. Kies ze in de volgende stap."
-        + (stil.length ? "<br>" + stil.length + (stil.length === 1 ? " foto kan deze browser niet tonen"
-              : " foto\u2019s kunnen deze browser niet tonen")
-              + ". Kiezen op een positie kan wel, maar zet het bestand voor live om naar JPG. "
-              + "Op een Mac gaat dat met rechtermuisklik, Snelle acties, Converteer afbeelding." : "")
+        + (stil.length ? "<br>" + stil.length + (stil.length === 1 ? " foto is niet omgezet"
+              : " foto\u2019s zijn niet omgezet")
+              + ". Kiezen op een positie kan wel, maar het bestand moet voor live nog naar JPG. "
+              + "Kijk bij het blok Techniek wat eraan scheelt." : "")
       : "Nieuwe foto\u2019s komen op hotelniveau te staan. Zet de foto\u2019s die alleen bij dit pakket horen, "
         + "zoals het hoofdbeeld, daarna op arrangementniveau.";
   }
@@ -1890,8 +1951,11 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
   async function optimaliseer(it){
     if(it.fout){
-      var alsnog = await naarJpgViaBitmap(it);    // tweede kans, bijvoorbeeld na een browserupdate
-      if(!alsnog){ renderOpt(); return; }
+      it.bezig = isHeic(it.ext) ? "HEIC omzetten\u2026" : "Omzetten\u2026";
+      renderOpt(); renderBib();
+      var alsnog = await zetOmNaarJpg(it);
+      it.bezig = null;
+      if(!alsnog){ it.fout = foutTekst(it); renderOpt(); renderBib(); return; }
       renderBib();
     }
     var e = eisen(it);
@@ -1900,9 +1964,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     try{ img = await laadAfbeelding(it.url); }
     catch(err){
       it.kanTonen = false;
-      it.fout = isHeic(it.ext)
-        ? "HEIC kan deze browser niet openen. Zet de foto om naar JPG, op een Mac met rechtermuisklik, Snelle acties, Converteer afbeelding"
-        : "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
+      it.fout = foutTekst(it);
       renderOpt(); renderBib(); return;
     }
 
@@ -1970,13 +2032,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         it.alpha = (it.ext === "png") && heeftTransparantie(img);
         it.kanTonen = true;
       }catch(e){
-        var gelukt = await naarJpgViaBitmap(it);   // sommige browsers lezen meer formaten dan een img
-        if(!gelukt){
-          it.kanTonen = false;
-          it.fout = isHeic(it.ext)
-            ? "HEIC kan deze browser niet openen. Zet de foto om naar JPG, op een Mac met rechtermuisklik, Snelle acties, Converteer afbeelding"
-            : "Deze afbeelding kan de browser niet openen, lever hem als JPG of PNG aan";
-        }
+        it.kanTonen = false;
+        it.bezig = isHeic(it.ext) ? "HEIC omzetten\u2026" : "Omzetten\u2026";
+        renderBib(); renderOpt();
+        var gelukt = await zetOmNaarJpg(it);
+        it.bezig = null;
+        if(!gelukt) it.fout = foutTekst(it);
       }
       renderOpt(); renderBib();
     }

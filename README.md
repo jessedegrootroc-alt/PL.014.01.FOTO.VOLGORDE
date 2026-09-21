@@ -6,6 +6,24 @@ stellen en te controleren voordat die live gaat.
 Alles zit in één bestand, `index.html`. Geen build, geen dependencies. Openen in de
 browser is genoeg.
 
+## Twee weergaven
+
+Linksonder staat een schakelaar tussen versie 1 en versie 2, ook met de
+cijfertoetsen. De keuze blijft in de browser bewaard.
+
+- **Versie 1** is de opbouw met hoge kaarten en een zijpaneel rechts.
+- **Versie 2** zet de eerste 5 foto's om in compacte rijen, maakt de stand van
+  zaken een balk, en heeft een extra stap **Foto's toevoegen** tussen stap 00 en
+  de eerste vijf. Daar zet je de foto's klaar en geef je per foto aan of hij bij
+  elk pakket van dit hotel hoort of alleen bij dit pakket. Bij de eerste 5 foto's
+  kies je ze daarna uit een rij miniaturen. Kiezen zet meteen het niveau van die
+  positie, een foto staat op maximaal één positie, en bij foto 1 krijgen
+  hotelniveau-foto's een waarschuwing, want een hoofdbeeld mag niet bij elk
+  pakket van het hotel terugkomen.
+
+Een versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
+`html[data-versie="3"]`.
+
 ## Wat de tool doet
 
 - **De eerste 5 foto's** zijn het hart van de tool. Per positie kies je een type beeld,
@@ -14,8 +32,6 @@ browser is genoeg.
   aantrekkelijk genoeg is.
 - **Fotoniveau** per positie: hotelniveau komt terug bij elk pakket van het hotel,
   arrangementniveau geldt alleen voor dit arrangement.
-- **Hoofdbeeldregister**: elk arrangement van hetzelfde hotel heeft een eigen
-  droombeeld nodig. Dubbele bestandsnamen worden gemeld.
 - **Korte controle** op de rest van de reeks en de visuele kwaliteit.
 - **Techniek lost zichzelf op**: voeg de foto's toe en de tool controleert breedte,
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
@@ -46,8 +62,13 @@ Foto's sla je los op, of samen als zip met `Alles als zip`. In die zip zit ook
 gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
 gecomprimeerd.
 
-HEIC kunnen de meeste browsers niet openen. Die foto's worden gemeld in plaats van
-omgezet.
+HEIC wordt ook omgezet naar JPG. Browsers kunnen HEIC zelf niet uitpakken, dus
+daarvoor haalt de tool eenmalig `libheif` op bij jsDelivr, en alleen zodra er
+echt een HEIC-bestand wordt toegevoegd. Het is een bestand van ongeveer 1,2 MB
+met de decoder erin, er gaat dus nog steeds geen foto naar buiten. Lukt het
+ophalen niet, bijvoorbeeld zonder internet, dan blijft de foto staan met de
+melding dat het bestand nog naar JPG moet en kun je het later opnieuw proberen
+met `Los op`.
 
 ## Iconen
 
