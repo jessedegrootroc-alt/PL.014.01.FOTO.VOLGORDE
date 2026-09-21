@@ -432,7 +432,37 @@ html[data-versie="1"] #chip-fotos{display:none}
 .fpick .fp-b{position:absolute; top:-6px; right:-6px; background:var(--ink); color:#FFFFFF;
   font-size:10px; font-weight:700; line-height:1; padding:3px 5px; border-radius:var(--r)}
 .fkies-leeg{font-size:12.5px; color:var(--ink-3)}
-.tile .t-img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; margin-top:5px; display:block}
+
+/* ---------- voorbeeld van de detailpagina, alleen versie 2 ---------- */
+html[data-versie="1"] #mz-wrap{display:none}
+#mz-wrap{padding:0 20px var(--s3)}
+.mz-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700;
+  color:var(--ink-3); margin-bottom:6px}
+.mozaiek{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px;
+  border-radius:var(--r); overflow:hidden}
+.mz-cel{position:relative; padding:0; border:0; margin:0; cursor:pointer; overflow:hidden;
+  aspect-ratio:4/3; background:var(--surface-2); display:block}
+.mz-cel.groot{grid-column:span 2; grid-row:span 2; aspect-ratio:auto}
+.mz-cel img{width:100%; height:100%; object-fit:cover; display:block}
+.mz-cel.leeg{border:1px dashed var(--line); background:var(--surface-2)}
+.mz-cel.leeg:hover{border-color:var(--accent)}
+.mz-cel:not(.leeg):hover img{opacity:.88}
+.mz-cel.volgende{outline:2px solid var(--accent); outline-offset:-2px}
+.mz-leeg{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:3px; padding:8px; text-align:center}
+.mz-leeg b{font-family:var(--font-head); font-size:13px; font-weight:600; color:var(--ink-2)}
+.mz-leeg span{font-size:11.5px; color:var(--ink-3); line-height:1.3}
+.mz-cel.groot .mz-leeg b{font-size:16px}
+.mz-cel.groot .mz-leeg span{font-size:13px}
+.mz-alle{position:absolute; right:10px; bottom:10px; display:inline-flex; align-items:center; gap:6px;
+  background:rgba(20,20,20,.72); color:#FFFFFF; font-size:11.5px; font-weight:600;
+  padding:6px 10px; border-radius:var(--r)}
+.mz-alle svg{width:11px; height:11px; display:block}
+.mz-hint{font-size:12.5px; color:var(--ink-3); margin-top:6px}
+@media (max-width:760px){
+  .mozaiek{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mz-cel.groot{grid-column:span 2; grid-row:span 1; aspect-ratio:4/3}
+}
 
 /* ---------- versieschakelaar ---------- */
 .vsw{position:fixed; left:16px; bottom:16px; z-index:70; font-family:var(--font-body)}
@@ -609,6 +639,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     </div>
 
     <div class="strip" id="strip"></div>
+
+    <div id="mz-wrap">
+      <p class="mz-lbl">Zo komt de reeks op de detailpagina te staan</p>
+      <div class="mozaiek" id="mozaiek"></div>
+      <p class="mz-hint" id="mz-hint"></p>
+    </div>
     <div class="cards" id="cards"></div>
 
     <div class="barline">
@@ -1453,13 +1489,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   function renderStrip(){
     var nxt = volgendeLeeg();
     stripHost.innerHTML = state.pos.map(function(p,i){
-      var a = advies(i), f = fotoVan(i);
+      var a = advies(i);
       return '<button type="button" class="tile'+(i===nxt?" next":"")+'" data-i="'+i+'"'
         + (p.status?' data-status="'+p.status+'"':'')+'>'
         + '<span class="t-n">Foto '+(i+1)+(i===state.hoofd?" · hoofdbeeld":"")+'</span>'
         + (p.cat ? '<div class="t-c">'+esc(lbl(p.cat))+'</div>'
                  : '<div class="t-e">Advies: '+esc(a.titel)+'</div>')
-        + (v2() && f && f.kanTonen !== false ? '<img class="t-img" src="'+f.url+'" alt="">' : '')
         + '</button>';
     }).join("");
     each(stripHost.children, function(b){
@@ -1470,6 +1505,49 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         var sel = document.getElementById("cat-"+i); if(sel) sel.focus();
       });
     });
+  }
+
+  /* ---------- voorbeeld van de detailpagina ---------- */
+  var mzHost = $("#mozaiek");
+  function renderMozaiek(){
+    if(!mzHost) return;
+    var nxt = volgendeLeeg();
+    if(OPT.length){                       // zijn er foto's, dan wijst het kader de eerste lege plek aan
+      nxt = -1;
+      for(var q=0;q<5;q++){ if(!fotoVan(q)){ nxt = q; break; } }
+    }
+    mzHost.innerHTML = state.pos.map(function(p,i){
+      var f = fotoVan(i), a = advies(i), toonbaar = f && f.kanTonen !== false;
+      var onder = p.cat ? lbl(p.cat) : "Advies: " + a.titel;
+      return '<button type="button" class="mz-cel'+(i === 0 ? " groot" : "")+(toonbaar ? "" : " leeg")
+        +   (i === nxt ? " volgende" : "")+'" data-i="'+i+'"'
+        +   ' aria-label="Foto '+(i+1)+', '+esc(onder)+'">'
+        + (toonbaar
+            ? '<img src="'+f.url+'" alt="">'
+            : '<span class="mz-leeg"><b>Foto '+(i+1)+(i === 0 ? ", hoofdbeeld" : "")+'</b>'
+              + '<span>'+esc(f ? f.naam : onder)+'</span></span>')
+        + (i === 4 ? '<span class="mz-alle" aria-hidden="true">'
+            + '<svg viewBox="0 0 10 10" fill="currentColor"><rect x="0" y="0" width="4" height="4" rx="1"/>'
+            + '<rect x="6" y="0" width="4" height="4" rx="1"/><rect x="0" y="6" width="4" height="4" rx="1"/>'
+            + '<rect x="6" y="6" width="4" height="4" rx="1"/></svg>Alle foto\u2019s</span>' : '')
+        + '</button>';
+    }).join("");
+
+    each(mzHost.children, function(b){
+      b.addEventListener("click", function(){
+        var i = parseInt(b.getAttribute("data-i"),10);
+        var card = cardsHost.querySelector('.card[data-i="'+i+'"]');
+        if(card) card.scrollIntoView({block:"center", behavior:"smooth"});
+        var sel = document.getElementById("cat-"+i); if(sel) sel.focus();
+      });
+    });
+
+    var klaar = aantalGekozen();
+    $("#mz-hint").textContent = klaar === 5
+      ? "Alle vijf de plekken zijn gevuld. Dit is wat de gast als eerste ziet."
+      : (OPT.length
+          ? "Nog " + (5-klaar) + (5-klaar === 1 ? " plek" : " plekken") + " open. Klik op een vlak om naar die foto te gaan."
+          : "Voeg eerst foto\u2019s toe in de vorige stap, dan vult dit voorbeeld zich.");
   }
 
   /* ---------- kenmerken en USP's ---------- */
@@ -1769,7 +1847,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   function renderAlles(){
-    renderCards(); renderStrip(); renderUsp(); renderSamenvatting();
+    renderCards(); renderStrip(); renderMozaiek(); renderUsp(); renderSamenvatting();
   }
 
   /* ---------- foto's optimaliseren ---------- */
