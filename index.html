@@ -404,26 +404,21 @@ main{padding-block:var(--s5) var(--s6)}
 /* ---------- fotobibliotheek, alleen versie 2 ---------- */
 html[data-versie="1"] #blok-fotos{display:none}
 html[data-versie="1"] #chip-fotos{display:none}
-.bib-zones{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s3)}
-.bib-zone{border:1px solid var(--line-soft); border-radius:var(--r); padding:12px; background:var(--surface-2)}
-.bib-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3)}
-.bib-uit{font-size:12.5px; color:var(--ink-2); line-height:1.45; margin:2px 0 10px}
-.bib-zone .drop{background:var(--surface); padding:13px; margin-bottom:10px}
-.bib-zone .drop p{font-size:13px}
-.bib-grid{display:flex; flex-wrap:wrap; gap:10px}
-.bib-item{width:98px}
-.bib-item img{width:98px; height:72px; object-fit:cover; border-radius:var(--r); border:1px solid var(--line);
+.bib-grid{display:flex; flex-wrap:wrap; gap:12px}
+.bib-item{width:160px}
+.bib-item img{width:160px; height:104px; object-fit:cover; border-radius:var(--r); border:1px solid var(--line);
   display:block; background:var(--na-bg)}
 .bib-item.gebruikt img{border-color:var(--ok)}
-.bib-naam{font-size:11px; color:var(--ink-2); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bib-rij{display:flex; align-items:center; gap:7px; margin-top:1px}
+.bib-item .niveau{margin-top:5px}
+.bib-item .niveau button{font-size:11px; padding:4px 6px}
+.bib-naam{font-size:11px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bib-rij{display:flex; align-items:center; gap:8px; margin-top:2px}
 .bib-pos{font-size:10.5px; font-weight:700; color:var(--ok)}
 .mini-link{background:none; border:0; padding:0; font-size:11px; color:var(--ink-3); text-decoration:underline; cursor:pointer}
 .mini-link:hover{color:var(--accent-hover)}
 .bib-leeg{font-size:12.5px; color:var(--ink-3)}
 .bib-hint{font-size:13px; color:var(--ink-2); margin-top:var(--s3)}
 .bib-hint b{color:var(--ink); font-weight:600}
-@media (max-width:760px){ .bib-zones{grid-template-columns:minmax(0,1fr)} }
 
 .fkies{margin-top:10px}
 .fkies-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700;
@@ -592,28 +587,13 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       <h2 id="h-fotos">Foto’s toevoegen</h2>
       <span class="tag sp">Eerst dit</span>
     </div>
-    <p class="lead">Zet de foto’s klaar op het juiste niveau. Hotelniveau gebruik je bij elk pakket van dit hotel, arrangementniveau alleen bij dit pakket.</p>
+    <p class="lead">Voeg de foto’s toe die je voor dit pakket kunt gebruiken. Zet daarna per foto of hij bij elk pakket van dit hotel hoort of alleen bij dit pakket.</p>
     <div class="block-b">
-      <div class="bib-zones">
-        <div class="bib-zone">
-          <p class="bib-lbl">Hotelniveau</p>
-          <p class="bib-uit">Komt terug bij elk pakket van dit hotel. Gebouw, kamers, interieur, wellness, tuin.</p>
-          <div class="drop" data-drop="hotel" role="button" tabindex="0" aria-label="Foto’s op hotelniveau toevoegen">
-            <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep hierheen</b> of klik om te kiezen</p>
-            <input type="file" multiple accept="image/*,.heic,.avif">
-          </div>
-          <div class="bib-grid" data-grid="hotel"></div>
-        </div>
-        <div class="bib-zone">
-          <p class="bib-lbl">Arrangementniveau</p>
-          <p class="bib-uit">Alleen voor dit pakket. Het hoofdbeeld hoort hier, net als beelden die per pakket verschillen.</p>
-          <div class="drop" data-drop="arrangement" role="button" tabindex="0" aria-label="Foto’s op arrangementniveau toevoegen">
-            <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep hierheen</b> of klik om te kiezen</p>
-            <input type="file" multiple accept="image/*,.heic,.avif">
-          </div>
-          <div class="bib-grid" data-grid="arrangement"></div>
-        </div>
+      <div class="drop" id="bib-drop" role="button" tabindex="0" aria-label="Foto’s toevoegen">
+        <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</p>
+        <input type="file" id="bib-files" multiple accept="image/*,.heic,.avif">
       </div>
+      <div class="bib-grid" id="bib-grid"></div>
       <p class="bib-hint" id="bib-hint"></p>
     </div>
   </section>
@@ -1150,62 +1130,64 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   function renderBib(){
-    var blok = $("#blok-fotos"); if(!blok) return;
-    ["hotel","arrangement"].forEach(function(nv){
-      var grid = blok.querySelector('[data-grid="'+nv+'"]');
-      var items = OPT.filter(function(it){ return (it.niveau || "arrangement") === nv; });
-      grid.innerHTML = items.length ? items.map(function(it){
-        var pos = posVanFoto(it.id);
-        var naar = (nv === "hotel") ? "arrangement" : "hotel";
-        return '<div class="bib-item'+(pos !== -1 ? " gebruikt" : "")+'" data-id="'+it.id+'">'
-          + '<img src="'+it.url+'" alt="">'
-          + '<p class="bib-naam" title="'+esc(it.naam)+'">'+esc(it.naam)+'</p>'
-          + '<div class="bib-rij">'
-          +   (pos !== -1 ? '<span class="bib-pos">Foto '+(pos+1)+'</span>' : '')
-          +   '<button type="button" class="mini-link" data-act="wissel" title="Naar '+naar+'niveau">verplaats</button>'
-          +   '<button type="button" class="mini-link" data-act="weg" title="Foto verwijderen">weg</button>'
-          + '</div></div>';
-      }).join("") : '<p class="bib-leeg">Nog geen foto\u2019s op dit niveau.</p>';
+    var grid = $("#bib-grid"); if(!grid) return;
+    grid.innerHTML = OPT.length ? OPT.map(function(it){
+      var pos = posVanFoto(it.id), nv = it.niveau || "hotel";
+      return '<div class="bib-item'+(pos !== -1 ? " gebruikt" : "")+'" data-id="'+it.id+'">'
+        + '<img src="'+it.url+'" alt="">'
+        + '<p class="bib-naam" title="'+esc(it.naam)+'">'+esc(it.naam)+'</p>'
+        + '<div class="niveau" role="group" aria-label="Niveau van '+esc(it.naam)+'">'
+        +   '<button type="button" data-n="hotel" aria-pressed="'+(nv === "hotel")+'">Hotel</button>'
+        +   '<button type="button" data-n="arrangement" aria-pressed="'+(nv === "arrangement")+'">Arrangement</button>'
+        + '</div>'
+        + '<div class="bib-rij">'
+        +   (pos !== -1 ? '<span class="bib-pos">Foto '+(pos+1)+'</span>' : '')
+        +   '<button type="button" class="mini-link" data-act="weg" title="Foto verwijderen">weg</button>'
+        + '</div></div>';
+    }).join("") : '';
 
-      each(grid.querySelectorAll(".bib-item"), function(el){
-        var it = OPT.filter(function(x){ return x.id === parseInt(el.getAttribute("data-id"),10); })[0];
-        if(!it) return;
-        el.querySelector('[data-act="wissel"]').addEventListener("click", function(){
-          it.niveau = (it.niveau === "hotel") ? "arrangement" : "hotel";
+    each(grid.querySelectorAll(".bib-item"), function(el){
+      var it = OPT.filter(function(x){ return x.id === parseInt(el.getAttribute("data-id"),10); })[0];
+      if(!it) return;
+      each(el.querySelectorAll(".niveau button"), function(b){
+        b.addEventListener("click", function(){
+          it.niveau = b.getAttribute("data-n");
           var p = posVanFoto(it.id);
           if(p !== -1) state.pos[p].niveau = it.niveau;
           renderBib(); renderAlles(); save();
         });
-        el.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
       });
+      el.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
     });
 
-    var h = OPT.filter(function(it){ return it.niveau === "hotel"; }).length;
+    var h = OPT.filter(function(it){ return (it.niveau || "hotel") === "hotel"; }).length;
     var a = OPT.length - h;
     $("#bib-hint").innerHTML = OPT.length
-      ? "<b>" + h + " op hotelniveau \u00b7 " + a + " op arrangementniveau.</b> Kies ze in de volgende stap. "
-        + "Dezelfde foto\u2019s staan in het blok Techniek, daar controleert de tool de bestanden."
-      : "Voeg de foto\u2019s toe die je voor dit pakket kunt gebruiken. Staat een foto op het verkeerde niveau, "
-        + "dan zet je hem later met \u00e9\u00e9n klik om.";
+      ? "<b>" + OPT.length + (OPT.length === 1 ? " foto \u00b7 " : " foto\u2019s \u00b7 ") + h + " op hotelniveau \u00b7 "
+        + a + " op arrangementniveau.</b> Hotelniveau komt terug bij elk pakket van dit hotel, arrangementniveau "
+        + "alleen bij dit pakket, zoals het hoofdbeeld. Kies ze in de volgende stap."
+      : "Nieuwe foto\u2019s komen op hotelniveau te staan. Zet de foto\u2019s die alleen bij dit pakket horen, "
+        + "zoals het hoofdbeeld, daarna op arrangementniveau.";
   }
 
-  each(document.querySelectorAll("#blok-fotos .drop"), function(dz){
-    var nv = dz.getAttribute("data-drop"), inp = dz.querySelector("input");
+  (function(){
+    var dz = $("#bib-drop"), inp = $("#bib-files");
+    if(!dz) return;
     dz.addEventListener("click", function(){ inp.click(); });
     dz.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); inp.click(); } });
     inp.addEventListener("change", function(){
       if(!inp.files.length) return;
       var kopie = Array.prototype.slice.call(inp.files);
       inp.value = "";
-      voegToe(kopie, nv);
+      voegToe(kopie, "hotel");
     });
     dz.addEventListener("dragover", function(e){ e.preventDefault(); dz.classList.add("over"); });
     dz.addEventListener("dragleave", function(){ dz.classList.remove("over"); });
     dz.addEventListener("drop", function(e){
       e.preventDefault(); dz.classList.remove("over");
-      if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files, nv);
+      if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files, "hotel");
     });
-  });
+  })();
 
   /* ---------- kaarten ---------- */
   var cardsHost = $("#cards"), stripHost = $("#strip"), dragFrom = null;
@@ -1263,8 +1245,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
         fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
           + (OPT.length ? '<div class="fkies-rij">' + OPT.map(function(it){
               var elders = posVanFoto(it.id), hier = (state.pos[i].fotoId === it.id);
-              var waarsch = (i === 0 && it.niveau === "hotel");
-              var titel = it.naam + (it.niveau === "hotel" ? " \u00b7 hotelniveau" : " \u00b7 arrangementniveau")
+              var waarsch = (i === 0 && (it.niveau || "hotel") === "hotel");
+              var titel = it.naam + ((it.niveau || "hotel") === "hotel" ? " \u00b7 hotelniveau" : " \u00b7 arrangementniveau")
                 + (elders !== -1 && elders !== i ? " \u00b7 staat al op foto " + (elders+1) : "")
                 + (waarsch ? " \u00b7 het hoofdbeeld mag niet op elk pakket terugkomen" : "");
               return '<button type="button" class="fpick'
@@ -1916,7 +1898,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       var url = URL.createObjectURL(f);
       var it = {id:++optId, bestand:f, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
-                niveau:(niveau || "arrangement"),
+                niveau:(niveau || "hotel"),
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
       OPT.push(it);
       herindexeer();
