@@ -14,12 +14,9 @@ cijfertoetsen. De keuze blijft in de browser bewaard.
 - **Versie 1** is de opbouw met hoge kaarten en een zijpaneel rechts.
 - **Versie 2** zet de eerste 5 foto's om in compacte rijen, maakt de stand van
   zaken een balk, en heeft een extra stap **Foto's toevoegen** tussen stap 00 en
-  de eerste vijf. Daar zet je de foto's klaar en geef je per foto aan of hij bij
-  elk pakket van dit hotel hoort of alleen bij dit pakket. Bij de eerste 5 foto's
-  kies je ze daarna uit een rij miniaturen. Kiezen zet meteen het niveau van die
-  positie, een foto staat op maximaal één positie, en bij foto 1 krijgen
-  hotelniveau-foto's een waarschuwing, want een hoofdbeeld mag niet bij elk
-  pakket van het hotel terugkomen.
+  de eerste vijf. Daar zet je de foto's klaar, bij de eerste 5 foto's kies je ze
+  uit een rij miniaturen. Een foto staat op maximaal één positie en laat op de
+  andere posities zien waar hij al staat.
 
 Een versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
 `html[data-versie="3"]`.
@@ -30,8 +27,6 @@ Een versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   waarna de tool adviseert wat de volgende foto het beste kan zijn. Het advies houdt
   rekening met wat al gebruikt is, of de omgeving al zichtbaar is, en of het gebouw
   aantrekkelijk genoeg is.
-- **Fotoniveau** per positie: hotelniveau komt terug bij elk pakket van het hotel,
-  arrangementniveau geldt alleen voor dit arrangement.
 - **Korte controle** op de rest van de reeks en de visuele kwaliteit.
 - **Techniek lost zichzelf op**: voeg de foto's toe en de tool controleert breedte,
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
