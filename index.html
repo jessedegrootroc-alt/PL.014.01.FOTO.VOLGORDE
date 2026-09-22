@@ -1518,15 +1518,16 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
         fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
           + (geenFoto ? '<p class="fkies-open">'+ico("dev","ic-sm")
               + ' Je hebt het type gekozen, maar nog geen foto voor deze positie</p>' : '')
-          + (OPT.length ? '<div class="fkies-rij">' + OPT.map(function(it){
-              var elders = posVanFoto(it.id), hier = (state.pos[i].fotoId === it.id);
-              var titel = it.naam + (elders !== -1 && elders !== i ? " \u00b7 staat al op foto " + (elders+1) : "");
-              return '<button type="button" class="fpick'+(elders !== -1 && elders !== i ? " elders" : "")+'"'
-                + ' data-foto="'+it.id+'" aria-pressed="'+hier+'" title="'+esc(titel)+'">'
-                + beeldHTML(it)
-                + (elders !== -1 && elders !== i ? '<span class="fp-b">'+(elders+1)+'</span>' : '')
-                + '</button>';
-            }).join("") + '</div>'
+          + (OPT.length ? (function(){
+              // alleen foto's die nog vrij zijn, plus de foto die hier al staat
+              var keus = OPT.filter(function(it){ return !inGebruik(it.id) || state.pos[i].fotoId === it.id; });
+              if(!keus.length) return '<p class="fkies-leeg">Alle foto\u2019s staan al in de reeks.</p>';
+              return '<div class="fkies-rij">' + keus.map(function(it){
+                var hier = (state.pos[i].fotoId === it.id);
+                return '<button type="button" class="fpick" data-foto="'+it.id+'" aria-pressed="'+hier+'" title="'+esc(it.naam)+'">'
+                  + beeldHTML(it) + '</button>';
+              }).join("") + '</div>';
+            })()
             : '<p class="fkies-leeg">Nog geen foto\u2019s toegevoegd in stap 01.</p>')
           + '</div>';
       }
@@ -1736,11 +1737,13 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
     for(var i=0;i<aantal;i++){ if(!restFoto(i)) return i; }
     return -1;
   }
+  // verandert welke foto's in de rest staan, dan moeten de keuzerijen van de eerste 5 mee
+  function naRestWissel(){ renderRest(); renderCards(); renderSamenvatting(); }
   function zetRest(i, id){
     var bestaand = REST.indexOf(id);
     if(bestaand !== -1) REST[bestaand] = null;
     REST[i] = id;
-    renderRest(); renderSamenvatting();
+    naRestWissel();
   }
   function vulRestAan(){
     var aantal = restPlekken(), vrij = vrijeFotos();
@@ -1752,7 +1755,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       if(!uit.length) break;
       REST[i] = uit.shift().id;
     }
-    renderRest(); renderSamenvatting();
+    naRestWissel();
     toast("De reeks is aangevuld, controleer de volgorde");
   }
 
@@ -1802,7 +1805,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
         var h = REST[i]; REST[i] = REST[i+1]; REST[i+1] = h; renderRest(); renderSamenvatting();
       });
       var weg = el.querySelector('[data-act="weg"]');
-      if(weg) weg.addEventListener("click", function(){ REST[i] = null; renderRest(); renderSamenvatting(); });
+      if(weg) weg.addEventListener("click", function(){ REST[i] = null; naRestWissel(); });
       if(!el.querySelector("img")) el.addEventListener("click", function(){
         var vrij = $("#reeks-vrij");
         if(vrij) vrij.scrollIntoView({block:"nearest", behavior:"smooth"});
@@ -1987,6 +1990,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
     fill.style.width = Math.max(0, Math.min(100,(n/14)*100)) + "%";
     fill.className = "fill" + ((n<8||n>14) ? " warn" : "");
     renderRest();
+    if(metFotos()) renderCards();
     $("#cnt-msg").textContent = n < 8
       ? "Richtlijn is minimaal 8 foto's. Er " + (8-n===1 ? "ontbreekt nog 1 foto" : "ontbreken er nog "+(8-n)) + "."
       : (n > 14 ? "Richtlijn is maximaal 14 foto's. Haal er "+(n-14)+" weg en houd de sterkste over."
