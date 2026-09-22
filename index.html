@@ -279,7 +279,7 @@ main{padding-block:var(--s5) var(--s6)}
 .ft-hint{font-size:12.5px; color:var(--ink-2); padding-bottom:var(--s3); margin-top:-8px}
 
 /* ---------- techniek en optimalisatie ---------- */
-.opt-hotel{margin:var(--s3) 0 var(--s2)}
+.opt-hotel{margin:0 0 var(--s4)}
 .opt-hotel label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
   color:var(--ink-3); font-weight:700; margin-bottom:4px}
 .opt-hotel input{width:100%; max-width:340px; border:1px solid var(--line); background:var(--surface);
@@ -601,6 +601,11 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       <div class="kop-acties">
         <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
       </div>
+      <div class="opt-hotel">
+        <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
+        <input id="hotelnaam" placeholder="Hotel Winselerhof">
+        <p class="hotel-hint" id="hotel-hint"></p>
+      </div>
       <div id="filters"></div>
       <div id="topkeuze"></div>
       <div class="eigen">
@@ -706,12 +711,6 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
             <span class="ft auto">WebP</span><span class="ft auto">HEIC</span><span class="ft auto">AVIF</span>
           </div>
           <p class="ft-hint">JPG, JPEG en PNG gaan zo de reeks in. WebP, HEIC en AVIF worden bij het toevoegen omgezet naar JPG, of naar PNG als er transparantie in zit.</p>
-
-          <div class="opt-hotel">
-            <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
-            <input id="hotelnaam" placeholder="Hotel Winselerhof">
-            <p class="hotel-hint" id="hotel-hint"></p>
-          </div>
 
           <div class="drop" id="drop" role="button" tabindex="0" aria-label="Foto's toevoegen">
             <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto's hierheen</b> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</p>
