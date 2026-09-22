@@ -47,7 +47,12 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   achteren. Automatisch aanvullen zet de overgebleven foto's in de geadviseerde
   volgorde neer.
 - **Korte controle** op de rest van de reeks en de visuele kwaliteit.
-- **Techniek lost zichzelf op**: voeg de foto's toe en de tool controleert breedte,
+- **Techniek lost zichzelf op**: het blok gaat alleen over de foto's die in de
+  reeks staan, dus die je bij de eerste 5 en bij de rest van de reeks hebt
+  gekozen. De overige foto's uit de bibliotheek blijven buiten de controle, de
+  zip en de beschrijvingen; erboven staat hoeveel dat er zijn. Is er nog niets
+  gekozen, dan volgt het blok gewoon alle toegevoegde foto's. De tool
+  controleert breedte,
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
   oplossen, lost hij op: comprimeren tot onder de limiet, WebP, HEIC of AVIF
   omzetten naar JPG, een beschrijvende bestandsnaam maken en een alt-tekst

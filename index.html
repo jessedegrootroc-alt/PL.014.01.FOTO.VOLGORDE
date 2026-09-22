@@ -1694,6 +1694,16 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   }
   function inGebruik(id){ return posVanFoto(id) !== -1 || REST.indexOf(id) !== -1; }
   function vrijeFotos(){ return OPT.filter(function(it){ return !inGebruik(it.id); }); }
+  // stap 05 gaat alleen over de foto's die in de reeks staan; is er nog niets gekozen,
+  // dan volgt de controle gewoon alle toegevoegde foto's
+  function ietsGekozen(){
+    return state.pos.some(function(p){ return !!p.fotoId; })
+        || REST.some(function(id){ return !!id; });
+  }
+  function reeksFotos(){
+    if(!metFotos() || !ietsGekozen()) return OPT.slice();
+    return OPT.filter(function(it){ return inGebruik(it.id); });
+  }
   function isOmgeving(it){ return heeftTag(catVan(it), "omgeving"); }
   function eersteLegePlek(){
     var aantal = restPlekken();
@@ -1796,6 +1806,8 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
         zetRest(plek, parseInt(b.getAttribute("data-foto"),10));
       });
     });
+
+    renderOpt();        // stap 05 volgt de reeks, dus ook wat hier bij komt of af gaat
   }
   if($("#reeks-vul")) $("#reeks-vul").addEventListener("click", vulRestAan);
 
@@ -1997,7 +2009,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
     if(typen === 5 && !state.gebouwNiet && posMet("gebouw") !== -1 && posMet("kamer") === -1){
       devList.push("Het gebouw staat in de reeks, maar een kamerbeeld ontbreekt in de eerste 5");
     }
-    OPT.forEach(function(it, n){
+    reeksFotos().forEach(function(it, n){
       problemen(it).forEach(function(pb){
         err++; errList.push("Foto " + (n+1) + " (" + it.naam + ") — " + pb.tekst);
       });
@@ -2437,13 +2449,16 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       return;
     }
     bar.hidden = false;
-    var teDoen = OPT.filter(function(it){ return problemen(it).length; }).length;
-    $("#opt-stand").textContent = teDoen
+    var lijst = reeksFotos(), buiten = OPT.length - lijst.length;
+    var teDoen = lijst.filter(function(it){ return problemen(it).length; }).length;
+    $("#opt-stand").textContent = (teDoen
       ? teDoen + (teDoen===1 ? " foto heeft nog een technisch punt." : " foto's hebben nog technische punten.")
-      : OPT.length + (OPT.length===1 ? " foto voldoet." : " foto's voldoen aan de eisen.");
+      : lijst.length + (lijst.length===1 ? " foto voldoet." : " foto's voldoen aan de eisen."))
+      + (buiten ? " " + buiten + (buiten===1 ? " foto staat niet in de reeks en blijft hier buiten."
+                                            : " foto's staan niet in de reeks en blijven hier buiten.") : "");
     $("#opt-alles").textContent = teDoen ? "Alles optimaliseren" : "Opnieuw controleren";
 
-    optLijst.innerHTML = OPT.map(function(it){
+    optLijst.innerHTML = lijst.map(function(it){
       var pr = problemen(it), cs = controle(it);
       return '<div class="opt-item '+(pr.length ? "bad" : "good")+'" data-id="'+it.id+'">'
         + beeldHTML(it, "opt-thumb")
@@ -2487,10 +2502,10 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
     hotelHint();
     var aiKnop = $("#opt-ai");
     aiKnop.hidden = !SAMPLE;
-    $("#ai-uitleg").hidden = !SAMPLE || !OPT.length;
-    $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
+    $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
+    $("#opt-hint").textContent = lijst.some(function(it){ return it.geoptimaliseerd; })
       ? "Sla foto's los op met de knop ernaast, of alles samen met Alles als zip. In de zip zit ook alt-teksten.txt."
-      : (OPT.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
+      : (lijst.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
   }
 
 
@@ -2559,9 +2574,9 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
     var oud = knop.textContent;
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
-      var gebruikt = {}, bestanden = [], regels = [];
-      for(var i=0;i<OPT.length;i++){
-        var it = OPT[i];
+      var gebruikt = {}, bestanden = [], regels = [], reeks = reeksFotos();
+      for(var i=0;i<reeks.length;i++){
+        var it = reeks[i];
         var bron = it.blob || it.bestand;
         if(!bron) continue;
         var naam = it.naam, basis = naam.replace(/\.[^.]+$/,""), ext = extVan(naam);
@@ -2646,7 +2661,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   }
   async function beschrijfMetClaude(knop){
     if(!SAMPLE) return;
-    var doelen = OPT.filter(kanNaarClaude);
+    var doelen = reeksFotos().filter(kanNaarClaude);
     if(!doelen.length){ toast("Er zijn nog geen foto\u2019s om te beschrijven"); return; }
     var max = Math.max(1, Math.min(SAMPLE_IMG.maxCount || 4, 8));
     var oud = knop.textContent, gedaan = 0;
@@ -2711,7 +2726,8 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
 
   $("#opt-alles").addEventListener("click", async function(){
     var b = this; b.disabled = true; b.textContent = "Bezig…";
-    for(var i=0;i<OPT.length;i++){ if(problemen(OPT[i]).length) await optimaliseer(OPT[i]); }
+    var reeks = reeksFotos();
+    for(var i=0;i<reeks.length;i++){ if(problemen(reeks[i]).length) await optimaliseer(reeks[i]); }
     b.disabled = false; renderOpt(); renderSamenvatting();
   });
 
