@@ -110,7 +110,7 @@ eerste vijf posities, dan volgt hij het gekozen type. Is er nog geen type gekoze
 of staat de foto verderop in de reeks, dan leest de tool het onderwerp uit de
 oorspronkelijke bestandsnaam: woorden als restaurant, sauna, suite, binnenplaats
 of fietsen wijzen het onderwerp aan, waarbij het laatste woord in de naam wint.
-Kies je Anders en typ je zelf een omschrijving, dan is dat het onderwerp.
+Kies je Andere include en typ je zelf een omschrijving, dan is dat het onderwerp.
 
 In de artifact-versie staat er een knop bij: **Beschrijvingen door Claude**. Die
 stuurt de foto's zelf mee, zodat het onderwerp klopt met wat er echt op staat.
