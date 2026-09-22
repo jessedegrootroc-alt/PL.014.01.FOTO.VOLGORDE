@@ -983,7 +983,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   };
 
   var STORE = "vialuxury-fotocheck-v12";
-  function leegPos(){ return {cat:null, anders:"", status:null, fotoId:null}; }
+  function leegPos(){ return {cat:null, anders:"", status:null, fotoId:null, autoCat:false}; }
   var state = {
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
@@ -1252,13 +1252,38 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   function aantalGekozen(){
     return state.pos.filter(function(p){ return !!p.fotoId && fotoVan(state.pos.indexOf(p)) !== null; }).length;
   }
+  // plek 1 vraagt om een droombeeld, dus het herkende onderwerp wordt daar de droomvariant
+  var DROOMVAN = {gebouw:"droom-hotel", interieur:"droom-hotel", tuin:"droom-hotel",
+                  kamer:"droom-kamer", suite:"droom-kamer", jacuzzi:"droom-kamer",
+                  wellness:"droom-wellness", zwembad:"droom-zwembad",
+                  omgeving:"droom-omgeving", natuur:"droom-natuur", zee:"droom-zee",
+                  stad:"droom-stad", fietsen:"droom-fietsen"};
+  function typeUitFoto(i, it){
+    var c = it && it.herkend;
+    if(!c || !CATS[c]) return null;
+    return (i === 0) ? (DROOMVAN[c] || null) : c;
+  }
+  function losType(i){
+    if(state.pos[i].autoCat){ state.pos[i].cat = null; state.pos[i].autoCat = false; }
+  }
   function kiesFoto(i, id){
     if(state.pos[i].fotoId === id){
       state.pos[i].fotoId = null;
+      losType(i);
     } else {
       var j = posVanFoto(id);
-      if(j !== -1) state.pos[j].fotoId = null;      // een foto staat op maximaal één positie
+      if(j !== -1){ state.pos[j].fotoId = null; losType(j); }   // een foto staat op maximaal één positie
       state.pos[i].fotoId = id;
+      // het type volgt de foto, zo hoef je niet twee keer te kiezen
+      if(!state.pos[i].cat || state.pos[i].autoCat){
+        var soort = typeUitFoto(i, OPT.filter(function(x){ return x.id === id; })[0]);
+        state.pos[i].cat = soort;
+        state.pos[i].autoCat = !!soort;
+        if(soort && state.pos[i].status === null){
+          var v = volgtAdvies(i);
+          state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
+        }
+      }
     }
     herindexeer(); renderAlles(); renderBib(); save();
   }
@@ -1598,6 +1623,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   function kiesCat(i, cat, viaSelect){
     var vorig = state.pos[i].cat;
     state.pos[i].cat = cat;
+    state.pos[i].autoCat = false;          // zelf gekozen gaat voor wat de tool herkende
     if(cat !== "anders") state.pos[i].anders = "";
     if(cat && state.pos[i].status === null){
       var v = volgtAdvies(i);

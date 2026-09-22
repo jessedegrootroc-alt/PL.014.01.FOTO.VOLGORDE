@@ -18,7 +18,11 @@ de kop van het bestand, verander ze samen.
   zaken een balk, en heeft een extra stap **Foto's toevoegen** tussen stap 00 en
   de eerste vijf. Daar zet je de foto's klaar, bij de eerste 5 foto's kies je ze
   uit een rij miniaturen. Een foto staat op maximaal één positie en laat op de
-  andere posities zien waar hij al staat.
+  andere posities zien waar hij al staat. Kies je een foto, dan vult de tool
+  het type beeld meteen in uit de bestandsnaam (`lobby hotel.png` wordt
+  Interieur, op plek 1 wordt het de droomvariant), zodat je niet twee keer
+  hoeft te kiezen. Zegt de naam niets, dan blijft de keuzelijst leeg en kies
+  je het type zelf; een type dat je zelf hebt gekozen wordt nooit overschreven.
 
 - **Versie 3** is versie 2 zonder de uitleg: geen blokomschrijvingen, geen
   labels als Richtlijn of Harde eis, geen hints en geen specificatietabel, met
