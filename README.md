@@ -88,7 +88,7 @@ Daarna http://localhost:8014 openen. Serveer het bestand via een server met
 ## Foto's optimaliseren
 
 Alles gebeurt in de browser, met canvas. Er gaat geen enkele foto naar een server.
-Foto's sla je los op, of samen als zip met `Alles als zip`. In die zip zit ook
+Foto's sla je los op, of samen met `Download afbeeldingen in zip`. In die zip zit ook
 `alt-teksten.txt` met per bestandsnaam de alt-tekst. De zip wordt in de browser
 gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
 gecomprimeerd.

@@ -355,6 +355,8 @@ main{padding-block:var(--s5) var(--s6)}
   padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer; width:100%}
 .btn:hover{border-color:var(--ink)}
 .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn-zip{background:#00B67E; border-color:#00B67E; color:#141414}
+.btn-zip:hover{background:#00A371; border-color:#00A371; color:#141414}
 .btn-primary:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
 .btn-row{display:flex; flex-direction:column; gap:var(--s2)}
 .paginakop .btn-reset{width:auto; flex:none; padding:8px 18px; font-size:13.5px; margin-top:6px}
@@ -828,7 +830,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
             <span class="stand" id="opt-stand"></span>
             <button class="btn btn-primary" id="opt-alles" type="button">Alles optimaliseren</button>
             <button class="btn" id="opt-ai" type="button" hidden>Beschrijvingen door Claude</button>
-            <button class="btn" id="opt-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-zip"></use></svg> Alles als zip</button>
+            <button class="btn btn-zip" id="opt-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-download"></use></svg> Download afbeeldingen in zip</button>
           </div>
           <p class="ai-uitleg" id="ai-uitleg" hidden>Claude kijkt naar de foto’s zelf en schrijft de beschrijving die erbij hoort. Dat gebruikt je eigen Claude-tegoed. Wat je zelf hebt getypt blijft staan.</p>
           <div id="opt-lijst"></div>
@@ -2560,8 +2562,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     aiKnop.hidden = !SAMPLE;
     $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
     $("#opt-hint").textContent = lijst.some(function(it){ return it.geoptimaliseerd; })
-      ? "Sla foto's los op met de knop ernaast, of alles samen met Alles als zip. In de zip zit ook alt-teksten.txt."
-      : (lijst.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
+      ? "Sla foto's los op met de knop ernaast, of alles samen met Download afbeeldingen in zip. In de zip zit ook alt-teksten.txt."
+      : (lijst.length ? "Met Download afbeeldingen in zip haal je de hele reeks in één keer binnen, inclusief een bestand met de alt-teksten." : "");
   }
 
 
@@ -2627,7 +2629,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
 
   async function downloadAlles(knop){
     if(!OPT.length) return;
-    var oud = knop.textContent;
+    var oud = knop.innerHTML;
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
       var gebruikt = {}, bestanden = [], regels = [], reeks = reeksFotos();
@@ -2644,7 +2646,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         bestanden.push({naam:naam, data:buf});
         regels.push(naam + "\t" + (it.alt || altVoorstel(it)));
       }
-      if(!bestanden.length){ knop.disabled = false; knop.textContent = oud; return; }
+      if(!bestanden.length){ knop.disabled = false; knop.innerHTML = oud; return; }
       bestanden.push({naam:"alt-teksten.txt",
         data:new TextEncoder().encode("Bestandsnaam\tAlt-tekst\n" + regels.join("\n") + "\n")});
       var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
@@ -2653,7 +2655,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     }catch(e){
       toast("Zip maken lukt niet");
     }
-    knop.disabled = false; knop.textContent = oud;
+    knop.disabled = false; knop.innerHTML = oud;
   }
 
   /* ---------- beschrijvingen door Claude, alleen in de artifact ---------- */
