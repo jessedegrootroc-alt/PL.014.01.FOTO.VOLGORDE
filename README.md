@@ -88,8 +88,11 @@ Daarna http://localhost:8014 openen. Serveer het bestand via een server met
 ## Foto's optimaliseren
 
 Alles gebeurt in de browser, met canvas. Er gaat geen enkele foto naar een server.
-Foto's sla je los op, of samen met `Download afbeeldingen in zip`. In die zip zit ook
-`alt-teksten.txt` met per bestandsnaam de alt-tekst. De zip wordt in de browser
+Foto's sla je los op, of samen met `Download afbeeldingen in zip`. Elke
+bestandsnaam begint met het volgnummer in de reeks, `01-`, `02-` enzovoort, zodat
+de map na het downloaden in de volgorde van de reeks staat: eerst foto 1 t/m 5,
+dan de rest van de reeks. Blok 05 toont de foto's in dezelfde volgorde. In die
+zip zit ook `alt-teksten.txt` met per bestandsnaam de alt-tekst. De zip wordt in de browser
 gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
 gecomprimeerd.
 

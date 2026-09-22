@@ -1748,6 +1748,19 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     if(!metFotos() || !ietsGekozen()) return OPT.slice();
     return OPT.filter(function(it){ return inGebruik(it.id); });
   }
+  // de reeks op volgorde: foto 1 t/m 5, dan de rest van de reeks, dan wat verder nog meedoet
+  function reeksVolgorde(){
+    var uit = [];
+    for(var i=0;i<5;i++){ var f = fotoVan(i); if(f) uit.push(f); }
+    for(var v=0;v<REST.length;v++){ var g = restFoto(v); if(g && uit.indexOf(g) === -1) uit.push(g); }
+    reeksFotos().forEach(function(it){ if(uit.indexOf(it) === -1) uit.push(it); });
+    return uit;
+  }
+  // bestandsnaam met volgnummer, zodat de map na het downloaden op volgorde van de reeks staat
+  function downloadNaam(it){
+    var n = reeksVolgorde().indexOf(it);
+    return (n === -1 ? "" : (n < 9 ? "0" : "") + (n+1) + "-") + it.naam;
+  }
   function isOmgeving(it){ return heeftTag(catVan(it), "omgeving"); }
   function eersteLegePlek(){
     var aantal = restPlekken();
@@ -2502,7 +2515,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       return;
     }
     bar.hidden = false;
-    var lijst = reeksFotos(), buiten = OPT.length - lijst.length;
+    var lijst = reeksVolgorde(), buiten = OPT.length - lijst.length;
     var teDoen = lijst.filter(function(it){ return problemen(it).length; }).length;
     $("#opt-stand").textContent = (teDoen
       ? teDoen + (teDoen===1 ? " foto heeft nog een technisch punt." : " foto's hebben nog technische punten.")
@@ -2516,7 +2529,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       return '<div class="opt-item '+(pr.length ? "bad" : "good")+'" data-id="'+it.id+'">'
         + beeldHTML(it, "opt-thumb")
         + '<div class="opt-body">'
-        +   '<p class="opt-naam">'+esc(it.naam)+'</p>'
+        +   '<p class="opt-naam">'+esc(downloadNaam(it))+'</p>'
         +   '<p class="opt-specs">'+(it.breedte ? it.breedte+" px · " : "")+kb(it.grootte)+" KB · "+esc(it.ext.toUpperCase())
         +     (isHoofdItem(it) ? " · foto 1, hoofdbeeld, maximaal 400 KB" : " · maximaal 250 KB")+'</p>'
         +   '<div class="opt-chips">'
@@ -2627,12 +2640,12 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     var oud = knop.innerHTML;
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
-      var gebruikt = {}, bestanden = [], regels = [], reeks = reeksFotos();
+      var gebruikt = {}, bestanden = [], regels = [], reeks = reeksVolgorde();
       for(var i=0;i<reeks.length;i++){
         var it = reeks[i];
         var bron = it.blob || it.bestand;
         if(!bron) continue;
-        var naam = it.naam, basis = naam.replace(/\.[^.]+$/,""), ext = extVan(naam);
+        var naam = downloadNaam(it), basis = naam.replace(/\.[^.]+$/,""), ext = extVan(naam);
         if(gebruikt[naam.toLowerCase()]){
           gebruikt[naam.toLowerCase()]++;
           naam = basis + "-" + gebruikt[naam.toLowerCase()] + "." + ext;
@@ -2816,7 +2829,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
   }
   function bewaar(it){
-    if(it.blob || it.bestand) bewaarBlob(it.blob || it.bestand, it.naam);
+    if(it.blob || it.bestand) bewaarBlob(it.blob || it.bestand, downloadNaam(it));
   }
 
   $("#opt-ai").addEventListener("click", function(){ beschrijfMetClaude(this); });
