@@ -6,7 +6,7 @@ stellen en te controleren voordat die live gaat.
 Alles zit in één bestand, `index.html`. Geen build, geen dependencies. Openen in de
 browser is genoeg.
 
-## Drie weergaven
+## Vier weergaven
 
 Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
 Versie 3 is de standaard, de keuze van een gebruiker blijft daarna in zijn eigen
@@ -42,10 +42,15 @@ de kop van het bestand, verander ze samen.
   erachter verhuist naar de tooltip van het adviesblok. Tekst die alleen in de
   uitgebreide versies hoort staat in de markup in een `span.uitgebreid`.
 
+- **Versie 4** is op dit moment een exacte kopie van versie 3, bedoeld om
+  verder op te bouwen zonder versie 3 te raken. De CSS van versie 3 staat
+  achter `html:is([data-versie="3"],[data-versie="4"])`, dus alles wat je
+  alleen voor versie 4 wilt zet je achter `html[data-versie="4"]`.
+
 Alles wat geen versie 1 is deelt dezelfde opbouw, dus de CSS daarvoor staat
 achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een
 versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
-`html[data-versie="4"]`.
+`html[data-versie="5"]`.
 
 ## Wat de tool doet
 
