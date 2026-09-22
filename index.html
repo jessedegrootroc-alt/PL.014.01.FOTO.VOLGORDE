@@ -1101,7 +1101,8 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
         a.titel = "Droombeeld";
         a.waarom = "De hoofdfoto is altijd een droombeeld. Geef aan wat voor soort, dan houden de andere foto's daar rekening mee.";
         a.primair = ["droom-hotel"];
-        a.alt = ["droom-omgeving","droom-natuur","droom-fietsen"];
+        // de kop zegt Droombeeld, dus elk droombeeld telt hier als goed alternatief
+        a.alt = Object.keys(CATS).filter(function(c){ return isDroom(c) && c !== "droom-hotel"; });
       }
       return a;
     }
@@ -1131,7 +1132,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
         a.alt = vrij(i, uniek(["gebouw","kamer","suite","interieur"].concat(wens)))
                   .filter(function(c){ return c !== kamerWens; }).slice(0,3);
       } else {
-        a.titel = "Gebouw of kamer";
+        a.titel = gebruikt(i,"kamer") ? "Gebouw" : "Gebouw of kamer";
         a.waarom = wens.indexOf("gebouw") !== -1
           ? reden("gebouw", "Laat het gebouw goed zien, dat verkoopt dit arrangement.")
           : "Bij voorkeur het gebouw. Niet aantrekkelijk genoeg? Geef dat hieronder aan.";
@@ -1140,6 +1141,9 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
                   .concat(["kamer","suite","interieur","tuin"]))).slice(0,3);
       }
       if(!a.primair.length){ a.primair = a.alt.slice(0,1); a.alt = a.alt.slice(1); }
+      // de titel noemt wat er echt geadviseerd wordt: is kamer al gebruikt (bijvoorbeeld door een
+      // droombeeld kamer op plek 1), dan zegt de kop niet Kamer terwijl het advies een suite is
+      if(a.titel === "Kamer" && a.primair.length && a.primair[0] !== "kamer") a.titel = lbl(a.primair[0]);
       return a;
     }
 
