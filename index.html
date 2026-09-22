@@ -626,6 +626,9 @@ html:not([data-versie="1"]) .c-note{flex:none}
 /* versie 3: geen stand van zaken, alleen de kopieerknop onder de blokken */
 html[data-versie="3"] .sum{display:none}
 html[data-versie="3"] .side{order:0; justify-content:flex-end}
+/* versie 3: geen sleepgreep en pijlen naast het nummer, de volgorde ligt vast */
+html[data-versie="3"] .handle,
+html[data-versie="3"] .movers{display:none}
 
 </style>
 <script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"3");}catch(e){document.documentElement.setAttribute("data-versie","3");}</script>
