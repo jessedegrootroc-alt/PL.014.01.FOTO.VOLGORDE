@@ -488,9 +488,10 @@ html[data-versie="1"] #reeks{display:none}
 .mini-knop{margin-left:auto; border:1px solid var(--line); background:var(--surface); border-radius:var(--r);
   padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; color:var(--ink-2); white-space:nowrap}
 .mini-knop:hover{border-color:var(--ink); color:var(--ink)}
-.slider{display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; scroll-snap-type:x proximity;
+.slider{display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; scroll-snap-type:x proximity;
   -webkit-overflow-scrolling:touch}
-.slot{flex:0 0 148px; scroll-snap-align:start; border:1px solid var(--line); border-radius:var(--r);
+/* de foto in een plek is even groot als overal: fotomaat plus de eigen padding en rand */
+.slot{flex:0 0 calc(var(--fotomaat) + 18px); scroll-snap-align:start; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); padding:8px; display:flex; flex-direction:column; gap:5px}
 .slot.leeg{border-style:dashed; background:var(--surface-2)}
 .slot.leeg.volgende{border-color:var(--accent); border-style:solid}
