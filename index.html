@@ -2657,7 +2657,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     return new Blob(delen.concat(centraal, [eind]), {type:"application/zip"});
   }
 
-  function zipVoortgang(n, totaal, tekst){
+  function toonVoortgang(n, totaal, tekst){
     var host = $("#zip-prog"); if(!host) return;
     if(n === null){ host.hidden = true; return; }
     var pct = totaal ? Math.round((n/totaal)*100) : 0;
@@ -2671,7 +2671,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
       var gebruikt = {}, bestanden = [], reeks = reeksVolgorde().filter(function(it){ return it.blob || it.bestand; });
-      zipVoortgang(0, reeks.length);
+      toonVoortgang(0, reeks.length);
       for(var i=0;i<reeks.length;i++){
         var it = reeks[i];
         var bron = it.blob || it.bestand;
@@ -2682,20 +2682,20 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         } else { gebruikt[naam.toLowerCase()] = 1; }
         var buf = new Uint8Array(await bron.arrayBuffer());
         bestanden.push({naam:naam, data:buf});
-        zipVoortgang(i+1, reeks.length);
+        toonVoortgang(i+1, reeks.length);
         await new Promise(function(r){ setTimeout(r, 60); });  // even tekenen, zodat de balk zichtbaar vult, ook bij kleine bestanden
       }
-      if(!bestanden.length){ zipVoortgang(null); knop.disabled = false; knop.innerHTML = oud; return; }
-      zipVoortgang(reeks.length, reeks.length, "Zip inpakken\u2026");
+      if(!bestanden.length){ toonVoortgang(null); knop.disabled = false; knop.innerHTML = oud; return; }
+      toonVoortgang(reeks.length, reeks.length, "Zip inpakken\u2026");
       await new Promise(function(r){ setTimeout(r, 0); });
       var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
       var blob = await maakZip(bestanden);
-      zipVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
+      toonVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
       await bewaarBlob(blob, zipNaam);
     }catch(e){
       toast("Zip maken lukt niet");
     }
-    setTimeout(function(){ zipVoortgang(null); }, 1200);
+    setTimeout(function(){ toonVoortgang(null); }, 1200);
     knop.disabled = false; knop.innerHTML = oud;
   }
 
@@ -2870,8 +2870,16 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
 
   $("#opt-alles").addEventListener("click", async function(){
     var b = this; b.disabled = true; b.textContent = "Bezig…";
-    var reeks = reeksFotos();
-    for(var i=0;i<reeks.length;i++){ if(problemen(reeks[i]).length) await optimaliseer(reeks[i]); }
+    var teDoen = reeksFotos().filter(function(it){ return problemen(it).length; });
+    if(teDoen.length) toonVoortgang(0, teDoen.length);
+    for(var i=0;i<teDoen.length;i++){
+      await optimaliseer(teDoen[i]);
+      toonVoortgang(i+1, teDoen.length);
+    }
+    if(teDoen.length){
+      toonVoortgang(teDoen.length, teDoen.length, "Klaar \u00b7 100%");
+      setTimeout(function(){ toonVoortgang(null); }, 1200);
+    }
     b.disabled = false; renderOpt(); renderSamenvatting();
   });
 
