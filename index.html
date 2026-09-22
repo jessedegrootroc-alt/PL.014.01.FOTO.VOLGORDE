@@ -964,15 +964,12 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   function heeftTag(c, t){ return !!(CATS[c] && CATS[c].tags.indexOf(t) !== -1); }
 
   var GROUPS = {
-    reeks:{kind:"guide", items:[
-      {id:"rs1", label:"Foto 6 t/m 14 zijn vooral aanvullende hotelbeelden",
-       uitleg:"Na de eerste vijf wil de gast het hotel zien. Vervang de omgevingsbeelden verderop door kamers, faciliteiten of interieur."},
+    reeks:{kind:"guide", items:[]},     // de controlepunten over de volgorde staan bij 04
+    visueel:{kind:"guide", items:[
       {id:"rs2", label:"De reeks eindigt waar mogelijk met omgevingsbeelden",
        uitleg:"De laatste foto's laten zien waar de gast terechtkomt. Zet de omgevingsbeelden achteraan in plaats van ertussen."},
       {id:"rs3", label:"De reeks voelt als de reis van de gast", sub:"Aankomst, verblijf, arrangement, hotel, omgeving.",
-       uitleg:"Zonder die lijn springt de reeks heen en weer. Sorteer op aankomst, verblijf, arrangement, hotel en omgeving."}
-    ]},
-    visueel:{kind:"guide", items:[
+       uitleg:"Zonder die lijn springt de reeks heen en weer. Sorteer op aankomst, verblijf, arrangement, hotel en omgeving."},
       {id:"v1", label:"Het licht is consistent door de hele reeks",
        uitleg:"Ongeveer dezelfde lichtstelling, geen mix van warm en koel licht en geen flitsfoto tussen daglichtbeelden. Wisselend licht laat de reeks op verschillende hotels lijken; kies beelden van hetzelfde moment van de dag, of bouw bewust op van dag naar avond, en vervang de foto die qua kleur of belichting uit de toon valt."},
       {id:"v4", label:"Geen zwaar bewerkte of onrealistische AI-beelden",
