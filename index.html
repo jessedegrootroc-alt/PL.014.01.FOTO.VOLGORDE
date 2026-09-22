@@ -404,21 +404,21 @@ main{padding-block:var(--s5) var(--s6)}
 /* ---------- fotobibliotheek, alleen versie 2 ---------- */
 html[data-versie="1"] #blok-fotos{display:none}
 html[data-versie="1"] #chip-fotos{display:none}
-.bib-grid{display:flex; flex-wrap:wrap; gap:12px}
-.bib-item{width:160px}
-.bib-item img{width:160px; aspect-ratio:16/9; max-width:100%; object-fit:cover; border-radius:var(--r);
+.bib-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr)); gap:14px}
+.bib-item{min-width:0}
+.bib-item img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:var(--r);
   border:1px solid var(--line); display:block; background:var(--na-bg)}
 .bib-item.gebruikt img{border-color:var(--ok)}
 .geenbeeld{display:grid; place-items:center; background:var(--na-bg); border:1px dashed var(--na-line);
   border-radius:var(--r); color:var(--ink-3); font-size:10.5px; font-weight:700; letter-spacing:1px}
-.bib-item .geenbeeld{width:160px; aspect-ratio:16/9; max-width:100%}
+.bib-item .geenbeeld{width:100%; aspect-ratio:16/9}
 .fpick .geenbeeld{width:82px; aspect-ratio:16/9; font-size:9px; letter-spacing:.5px; border-radius:5px}
 .opt-thumb.geenbeeld{width:96px; aspect-ratio:16/9; max-width:100%}
 .bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
 .bib-fout.bezig{color:var(--dev)}
-.bib-naam{font-size:11px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bib-naam{font-size:12px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bib-rij{display:flex; align-items:center; gap:8px; margin-top:2px}
-.bib-pos{font-size:10.5px; font-weight:700; color:var(--ok)}
+.bib-pos{font-size:11px; font-weight:700; color:var(--ok)}
 .mini-link{background:none; border:0; padding:0; font-size:11px; color:var(--ink-3); text-decoration:underline; cursor:pointer}
 .mini-link:hover{color:var(--accent-hover)}
 .bib-leeg{font-size:12.5px; color:var(--ink-3)}
