@@ -56,7 +56,8 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   plek oranje met de reden. Klikken op een foto onder de slider zet hem op de
   eerstvolgende lege plek, met de pijlen schuif je hem naar voren of naar
   achteren. Automatisch aanvullen zet de overgebleven foto's in de geadviseerde
-  volgorde neer.
+  volgorde neer. De vrije foto's onder de slider staan in dezelfde strook van
+  twee rijen hoog die naar rechts scrolt.
 - **Korte controle** op de rest van de reeks en de visuele kwaliteit.
 - **Techniek lost zichzelf op**: het blok gaat alleen over de foto's die in de
   reeks staan, dus die je bij de eerste 5 en bij de rest van de reeks hebt
