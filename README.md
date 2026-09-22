@@ -116,9 +116,16 @@ blijven de beschrijvingen hieronder gelden.
 
 Elk onderwerp heeft meerdere formuleringen. Staan er twee kamerbeelden in de
 reeks, dan krijgt de tweede een andere zin, zodat geen twee foto's dezelfde
-beschrijving hebben. Hetzelfde geldt voor de bestandsnaam, die telt door als
-`-2`. Wijzigt de hotelnaam, een kenmerk of het type beeld, dan lopen de
-beschrijvingen en de namen meteen mee.
+beschrijving hebben.
+
+De bestandsnaam is die beschrijving, als slug van maximaal 60 tekens, dus
+"Kamer in Hotel Acropolis" wordt `kamer-in-hotel-acropolis.jpg`. Bij het
+optimaliseren hernoemt de tool de foto altijd, ook als de oorspronkelijke naam
+al goed was, zodat naam en beschrijving bij elkaar horen. Typ je zelf een
+beschrijving, dan volgt de bestandsnaam zodra je het veld verlaat. Komen twee
+namen toch op hetzelfde uit, dan telt de tweede door als `-2`. Wijzigt de
+hotelnaam, een kenmerk of het type beeld, dan lopen de beschrijvingen en de
+namen meteen mee.
 
 ## Iconen
 

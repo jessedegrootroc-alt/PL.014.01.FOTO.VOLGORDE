@@ -2217,12 +2217,20 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   }
   function onderwerpVan(it){ return ONDERWERP[catVan(it)] || ONDERWERP["anders"]; }
 
+  function korteSlug(tekst, max){
+    var t = slug(tekst);
+    if(t.length <= max) return t;
+    var kort = t.slice(0, max), streep = kort.lastIndexOf("-");
+    return (streep > 12 ? kort.slice(0, streep) : kort).replace(/-+$/, "");
+  }
   function naamBasis(it){
-    var o = onderwerpVan(it);
+    // de bestandsnaam volgt de beschrijving van de foto
+    var uit = korteSlug((it.alt || "").trim() || altVoorstel(it), 60);
+    if(uit) return uit;
+    var o = onderwerpVan(it);                     // zonder beschrijving: onderwerp en hotelnaam
     var h = slug(hotelNaam);
     var voor = h ? (/^hotel(-|$)/.test(h) ? h : "hotel-" + h) : "hotel";
     var delen = voor.split("-");
-    // het onderwerp niet herhalen, anders wordt het hotel-kasteel-winselerhof-hotel
     return delen.indexOf(o.slug) !== -1 ? voor : voor + "-" + o.slug;
   }
   function naamVoorstel(it){
@@ -2383,11 +2391,8 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       it.geoptimaliseerd = true;
     }
     if(!(it.alt || "").trim()){ it.alt = altVoorstel(it); it.autoAlt = true; }
-    var kaal = it.naam.replace(/\.[^.]+$/,"");
-    if(SLECHTE_NAAM.test(kaal) || kaal.length <= 8 || extVan(it.naam) !== it.ext){
-      it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,"");
-      it.naam = it.doelNaam + "." + it.ext;
-    }
+    it.doelNaam = naamVoorstel(it).replace(/\.[^.]+$/,"");
+    it.naam = it.doelNaam + "." + it.ext;
     renderOpt();
   }
 
