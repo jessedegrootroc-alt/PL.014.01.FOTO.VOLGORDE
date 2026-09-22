@@ -94,7 +94,8 @@ Foto's sla je los op, of samen met `Download afbeeldingen in zip`. Elke
 bestandsnaam begint met het volgnummer in de reeks, `01-`, `02-` enzovoort, zodat
 de map na het downloaden in de volgorde van de reeks staat: eerst foto 1 t/m 5,
 dan de rest van de reeks. Blok 05 toont de foto's in dezelfde volgorde. De zip bevat
-alleen de foto's; de beschrijvingen staan in blok 05 bij elke foto. De zip wordt in de browser
+alleen de foto's; de beschrijvingen staan in blok 05 bij elke foto. Tijdens het
+inpakken vult een balk onder de knoppen per foto tot 100%. De zip wordt in de browser
 gemaakt, zonder bibliotheek en zonder compressie, want de foto's zijn al
 gecomprimeerd.
 

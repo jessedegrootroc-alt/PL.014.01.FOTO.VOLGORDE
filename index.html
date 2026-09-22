@@ -345,6 +345,10 @@ main{padding-block:var(--s5) var(--s6)}
 .sum h2{font-size:17px; margin-bottom:var(--s2)}
 .progress{height:8px; border-radius:var(--r); background:var(--na-bg); overflow:hidden; margin:var(--s2) 0 6px}
 .progress i{display:block; height:100%; background:var(--accent); width:0; transition:width .25s ease}
+.zip-prog{display:flex; align-items:center; gap:10px; margin:2px 0 10px}
+.zip-prog[hidden]{display:none}
+.zip-prog .progress{flex:1; margin:0}
+.zip-prog span{font-size:12.5px; font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums; min-width:11ch; text-align:right}
 .prog-lbl{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .stats{display:flex; flex-direction:column; gap:var(--s1); margin-top:var(--s3)}
 .stat{display:flex; align-items:center; gap:var(--s2); padding:8px 10px; border-radius:var(--r);
@@ -835,6 +839,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
             <button class="btn btn-primary" id="opt-alles" type="button">Alles optimaliseren</button>
             <button class="btn" id="opt-ai" type="button" hidden>Beschrijvingen door Claude</button>
             <button class="btn btn-zip" id="opt-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-download"></use></svg> Download afbeeldingen in zip</button>
+          </div>
+          <div class="zip-prog" id="zip-prog" hidden aria-live="polite">
+            <div class="progress"><i id="zip-fill"></i></div><span id="zip-lbl">0%</span>
           </div>
           <p class="ai-uitleg" id="ai-uitleg" hidden>Claude kijkt naar de foto’s zelf en schrijft de beschrijving die erbij hoort. Dat gebruikt je eigen Claude-tegoed. Wat je zelf hebt getypt blijft staan.</p>
           <div id="opt-lijst"></div>
@@ -2650,16 +2657,24 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     return new Blob(delen.concat(centraal, [eind]), {type:"application/zip"});
   }
 
+  function zipVoortgang(n, totaal, tekst){
+    var host = $("#zip-prog"); if(!host) return;
+    if(n === null){ host.hidden = true; return; }
+    var pct = totaal ? Math.round((n/totaal)*100) : 0;
+    host.hidden = false;
+    $("#zip-fill").style.width = pct + "%";
+    $("#zip-lbl").textContent = tekst || (n + " van " + totaal + " \u00b7 " + pct + "%");
+  }
   async function downloadAlles(knop){
     if(!OPT.length) return;
     var oud = knop.innerHTML;
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
-      var gebruikt = {}, bestanden = [], reeks = reeksVolgorde();
+      var gebruikt = {}, bestanden = [], reeks = reeksVolgorde().filter(function(it){ return it.blob || it.bestand; });
+      zipVoortgang(0, reeks.length);
       for(var i=0;i<reeks.length;i++){
         var it = reeks[i];
         var bron = it.blob || it.bestand;
-        if(!bron) continue;
         var naam = downloadNaam(it), basis = naam.replace(/\.[^.]+$/,""), ext = extVan(naam);
         if(gebruikt[naam.toLowerCase()]){
           gebruikt[naam.toLowerCase()]++;
@@ -2667,14 +2682,20 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         } else { gebruikt[naam.toLowerCase()] = 1; }
         var buf = new Uint8Array(await bron.arrayBuffer());
         bestanden.push({naam:naam, data:buf});
+        zipVoortgang(i+1, reeks.length);
+        await new Promise(function(r){ setTimeout(r, 60); });  // even tekenen, zodat de balk zichtbaar vult, ook bij kleine bestanden
       }
-      if(!bestanden.length){ knop.disabled = false; knop.innerHTML = oud; return; }
+      if(!bestanden.length){ zipVoortgang(null); knop.disabled = false; knop.innerHTML = oud; return; }
+      zipVoortgang(reeks.length, reeks.length, "Zip inpakken\u2026");
+      await new Promise(function(r){ setTimeout(r, 0); });
       var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
       var blob = await maakZip(bestanden);
+      zipVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
       await bewaarBlob(blob, zipNaam);
     }catch(e){
       toast("Zip maken lukt niet");
     }
+    setTimeout(function(){ zipVoortgang(null); }, 1200);
     knop.disabled = false; knop.innerHTML = oud;
   }
 
