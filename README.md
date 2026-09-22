@@ -89,6 +89,14 @@ oorspronkelijke bestandsnaam: woorden als restaurant, sauna, suite, binnenplaats
 of fietsen wijzen het onderwerp aan, waarbij het laatste woord in de naam wint.
 Kies je Anders en typ je zelf een omschrijving, dan is dat het onderwerp.
 
+In de artifact-versie staat er een knop bij: **Beschrijvingen door Claude**. Die
+stuurt de foto's zelf mee, zodat de beschrijving gaat over wat er echt op staat,
+bijvoorbeeld een kamer met balkon en uitzicht op de tuin. Het loopt via de
+sample-capability, dus het gebruikt het Claude-tegoed van degene die de tool
+open heeft en het vraagt de eerste keer toestemming. Wat iemand zelf heeft
+getypt blijft staan. Draait de tool als los bestand, dan is de knop er niet en
+blijven de beschrijvingen hieronder gelden.
+
 Elk onderwerp heeft meerdere formuleringen. Staan er twee kamerbeelden in de
 reeks, dan krijgt de tweede een andere zin, zodat geen twee foto's dezelfde
 beschrijving hebben. Hetzelfde geldt voor de bestandsnaam, die telt door als

@@ -325,6 +325,8 @@ main{padding-block:var(--s5) var(--s6)}
 .opt-acties button:hover{border-color:var(--ink)}
 .opt-leeg{font-size:13.5px; color:var(--ink-3); margin-bottom:var(--s2)}
 .opt-hint{font-size:12.5px; color:var(--ink-3); margin-top:var(--s2)}
+.ai-uitleg{font-size:12.5px; color:var(--ink-2); margin-bottom:var(--s2)}
+.ai-uitleg[hidden]{display:none}
 @media (max-width:680px){
   .opt-item{grid-template-columns:76px minmax(0,1fr)}
   .opt-thumb{width:76px}
@@ -768,8 +770,10 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
           <div class="opt-bar" id="opt-bar" hidden>
             <span class="stand" id="opt-stand"></span>
             <button class="btn btn-primary" id="opt-alles" type="button">Alles optimaliseren</button>
+            <button class="btn" id="opt-ai" type="button" hidden>Beschrijvingen door Claude</button>
             <button class="btn" id="opt-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-zip"></use></svg> Alles als zip</button>
           </div>
+          <p class="ai-uitleg" id="ai-uitleg" hidden>Claude kijkt naar de foto’s zelf en schrijft de beschrijving die erbij hoort. Dat gebruikt je eigen Claude-tegoed. Wat je zelf hebt getypt blijft staan.</p>
           <div id="opt-lijst"></div>
           <p class="opt-hint" id="opt-hint"></p>
 
@@ -2430,6 +2434,9 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     });
 
     hotelHint();
+    var aiKnop = $("#opt-ai");
+    aiKnop.hidden = !SAMPLE;
+    $("#ai-uitleg").hidden = !SAMPLE || !OPT.length;
     $("#opt-hint").textContent = OPT.some(function(it){ return it.geoptimaliseerd; })
       ? "Sla foto's los op met de knop ernaast, of alles samen met Alles als zip. In de zip zit ook alt-teksten.txt."
       : (OPT.length ? "Met Alles als zip download je de hele reeks in één keer, inclusief een bestand met de alt-teksten." : "");
@@ -2527,6 +2534,102 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     knop.disabled = false; knop.textContent = oud;
   }
 
+  /* ---------- beschrijvingen door Claude, alleen in de artifact ---------- */
+  var SAMPLE = null, SAMPLE_IMG = null;
+  if(window.claude && typeof window.claude.use === "function"){
+    window.claude.use("sample").then(function(sp){
+      if(!sp || typeof sp.limits !== "function") return null;
+      return sp.limits().then(function(lim){
+        if(lim && lim.images){ SAMPLE = sp; SAMPLE_IMG = lim.images; renderOpt(); }
+      }, function(){});
+    }, function(){});
+  }
+  function kanNaarClaude(it){
+    return (it.blob || it.bestand) && it.kanTonen !== false
+      && ["jpg","jpeg","png","webp","gif"].indexOf(it.ext) !== -1;
+  }
+  function plekTekst(it){
+    if(it.onderwerp.type === "pos"){
+      var i = it.onderwerp.v;
+      return "foto " + (i+1) + (i === 0 ? ", het hoofdbeeld van het arrangement" : " van de reeks")
+        + (state.pos[i].cat ? ", gekozen type: " + lbl(state.pos[i].cat) : "");
+    }
+    return "verderop in de reeks";
+  }
+  function aiFoutTekst(code){
+    if(code === "not_granted" || code === "sampling_disabled" || code === "not_declared"
+       || code === "capability_disabled" || code === "capability_removed" || code === "images_unavailable"){
+      return "Claude is hier niet beschikbaar, de tool gebruikt de eigen beschrijvingen";
+    }
+    if(code === "rate_limited") return "Even te veel gevraagd, probeer het over een minuut opnieuw";
+    if(code === "session_expired") return "Je sessie is verlopen, log opnieuw in";
+    if(code === "image_rejected") return "Een van de foto\u2019s kan niet worden meegestuurd";
+    if(code === "invalid_json" || code === "empty_completion") return "Het antwoord kwam er niet goed uit, probeer het opnieuw";
+    if(code === "refused") return "Claude schrijft hier geen beschrijving voor";
+    return "Het lukte niet, probeer het later opnieuw";
+  }
+  function aiPrompt(groep){
+    var kenmerken = state.filters.map(function(f){ return FILTERS[f.id] ? FILTERS[f.id].label : ""; })
+      .filter(Boolean).concat(state.eigen);
+    var regels = [
+      "Je schrijft alt-teksten voor de fotogalerij van een hotelarrangement op een Nederlandse reissite.",
+      "Hotel: " + (hotelNaam || "naam onbekend") + ".",
+      (kenmerken.length ? "Kenmerken van dit arrangement: " + kenmerken.join(", ") + "." : ""),
+      "",
+      "Per foto krijg je de bestandsnaam en waar hij in de reeks staat:",
+      groep.map(function(it, k){ return (k+1) + ". " + it.naam + " \u2014 " + plekTekst(it); }).join("\n"),
+      "",
+      "Schrijf voor elke foto een alt-tekst, in dezelfde volgorde:",
+      "- Beschrijf wat er echt te zien is op die foto: de ruimte, het uitzicht, het licht, het materiaal.",
+      "- Begin bij het onderwerp, dus niet met foto van of afbeelding van.",
+      "- Noem de hotelnaam een keer, natuurlijk in de zin, als die bekend is.",
+      "- Nederlands, 8 tot 16 woorden, maximaal 125 tekens, geen punt aan het eind.",
+      "- Concreet en feitelijk, geen marketingtaal, geen zoekwoorden stapelen, niets verzinnen wat je niet ziet.",
+      "- Elke beschrijving is anders dan de andere.",
+      "",
+      "Antwoord met alleen een JSON-array van " + groep.length + " strings, in dezelfde volgorde.",
+      'Bijvoorbeeld: ["Tweepersoonskamer met balkon en uitzicht op de tuin van Hotel X"]'
+    ];
+    return regels.filter(function(r){ return r !== ""; }).join("\n");
+  }
+  async function beschrijfMetClaude(knop){
+    if(!SAMPLE) return;
+    var doelen = OPT.filter(kanNaarClaude);
+    if(!doelen.length){ toast("Er zijn nog geen foto\u2019s om te beschrijven"); return; }
+    var max = Math.max(1, Math.min(SAMPLE_IMG.maxCount || 4, 8));
+    var oud = knop.textContent, gedaan = 0;
+    knop.disabled = true;
+    try{
+      for(var i=0;i<doelen.length;i+=max){
+        var groep = doelen.slice(i, i+max);
+        knop.textContent = "Claude kijkt\u2026 " + gedaan + " van " + doelen.length;
+        var uit = await SAMPLE.json(aiPrompt(groep), {
+          images: groep.map(function(it){ return it.blob || it.bestand; }),
+          modelTier: "default"
+        });
+        if(!uit || typeof uit.length !== "number") throw {code:"invalid_json"};
+        groep.forEach(function(it, k){
+          var t = uit[k];
+          if(typeof t === "string" && t.trim()){
+            it.alt = t.trim().replace(/\s+/g, " ").slice(0, 140);
+            it.autoAlt = false;
+          }
+        });
+        gedaan += groep.length;
+        renderOpt(); renderSamenvatting();
+      }
+      toast(gedaan + (gedaan === 1 ? " beschrijving geschreven" : " beschrijvingen geschreven"));
+    }catch(e){
+      var code = e && e.code;
+      toast(aiFoutTekst(code));
+      if(["not_granted","sampling_disabled","not_declared","capability_disabled",
+          "capability_removed","images_unavailable"].indexOf(code) !== -1){
+        SAMPLE = null; renderOpt();
+      }
+    }
+    knop.disabled = false; knop.textContent = oud;
+  }
+
   var DOWNLOADS = null;
   if(window.claude && typeof window.claude.use === "function"){
     window.claude.use("downloads").then(function(d){ DOWNLOADS = d; }, function(){});
@@ -2551,6 +2654,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     if(it.blob || it.bestand) bewaarBlob(it.blob || it.bestand, it.naam);
   }
 
+  $("#opt-ai").addEventListener("click", function(){ beschrijfMetClaude(this); });
   $("#opt-zip").addEventListener("click", function(){ downloadAlles(this); });
 
   $("#opt-alles").addEventListener("click", async function(){
