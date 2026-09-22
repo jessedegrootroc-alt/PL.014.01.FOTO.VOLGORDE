@@ -9,7 +9,9 @@ browser is genoeg.
 ## Drie weergaven
 
 Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
-De keuze blijft in de browser bewaard.
+Versie 3 is de standaard, de keuze van een gebruiker blijft daarna in zijn eigen
+browser bewaard. De standaard staat in `STANDAARD_VERSIE` en in het scriptje in
+de kop van het bestand, verander ze samen.
 
 - **Versie 1** is de opbouw met hoge kaarten en een zijpaneel rechts.
 - **Versie 2** zet de eerste 5 foto's om in compacte rijen, maakt de stand van
