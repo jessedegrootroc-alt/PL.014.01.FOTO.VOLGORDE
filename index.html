@@ -296,11 +296,11 @@ main{padding-block:var(--s5) var(--s6)}
 .opt-bar{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3); align-items:center; margin-bottom:var(--s3)}
 .opt-bar .stand{font-size:13.5px; color:var(--ink-2); flex:1; min-width:180px}
 .opt-bar .btn{width:auto; padding:8px 16px; font-size:13.5px}
-.opt-item{display:grid; grid-template-columns:96px minmax(0,1fr) auto; gap:var(--s3);
+.opt-item{display:grid; grid-template-columns:200px minmax(0,1fr) auto; gap:var(--s3);
   border:1px solid var(--line); border-radius:var(--r); padding:12px; margin-bottom:var(--s2); align-items:start}
 .opt-item.bad{border-color:var(--err-line)}
 .opt-item.good{border-color:var(--ok-line)}
-.opt-thumb{width:96px; aspect-ratio:16/9; max-width:100%; object-fit:cover; border-radius:var(--r);
+.opt-thumb{width:200px; aspect-ratio:16/9; max-width:100%; object-fit:cover; border-radius:var(--r);
   background:var(--na-bg); display:block}
 .opt-naam{font-size:13.5px; font-weight:600; word-break:break-all}
 .opt-specs{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-top:2px}
@@ -328,8 +328,8 @@ main{padding-block:var(--s5) var(--s6)}
 .ai-uitleg{font-size:12.5px; color:var(--ink-2); margin-bottom:var(--s2)}
 .ai-uitleg[hidden]{display:none}
 @media (max-width:680px){
-  .opt-item{grid-template-columns:76px minmax(0,1fr)}
-  .opt-thumb{width:76px}
+  .opt-item{grid-template-columns:130px minmax(0,1fr)}
+  .opt-thumb,.opt-thumb.geenbeeld{width:130px}
   .opt-acties{grid-column:1 / -1; flex-direction:row; flex-wrap:wrap}
   .opt-velden{grid-template-columns:minmax(0,1fr)}
 }
@@ -413,7 +413,7 @@ html[data-versie="1"] #chip-fotos{display:none}
   border-radius:var(--r); color:var(--ink-3); font-size:10.5px; font-weight:700; letter-spacing:1px}
 .bib-item .geenbeeld{width:100%; aspect-ratio:16/9}
 .fpick .geenbeeld{width:100%; aspect-ratio:16/9; font-size:9px; letter-spacing:.5px; border-radius:5px}
-.opt-thumb.geenbeeld{width:96px; aspect-ratio:16/9; max-width:100%}
+.opt-thumb.geenbeeld{width:200px; aspect-ratio:16/9; max-width:100%}
 .bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
 .bib-fout.bezig{color:var(--dev)}
 .bib-naam{font-size:12px; color:var(--ink-2); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
