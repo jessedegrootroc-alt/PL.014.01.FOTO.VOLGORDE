@@ -22,9 +22,11 @@ de kop van het bestand, verander ze samen.
 
 - **Versie 3** is versie 2 zonder de uitleg: geen blokomschrijvingen, geen
   labels als Richtlijn of Harde eis, geen hints en geen specificatietabel, met
-  krappere marges. Het advies zelf blijft staan, de reden erachter verhuist naar
-  de tooltip van het adviesblok. Tekst die alleen in de uitgebreide versies
-  hoort staat in de markup in een `span.uitgebreid`.
+  krappere marges. Ook de balk **Stand van zaken** is hier weg, alleen de knop
+  Kopieer samenvatting blijft en die staat onder de blokken; het Overzicht
+  onderaan laat dezelfde telling zien. Het advies zelf blijft staan, de reden
+  erachter verhuist naar de tooltip van het adviesblok. Tekst die alleen in de
+  uitgebreide versies hoort staat in de markup in een `span.uitgebreid`.
 
 Alles wat geen versie 1 is deelt dezelfde opbouw, dus de CSS daarvoor staat
 achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een

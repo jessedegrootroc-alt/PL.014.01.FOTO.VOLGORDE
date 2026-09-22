@@ -545,7 +545,6 @@ html[data-versie="3"] .advice .a-alts{margin-top:6px}
 html[data-versie="3"] .barline{padding:11px 18px}
 html[data-versie="3"] .paginakop{padding-bottom:var(--s3)}
 html[data-versie="3"] .paginakop h1{font-size:23px}
-html[data-versie="3"] .sum{padding:14px 16px}
 html[data-versie="3"] .ov-h{padding:14px 18px 2px}
 html[data-versie="3"] .ov-col{padding:12px 18px}
 html[data-versie="3"] .opt-item{padding:10px}
@@ -623,6 +622,10 @@ html:not([data-versie="1"]) .c-note{flex:1 1 100%}
   html:not([data-versie="1"]) .sum{grid-template-columns:minmax(0,1fr)}
   html:not([data-versie="1"]) .stats{grid-column:1; grid-row:auto; flex-direction:column; margin-top:var(--s2)}
 }
+/* versie 3: geen stand van zaken, alleen de kopieerknop onder de blokken */
+html[data-versie="3"] .sum{display:none}
+html[data-versie="3"] .side{order:0; justify-content:flex-end}
+
 </style>
 <script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"3");}catch(e){document.documentElement.setAttribute("data-versie","3");}</script>
 
