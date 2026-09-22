@@ -2585,8 +2585,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     aiKnop.hidden = !SAMPLE;
     $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
     $("#opt-hint").textContent = lijst.some(function(it){ return it.geoptimaliseerd; })
-      ? "Sla foto's los op met de knop ernaast, of alles samen met Download afbeeldingen in zip. In de zip zit ook alt-teksten.txt."
-      : (lijst.length ? "Met Download afbeeldingen in zip haal je de hele reeks in één keer binnen, inclusief een bestand met de alt-teksten." : "");
+      ? "Sla foto's los op met de knop ernaast, of alles samen met Download afbeeldingen in zip."
+      : (lijst.length ? "Met Download afbeeldingen in zip haal je de hele reeks in één keer binnen, op volgorde genummerd." : "");
   }
 
 
@@ -2655,7 +2655,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     var oud = knop.innerHTML;
     knop.disabled = true; knop.textContent = "Zip maken…";
     try{
-      var gebruikt = {}, bestanden = [], regels = [], reeks = reeksVolgorde();
+      var gebruikt = {}, bestanden = [], reeks = reeksVolgorde();
       for(var i=0;i<reeks.length;i++){
         var it = reeks[i];
         var bron = it.blob || it.bestand;
@@ -2667,11 +2667,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         } else { gebruikt[naam.toLowerCase()] = 1; }
         var buf = new Uint8Array(await bron.arrayBuffer());
         bestanden.push({naam:naam, data:buf});
-        regels.push(naam + "\t" + (it.alt || altVoorstel(it)));
       }
       if(!bestanden.length){ knop.disabled = false; knop.innerHTML = oud; return; }
-      bestanden.push({naam:"alt-teksten.txt",
-        data:new TextEncoder().encode("Bestandsnaam\tAlt-tekst\n" + regels.join("\n") + "\n")});
       var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
       var blob = await maakZip(bestanden);
       await bewaarBlob(blob, zipNaam);
