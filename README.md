@@ -87,12 +87,12 @@ met `Los op`.
 
 ## Beschrijvingen en bestandsnamen
 
-De beschrijving die de tool genereert is gericht op vindbaarheid. Hij begint met
-wat er op de foto staat, noemt de hotelnaam, en bij het hoofdbeeld komt de
-context uit de gekozen kenmerken erbij, bijvoorbeeld "Vooraanzicht van Kasteel
-Winselerhof, een kasteelhotel in de natuur". Foto's van de omgeving krijgen de
-locatie erbij, de rest blijft kort en beschrijvend, zodat er geen zoekwoorden
-worden gestapeld.
+De beschrijving die de tool genereert is kort en algemeen: het onderwerp plus de
+hotelnaam, dus "Kamer in Hotel Acropolis" of "Restaurant van Hotel Acropolis",
+en bij het gebouw gewoon de hotelnaam. Geen details als tweepersoonskamer of
+vooraanzicht, want die kloppen lang niet altijd. Bij het hoofdbeeld komt de
+context uit de gekozen kenmerken erbij, bijvoorbeeld "Kasteel Winselerhof, een
+kasteelhotel in de natuur", en foto's van de omgeving krijgen de locatie erbij.
 
 De beschrijving volgt het onderwerp van die ene foto. Staat de foto op een van de
 eerste vijf posities, dan volgt hij het gekozen type. Is er nog geen type gekozen,
@@ -102,8 +102,8 @@ of fietsen wijzen het onderwerp aan, waarbij het laatste woord in de naam wint.
 Kies je Anders en typ je zelf een omschrijving, dan is dat het onderwerp.
 
 In de artifact-versie staat er een knop bij: **Beschrijvingen door Claude**. Die
-stuurt de foto's zelf mee, zodat de beschrijving gaat over wat er echt op staat,
-bijvoorbeeld een kamer met balkon en uitzicht op de tuin. Het loopt via de
+stuurt de foto's zelf mee, zodat het onderwerp klopt met wat er echt op staat.
+Claude houdt zich aan dezelfde korte vorm van drie tot zes woorden. Het loopt via de
 sample-capability, dus het gebruikt het Claude-tegoed van degene die de tool
 open heeft en het vraagt de eerste keer toestemming. Wat iemand zelf heeft
 getypt blijft staan. Draait de tool als los bestand, dan is de knop er niet en
