@@ -412,7 +412,7 @@ html[data-versie="1"] #chip-fotos{display:none}
 .geenbeeld{display:grid; place-items:center; background:var(--na-bg); border:1px dashed var(--na-line);
   border-radius:var(--r); color:var(--ink-3); font-size:10.5px; font-weight:700; letter-spacing:1px}
 .bib-item .geenbeeld{width:100%; aspect-ratio:16/9}
-.fpick .geenbeeld{width:82px; aspect-ratio:16/9; font-size:9px; letter-spacing:.5px; border-radius:5px}
+.fpick .geenbeeld{width:100%; aspect-ratio:16/9; font-size:9px; letter-spacing:.5px; border-radius:5px}
 .opt-thumb.geenbeeld{width:96px; aspect-ratio:16/9; max-width:100%}
 .bib-fout{font-size:10.5px; font-weight:600; color:var(--err); margin-top:2px}
 .bib-fout.bezig{color:var(--dev)}
@@ -430,10 +430,10 @@ html[data-versie="1"] #chip-fotos{display:none}
   color:var(--ink-3); margin-bottom:5px}
 .fkies-open{display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;
   color:var(--dev); margin-bottom:6px}
-.fkies-rij{display:flex; flex-wrap:wrap; gap:7px}
-.fpick{position:relative; padding:0; border:1px solid var(--line); border-radius:var(--r);
+.fkies-rij{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr)); gap:8px}
+.fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
-.fpick img{width:82px; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
+.fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
 .fpick:hover{border-color:var(--ink-3)}
 .fpick[aria-pressed="true"]{border-color:var(--accent); box-shadow:0 0 0 2px rgba(251,134,44,.25)}
 .fpick.elders img{opacity:.4}
@@ -503,8 +503,8 @@ html[data-versie="1"] #reeks{display:none}
 .reeks-hint b{color:var(--ink); font-weight:600}
 .vrij-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700;
   color:var(--ink-3); margin:var(--s3) 0 5px}
-.reeks-vrij{display:flex; flex-wrap:wrap; gap:7px}
-.reeks-vrij .leegtekst{font-size:12.5px; color:var(--ink-3)}
+.reeks-vrij{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr)); gap:8px}
+.reeks-vrij .leegtekst{grid-column:1 / -1; font-size:12.5px; color:var(--ink-3)}
 
 /* ---------- versie 3: minimaal ---------- */
 html[data-versie="3"] .paginakop .sub,
