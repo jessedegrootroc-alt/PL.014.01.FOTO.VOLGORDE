@@ -1271,6 +1271,18 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   function losType(i){
     if(state.pos[i].autoCat){ state.pos[i].cat = null; state.pos[i].autoCat = false; }
   }
+  // het type volgt de foto, zo hoef je niet twee keer te kiezen; een zelf gekozen type blijft staan
+  function pasTypeToe(i){
+    var p = state.pos[i], f = fotoVan(i);
+    if(!f || (p.cat && !p.autoCat)) return;
+    var soort = typeUitFoto(i, f);
+    p.cat = soort;
+    p.autoCat = !!soort;
+    if(soort && p.status === null){
+      var v = volgtAdvies(i);
+      p.status = (v === "afwijkend") ? "dev" : "ok";
+    }
+  }
   function kiesFoto(i, id){
     if(state.pos[i].fotoId === id){
       state.pos[i].fotoId = null;
@@ -1279,16 +1291,9 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       var j = posVanFoto(id);
       if(j !== -1){ state.pos[j].fotoId = null; losType(j); }   // een foto staat op maximaal één positie
       state.pos[i].fotoId = id;
-      // het type volgt de foto, zo hoef je niet twee keer te kiezen
-      if(!state.pos[i].cat || state.pos[i].autoCat){
-        var soort = typeUitFoto(i, OPT.filter(function(x){ return x.id === id; })[0]);
-        state.pos[i].cat = soort;
-        state.pos[i].autoCat = !!soort;
-        if(soort && state.pos[i].status === null){
-          var v = volgtAdvies(i);
-          state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
-        }
-      }
+      pasTypeToe(i);
+      // zegt de bestandsnaam niets, dan mag Claude naar de foto kijken (alleen in de artifact)
+      if(!state.pos[i].cat && SAMPLE){ var f = fotoVan(i); if(f) herkenMetClaude([f]); }
     }
     herindexeer(); renderAlles(); renderBib(); save();
   }
@@ -1520,9 +1525,14 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       var fkies = "";
       if(metFotos()){
         var geenFoto = OPT.length && p.cat && !state.pos[i].fotoId;
+        var fk = fotoVan(i), geenType = fk && !p.cat;
         fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
           + (geenFoto ? '<p class="fkies-open">'+ico("dev","ic-sm")
               + ' Je hebt het type gekozen, maar nog geen foto voor deze positie</p>' : '')
+          + (geenType ? '<p class="fkies-open">'+ico("dev","ic-sm") + ' '
+              + (fk.herkenning === "bezig" ? 'Claude kijkt wat er op de foto staat…'
+                                           : 'Het onderwerp is niet uit de foto af te leiden, kies het type hiernaast zelf')
+              + '</p>' : '')
           + (OPT.length ? (function(){
               // alleen foto's die nog vrij zijn, plus de foto die hier al staat
               var keus = OPT.filter(function(it){ return !inGebruik(it.id) || state.pos[i].fotoId === it.id; });
@@ -2432,7 +2442,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
   }
 
   async function voegToe(lijst){
-    var bestanden = Array.prototype.slice.call(lijst);
+    var bestanden = Array.prototype.slice.call(lijst), nieuw = [];
     for(var i=0;i<bestanden.length;i++){
       var f = bestanden[i];
       if(!/^image\//.test(f.type) && ["heic","avif","webp"].indexOf(extVan(f.name)) === -1) continue;
@@ -2441,7 +2451,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
                 herkend:catUitNaam(f.name),
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
-      OPT.push(it);
+      OPT.push(it); nieuw.push(it);
       herindexeer();
       try{
         var img = await laadAfbeelding(url);
@@ -2465,6 +2475,7 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       renderOpt(); renderBib();
     }
     renderAlles();
+    if(SAMPLE) herkenMetClaude(nieuw);   // alleen in de artifact, en alleen voor namen die niets zeggen
   }
 
   function herindexeer(){
@@ -2698,6 +2709,51 @@ html[data-versie="3"] .side{order:0; justify-content:flex-end}
       'Bijvoorbeeld: ["Kamer in Hotel X", "Restaurant van Hotel X"]'
     ];
     return regels.filter(function(r){ return r !== ""; }).join("\n");
+  }
+  // Claude kijkt naar de foto en kiest een onderwerp uit de vaste lijst, snel model, klein antwoord.
+  // Alleen voor foto's waarvan de bestandsnaam niets zegt, en elke foto maar één keer.
+  var HERKEN_KEYS = ["gebouw","kamer","suite","jacuzzi","interieur","tuin","diner","ontbijt","wellness",
+                     "zwembad","fietsen","activiteit","omgeving","natuur","zee","stad",
+                     "bezienswaardigheid","evenement","museum"];
+  function herkenPrompt(groep){
+    return [
+      "Je bepaalt per foto het onderwerp voor de fotogalerij van een hotelarrangement.",
+      "Kies voor elke foto precies één sleutel uit deze lijst:",
+      HERKEN_KEYS.map(function(k){ return k + " = " + lbl(k); }).join(", ") + ".",
+      "Gebruik null als geen enkele sleutel past. Een strand of kustlijn is zee, een gevel of entree is gebouw,",
+      "een bed of slaapkamer is kamer, een gedekte tafel of gerecht is diner, een ontbijtbuffet is ontbijt.",
+      "Antwoord met alleen een JSON-array van " + groep.length + " waarden, in dezelfde volgorde als de foto’s."
+    ].join("\n");
+  }
+  async function herkenMetClaude(items){
+    if(!SAMPLE) return;
+    var doelen = items.filter(function(it){ return !it.herkend && !it.herkenning && kanNaarClaude(it); });
+    if(!doelen.length) return;
+    var max = Math.max(1, Math.min(SAMPLE_IMG.maxCount || 4, 8));
+    doelen.forEach(function(it){ it.herkenning = "bezig"; });
+    renderCards();
+    try{
+      for(var i=0;i<doelen.length;i+=max){
+        var groep = doelen.slice(i, i+max);
+        var uit = await SAMPLE.json(herkenPrompt(groep), {
+          images: groep.map(function(it){ return it.blob || it.bestand; }),
+          modelTier: "quick"
+        });
+        if(!uit || typeof uit.length !== "number") throw {code:"invalid_json"};
+        groep.forEach(function(it, k){
+          it.herkenning = "klaar";
+          if(typeof uit[k] === "string" && HERKEN_KEYS.indexOf(uit[k]) !== -1) it.herkend = uit[k];
+        });
+      }
+    }catch(e){
+      doelen.forEach(function(it){ it.herkenning = "klaar"; });
+      var code = e && e.code;
+      if(["not_granted","sampling_disabled","not_declared","capability_disabled",
+          "capability_removed","images_unavailable"].indexOf(code) !== -1){ SAMPLE = null; renderOpt(); }
+      else toast(aiFoutTekst(code));
+    }
+    for(var q=0;q<5;q++){ var f = fotoVan(q); if(f && doelen.indexOf(f) !== -1) pasTypeToe(q); }
+    herindexeer(); renderAlles(); renderBib(); save();
   }
   async function beschrijfMetClaude(knop){
     if(!SAMPLE) return;

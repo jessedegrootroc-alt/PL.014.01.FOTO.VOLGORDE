@@ -23,8 +23,11 @@ de kop van het bestand, verander ze samen.
   Kies je een foto, dan vult de tool
   het type beeld meteen in uit de bestandsnaam (`lobby hotel.png` wordt
   Interieur, op plek 1 wordt het de droomvariant), zodat je niet twee keer
-  hoeft te kiezen. Zegt de naam niets, dan blijft de keuzelijst leeg en kies
-  je het type zelf; een type dat je zelf hebt gekozen wordt nooit overschreven.
+  hoeft te kiezen. Zegt de naam niets, dan kijkt Claude in de artifact-versie
+  naar de foto zelf en kiest een onderwerp uit de vaste lijst (snel model, één
+  keer per foto, meteen bij het toevoegen). Draait de tool als los bestand, of
+  herkent Claude niets, dan blijft de keuzelijst leeg met de melding dat je het
+  type zelf kiest. Een type dat je zelf hebt gekozen wordt nooit overschreven.
 
 - **Versie 3** is versie 2 zonder de uitleg: geen blokomschrijvingen, geen
   labels als Richtlijn of Harde eis, geen hints en geen specificatietabel, met
