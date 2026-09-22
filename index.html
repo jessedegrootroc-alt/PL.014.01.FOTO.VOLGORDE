@@ -426,6 +426,8 @@ html[data-versie="1"] #chip-fotos{display:none}
 .fkies{margin-top:10px}
 .fkies-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700;
   color:var(--ink-3); margin-bottom:5px}
+.fkies-open{display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;
+  color:var(--dev); margin-bottom:6px}
 .fkies-rij{display:flex; flex-wrap:wrap; gap:7px}
 .fpick{position:relative; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
@@ -1388,7 +1390,10 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
       var fkies = "";
       if(v2()){
+        var geenFoto = OPT.length && p.cat && !state.pos[i].fotoId;
         fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
+          + (geenFoto ? '<p class="fkies-open">'+ico("dev","ic-sm")
+              + ' Je hebt het type gekozen, maar nog geen foto voor deze positie</p>' : '')
           + (OPT.length ? '<div class="fkies-rij">' + OPT.map(function(it){
               var elders = posVanFoto(it.id), hier = (state.pos[i].fotoId === it.id);
               var titel = it.naam + (elders !== -1 && elders !== i ? " \u00b7 staat al op foto " + (elders+1) : "");
