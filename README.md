@@ -139,6 +139,9 @@ namen meteen mee.
 
 ## Iconen
 
+Het favicon is het oranje VL-blokje. Het staat als `favicon.png` in de map en zit
+als data-URI in de kop van `index.html`, zodat het ene bestand genoeg blijft.
+
 De iconen komen uit de set in `MAZUREL/assets/iconen` en staan als `<symbol>`
 bovenaan `index.html`. Ze zijn omgezet naar `currentColor`, zodat de tool ze
 groen, oranje of rood kleurt via CSS. Een icoon toevoegen betekent: het pad uit
