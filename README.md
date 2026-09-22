@@ -27,6 +27,13 @@ Een versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   waarna de tool adviseert wat de volgende foto het beste kan zijn. Het advies houdt
   rekening met wat al gebruikt is, of de omgeving al zichtbaar is, en of het gebouw
   aantrekkelijk genoeg is.
+- **Rest van de reeks** in versie 2: een slider met een plek per foto vanaf foto 6.
+  Het aantal plekken volgt de teller van 8 tot 14. Per plek zegt de tool wat er
+  hoort, hotelbeeld of omgeving, en bij een foto die daar niet bij past kleurt de
+  plek oranje met de reden. Klikken op een foto onder de slider zet hem op de
+  eerstvolgende lege plek, met de pijlen schuif je hem naar voren of naar
+  achteren. Automatisch aanvullen zet de overgebleven foto's in de geadviseerde
+  volgorde neer.
 - **Korte controle** op de rest van de reeks en de visuele kwaliteit.
 - **Techniek lost zichzelf op**: voeg de foto's toe en de tool controleert breedte,
   bestandsgrootte, bestandstype, bestandsnaam en alt-tekst. Wat hij zelf kan
