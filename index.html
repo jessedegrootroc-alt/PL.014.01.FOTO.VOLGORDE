@@ -36,14 +36,14 @@ button,input,textarea,select{font:inherit; color:inherit}
 .ic-lg{width:20px; height:20px}
 
 /* ---------- kop ---------- */
-.paginakop{padding-bottom:var(--s4)}
+.paginakop{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between;
+  gap:var(--s3); padding-bottom:var(--s4)}
+.kop-tekst{min-width:0}
 .brandline{display:flex; align-items:center; gap:var(--s2); font-size:11px; letter-spacing:2px;
   text-transform:uppercase; color:var(--ink-3); font-weight:600; margin-bottom:var(--s1)}
 .dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
 .paginakop h1{font-size:27px; line-height:1.1}
 .paginakop .sub{font-size:14px; color:var(--ink-2); margin-top:3px}
-.kop-acties{display:flex; justify-content:flex-end; padding-bottom:var(--s3);
-  margin-bottom:var(--s3); border-bottom:1px solid var(--line-soft)}
 
 .meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s3)}
 .field{display:flex; flex-direction:column; gap:3px}
@@ -356,7 +356,7 @@ main{padding-block:var(--s5) var(--s6)}
 .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
 .btn-primary:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
 .btn-row{display:flex; flex-direction:column; gap:var(--s2)}
-.kop-acties .btn-reset{width:auto; padding:8px 16px; font-size:13.5px; margin-left:auto}
+.paginakop .btn-reset{width:auto; flex:none; padding:8px 18px; font-size:13.5px; margin-top:6px}
 
 .overview{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); margin-top:var(--s5)}
 .ov-h{padding:16px 20px 4px}
@@ -621,9 +621,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
 <main class="wrap">
   <div class="paginakop">
-    <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
-    <h1>Fotocheck arrangement</h1>
-    <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
+    <div class="kop-tekst">
+      <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
+      <h1>Fotocheck arrangement</h1>
+      <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
+    </div>
+    <button class="btn btn-reset" id="btn-reset" type="button">Resetten</button>
   </div>
 
 
@@ -636,9 +639,6 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     </div>
     <p class="lead">Waarom boekt iemand dit arrangement? Kies de gekoppelde filters en markeer er hoogstens drie als belangrijkste. Die sturen het advies hieronder.</p>
     <div class="block-b">
-      <div class="kop-acties">
-        <button class="btn btn-reset" id="btn-reset" type="button">Leegmaken</button>
-      </div>
       <div class="opt-hotel">
         <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
         <input id="hotelnaam" placeholder="Hotel Winselerhof">
@@ -808,7 +808,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       <div class="ov-col err"><h3>Aanpassen voor live <span id="ov-err-n">0</span></h3><div id="ov-err"></div></div>
     </div>
   </section>
-  <p class="foot">Je invoer blijft in deze browser bewaard tot je op leegmaken klikt. Toegevoegde foto’s blijven alleen tijdens deze sessie staan.</p>
+  <p class="foot">Je invoer blijft in deze browser bewaard tot je op resetten klikt. Toegevoegde foto’s blijven alleen tijdens deze sessie staan.</p>
 </main>
 
 <div class="vsw" id="versieschakelaar">
@@ -2745,9 +2745,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       URL.revokeObjectURL(it.bronUrl);
     });
     OPT = [];
+    REST = [];
+    hotelNaam = "";
+    var hnVeld = $("#hotelnaam"); if(hnVeld) hnVeld.value = "";
     try{ localStorage.removeItem(STORE); }catch(e){}
     renderRows(); renderCount(); renderFilters(); renderOpt(); renderBib(); renderAlles();
-    toast("Leeg, klaar voor het volgende arrangement");
+    toast("Alles is gereset, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
   });
 
