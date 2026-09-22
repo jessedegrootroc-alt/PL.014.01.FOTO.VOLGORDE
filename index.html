@@ -1512,6 +1512,8 @@ html[data-versie="3"] .movers{display:none}
           tekst = p.status === "ok" ? "Eigen keuze, staat op klopt"
                 : p.status === "dev" ? "Eigen keuze, gemarkeerd als afwijking"
                 : "Eigen keuze, hier geeft de tool geen advies over";
+        } else if(v === "afwijkend" && p.status === "ok"){
+          cls = null;                       // bewust op klopt gezet, dan is de waarschuwing klaar
         } else if(v === "afwijkend"){
           cls = "dev";
           tekst = "Wijkt af van het advies (" + a.titel + ")";
@@ -1520,9 +1522,8 @@ html[data-versie="3"] .movers{display:none}
           cls = "ok";
           tekst = v === "primair" ? "Volgt het advies voor deze positie" : "Goed alternatief voor deze positie";
         }
-        advBlok = '<p class="verdictline '+cls+'">'+ico(cls === "ok" ? "ok" : (cls === "dev" ? "dev" : "na"),"ic-sm")+' '+esc(tekst)+'</p>'
-          + bijzin
-          + (gebruikt(i, p.cat) ? '<p class="c-sub" style="color:var(--dev)">Dit type staat ook op een andere positie. Kijk of meer variatie mogelijk is.</p>' : "");
+        advBlok = (cls ? '<p class="verdictline '+cls+'">'+ico(cls === "ok" ? "ok" : (cls === "dev" ? "dev" : "na"),"ic-sm")+' '+esc(tekst)+'</p>' + bijzin : "")
+          + (gebruikt(i, p.cat) && p.status !== "ok" ? '<p class="c-sub" style="color:var(--dev)">Dit type staat ook op een andere positie. Kijk of meer variatie mogelijk is.</p>' : "");
       }
 
       var fkies = "";
