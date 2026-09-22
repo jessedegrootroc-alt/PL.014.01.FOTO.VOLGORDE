@@ -232,6 +232,9 @@ main{padding-block:var(--s5) var(--s6)}
 
 /* ---------- checklistrijen ---------- */
 .rows{display:flex; flex-direction:column}
+.rows-kop{display:flex; justify-content:flex-end; padding:6px 0 4px}
+.rows-alles .ic{vertical-align:-2px; margin-right:3px}
+.rows-alles[disabled]{opacity:.45; cursor:default}
 .row{display:flex; align-items:flex-start; gap:var(--s3); padding:11px 0; border-top:1px solid var(--line-soft)}
 .rows .row:first-child{border-top:0}
 .row .txt{min-width:0; flex:1}
@@ -1979,7 +1982,11 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       var mid = g.kind === "tech" ? "bad" : "dev";
       var midLbl = g.kind === "tech" ? "Aanpassen voor live" : "Bewuste afwijking";
 
-      host.innerHTML = g.items.map(function(it){
+      var allesOk = g.items.length && g.items.every(function(it){ return state.checks[it.id] === "ok"; });
+      host.innerHTML = (g.items.length > 1
+        ? '<div class="rows-kop"><button type="button" class="mini-knop rows-alles"'+(allesOk ? ' disabled' : '')+'>'
+          + ico("ok","ic-sm") + ' Alles aanvinken</button></div>' : "")
+        + g.items.map(function(it){
         var v = state.checks[it.id];
         return '<div class="row" data-id="'+it.id+'"'+(v?' data-status="'+v+'"':'')+'>'
           + '<span class="txt"><span class="lbl">'+esc(it.label)+'</span>'
@@ -1993,6 +2000,12 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
           + '</span></div>';
       }).join("");
 
+      var alles = host.querySelector(".rows-alles");
+      if(alles) alles.addEventListener("click", function(){
+        g.items.forEach(function(it){ state.checks[it.id] = "ok"; });
+        renderRows(); renderSamenvatting(); save();
+      });
+
       each(host.querySelectorAll(".row"), function(row){
         var id = row.getAttribute("data-id");
         each(row.querySelectorAll(".mini button"), function(b){
@@ -2004,6 +2017,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
             each(row.querySelectorAll(".mini button"), function(x){
               x.setAttribute("aria-pressed", String(x.getAttribute("data-v") === state.checks[id]));
             });
+            if(alles) alles.disabled = g.items.every(function(it){ return state.checks[it.id] === "ok"; });
             renderSamenvatting(); save();
           });
         });

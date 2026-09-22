@@ -58,7 +58,9 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   achteren. Automatisch aanvullen zet de overgebleven foto's in de geadviseerde
   volgorde neer. De vrije foto's onder de slider staan in dezelfde strook van
   twee rijen hoog die naar rechts scrolt.
-- **Korte controle** op de rest van de reeks en de visuele kwaliteit.
+- **Korte controle** op de visuele kwaliteit en de opbouw van de reeks. Met
+  **Alles aanvinken** boven de lijst zet je alle punten in een keer op klopt;
+  daarna kun je per punt nog terug.
 - **Techniek lost zichzelf op**: het blok gaat alleen over de foto's die in de
   reeks staan, dus die je bij de eerste 5 en bij de rest van de reeks hebt
   gekozen. De overige foto's uit de bibliotheek blijven buiten de controle, de
