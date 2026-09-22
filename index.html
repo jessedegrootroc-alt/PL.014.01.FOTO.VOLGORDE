@@ -447,6 +447,11 @@ html[data-versie="1"] #chip-fotos{display:none}
 .fkies-rij{display:grid; grid-auto-flow:column; grid-template-rows:repeat(2,auto); grid-auto-columns:var(--fotomaat);
   gap:14px; overflow-x:auto; padding-bottom:6px; scroll-snap-type:x proximity}
 .fkies-rij .fpick{scroll-snap-align:start}
+.fkies-klein{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.fkies-klein img,.fkies-klein .geenbeeld{width:200px; aspect-ratio:16/9; object-fit:cover; border-radius:5px;
+  border:1px solid var(--line); display:block; background:var(--na-bg)}
+.fkies-klein .mini-link{font-size:12.5px}
+html:not([data-versie="1"]) .card.open{border-color:var(--accent)}
 .fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
 .fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
@@ -1298,11 +1303,13 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   function kiesFoto(i, id){
     if(state.pos[i].fotoId === id){
       state.pos[i].fotoId = null;
+      openKaart = null;
       losType(i);
     } else {
       var j = posVanFoto(id);
       if(j !== -1){ state.pos[j].fotoId = null; losType(j); }   // een foto staat op maximaal één positie
       state.pos[i].fotoId = id;
+      openKaart = null;                 // door naar de volgende plek zonder foto
       pasTypeToe(i);
       // zegt de bestandsnaam niets, dan mag Claude naar de foto kijken (alleen in de artifact)
       if(!state.pos[i].cat && SAMPLE){ var f = fotoVan(i); if(f) herkenMetClaude([f]); }
@@ -1496,8 +1503,17 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     return out;
   }
 
+  var openKaart = null;   // kaart die de gebruiker zelf heeft opengeklapt, anders de eerste zonder foto
+  function eersteZonderFoto(){
+    for(var i=0;i<5;i++){ if(!state.pos[i].fotoId) return i; }
+    return -1;
+  }
+  function kaartActief(){
+    if(!metFotos() || !OPT.length) return -1;
+    return (openKaart !== null) ? openKaart : eersteZonderFoto();
+  }
   function renderCards(){
-    var nxt = volgendeLeeg();
+    var nxt = volgendeLeeg(), actief = kaartActief();
     cardsHost.innerHTML = state.pos.map(function(p,i){
       var a = advies(i), v = volgtAdvies(i), isHoofd = (i === state.hoofd);
       var advBlok = "";
@@ -1546,7 +1562,10 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
               + (fk.herkenning === "bezig" ? 'Claude kijkt wat er op de foto staat…'
                                            : 'Het onderwerp is niet uit de foto af te leiden, kies het type hiernaast zelf')
               + '</p>' : '')
-          + (OPT.length ? (function(){
+          + (OPT.length && i !== actief ? (fk
+              ? '<div class="fkies-klein">' + beeldHTML(fk) + '<button type="button" class="mini-link" data-open>Andere foto kiezen</button></div>'
+              : '<div class="fkies-klein"><button type="button" class="mini-link" data-open>Foto kiezen</button></div>')
+            : OPT.length ? (function(){
               // alleen foto's die nog vrij zijn, plus de foto die hier al staat
               var keus = OPT.filter(function(it){ return !inGebruik(it.id) || state.pos[i].fotoId === it.id; });
               if(!keus.length) return '<p class="fkies-leeg">Alle foto\u2019s staan al in de reeks.</p>';
@@ -1560,7 +1579,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
           + '</div>';
       }
 
-      return '<div class="card'+(i===nxt?" next":"")+'" data-i="'+i+'"'+(p.status?' data-status="'+p.status+'"':'')+'>'
+      return '<div class="card'+(i===nxt?" next":"")+(i===actief?" open":"")+'" data-i="'+i+'"'+(p.status?' data-status="'+p.status+'"':'')+'>'
         + '<div class="c-num">'
         +   '<span class="num">'+(i+1)+'</span>'
         +   '<button type="button" class="handle" title="Sleep om te verplaatsen" aria-label="Sleep om te verplaatsen">'+ico("sleep")+'</button>'
@@ -1592,6 +1611,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     each(cardsHost.querySelectorAll(".card"), function(card){
       var i = parseInt(card.getAttribute("data-i"),10);
 
+      each(card.querySelectorAll("[data-open]"), function(b){
+        b.addEventListener("click", function(){ openKaart = i; renderCards(); });
+      });
       each(card.querySelectorAll("[data-foto]"), function(b){
         b.addEventListener("click", function(){ kiesFoto(i, parseInt(b.getAttribute("data-foto"),10)); });
       });

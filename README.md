@@ -18,7 +18,10 @@ de kop van het bestand, verander ze samen.
   zaken een balk, en heeft een extra stap **Foto's toevoegen** tussen stap 00 en
   de eerste vijf. Daar zet je de foto's klaar, bij de eerste 5 foto's kies je ze
   uit een strook miniaturen van twee rijen hoog die naar rechts scrolt; het type
-  en de status staan daaronder, links uitgelijnd. Een foto staat op maximaal één positie: zodra hij
+  en de status staan daaronder, links uitgelijnd. Alleen de kaart die aan de
+  beurt is (de eerste zonder foto) toont die strook. Kies je een foto, dan
+  klapt de kaart in tot een kleine weergave van die foto en gaat de volgende
+  open. Met *Andere foto kiezen* of *Foto kiezen* klap je een kaart weer uit. Een foto staat op maximaal één positie: zodra hij
   ergens staat, bij de eerste 5 of in de rest van de reeks, verdwijnt hij uit
   de keuzerij van de andere posities. Haal je hem weg, dan komt hij terug.
   Kies je een foto, dan vult de tool
