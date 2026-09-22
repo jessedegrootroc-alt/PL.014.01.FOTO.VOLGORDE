@@ -33,9 +33,9 @@ de kop van het bestand, verander ze samen.
 - **Versie 3** is versie 2 zonder de uitleg: geen blokomschrijvingen, geen
   labels als Richtlijn of Harde eis, geen hints en geen specificatietabel, met
   krappere marges. Naast het nummer staan pijl omhoog, sleepgreep en pijl omlaag
-  onder elkaar. Ook de balk **Stand van zaken** is hier weg, alleen de knop
-  Kopieer samenvatting blijft en die staat onder de blokken; het Overzicht
-  onderaan laat dezelfde telling zien. Het advies zelf blijft staan, de reden
+  onder elkaar. Ook de balk **Stand van zaken** en de knop Kopieer
+  samenvatting zijn hier weg; het Overzicht onderaan laat dezelfde telling
+  zien. Het advies zelf blijft staan, de reden
   erachter verhuist naar de tooltip van het adviesblok. Tekst die alleen in de
   uitgebreide versies hoort staat in de markup in een `span.uitgebreid`.
 

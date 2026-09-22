@@ -628,9 +628,8 @@ html:not([data-versie="1"]) .c-note{flex:none}
   html:not([data-versie="1"]) .sum{grid-template-columns:minmax(0,1fr)}
   html:not([data-versie="1"]) .stats{grid-column:1; grid-row:auto; flex-direction:column; margin-top:var(--s2)}
 }
-/* versie 3: geen stand van zaken, alleen de kopieerknop onder de blokken */
-html[data-versie="3"] .sum{display:none}
-html[data-versie="3"] .side{order:0; justify-content:flex-end}
+/* versie 3: geen stand van zaken en geen kopieerknop, het overzicht onderaan is genoeg */
+html[data-versie="3"] .side{display:none}
 /* versie 2 en 3: onder het nummer pijl omhoog, dan de greep, dan pijl omlaag */
 html:not([data-versie="1"]) .movers{display:contents}
 html:not([data-versie="1"]) .movers [data-act="up"]{order:1}
