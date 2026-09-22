@@ -194,6 +194,7 @@ main{padding-block:var(--s5) var(--s6)}
 .verdictline{font-size:12.5px; font-weight:600; margin-top:8px; display:flex; align-items:center; gap:6px}
 .verdictline.ok{color:var(--ok)}
 .verdictline.dev{color:var(--dev)}
+.verdictline.na{color:var(--na)}
 
 .c-side{display:flex; flex-direction:column; gap:var(--s2); min-width:0}
 .pick label{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:600;
@@ -1097,6 +1098,10 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     if(!p.cat) return "Kies eerst een type beeld, dan legt de tool uit wat er nog mist.";
     var a = advies(i), v = volgtAdvies(i), stukken = [];
 
+    if(v === "anders"){
+      return "Je omschrijft dit beeld zelf" + (p.anders ? " als " + p.anders : "")
+        + ". De tool vergelijkt het niet met het advies, kijk zelf of het bij deze positie past.";
+    }
     if(i === 0 && !isDroom(p.cat)){
       stukken.push("Foto 1 is het hoofdbeeld en is bij voorkeur een droombeeld, een beeld waarvan de gast denkt: hier wil ik heen.");
     }
@@ -1123,6 +1128,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
   function volgtAdvies(i){
     var c = state.pos[i].cat; if(!c) return null;
+    if(c === "anders") return "anders";   // eigen omschrijving, daar geeft de tool geen advies over
     var a = advies(i);
     if(a.primair.indexOf(c) !== -1) return "primair";
     if(a.alt.indexOf(c) !== -1) return "alternatief";
@@ -1362,12 +1368,22 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
               + (state.gebouwNiet ? "Gebouw staat op niet geschikt, terugzetten" : "Gebouw niet geschikt voor dit hotel") + '</button>' : "")
           + '</div>';
       } else {
-        var cls = (v === "afwijkend") ? "dev" : "ok";
-        var tekst = v === "primair" ? "Volgt het advies voor deze positie"
-                  : v === "alternatief" ? "Goed alternatief voor deze positie"
-                  : "Wijkt af van het advies (" + a.titel + ")";
-        advBlok = '<p class="verdictline '+cls+'">'+ico(cls==="ok"?"ok":"dev","ic-sm")+' '+esc(tekst)+'</p>'
-          + (v === "afwijkend" ? '<p class="c-sub">Mag, als dat voor dit arrangement logischer of visueel sterker is. Zet de status op afwijking en leg vast waarom.</p>' : "")
+        var cls, tekst, bijzin = "";
+        if(v === "anders"){
+          cls = p.status === "ok" ? "ok" : (p.status === "dev" ? "dev" : "na");
+          tekst = p.status === "ok" ? "Eigen keuze, staat op klopt"
+                : p.status === "dev" ? "Eigen keuze, gemarkeerd als afwijking"
+                : "Eigen keuze, hier geeft de tool geen advies over";
+        } else if(v === "afwijkend"){
+          cls = "dev";
+          tekst = "Wijkt af van het advies (" + a.titel + ")";
+          bijzin = '<p class="c-sub">Mag, als dat voor dit arrangement logischer of visueel sterker is. Zet de status op afwijking en leg vast waarom.</p>';
+        } else {
+          cls = "ok";
+          tekst = v === "primair" ? "Volgt het advies voor deze positie" : "Goed alternatief voor deze positie";
+        }
+        advBlok = '<p class="verdictline '+cls+'">'+ico(cls === "ok" ? "ok" : (cls === "dev" ? "dev" : "na"),"ic-sm")+' '+esc(tekst)+'</p>'
+          + bijzin
           + (gebruikt(i, p.cat) ? '<p class="c-sub" style="color:var(--dev)">Dit type staat ook op een andere positie. Kijk of meer variatie mogelijk is.</p>' : "");
       }
 
@@ -1729,7 +1745,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
 
     state.pos.forEach(function(p,i){
       total++;
-      var naam = "Foto " + (i+1) + (p.cat ? " · " + lbl(p.cat) : "");
+      var naam = "Foto " + (i+1) + (p.cat ? " · " + lbl(p.cat) + (p.anders ? " (" + p.anders + ")" : "") : "");
       if(p.status === "ok"){ ok++; okList.push(naam); }
       else if(p.status === "dev"){
         dev++;
