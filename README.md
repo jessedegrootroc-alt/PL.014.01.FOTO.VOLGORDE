@@ -6,10 +6,10 @@ stellen en te controleren voordat die live gaat.
 Alles zit in één bestand, `index.html`. Geen build, geen dependencies. Openen in de
 browser is genoeg.
 
-## Twee weergaven
+## Drie weergaven
 
-Linksonder staat een schakelaar tussen versie 1 en versie 2, ook met de
-cijfertoetsen. De keuze blijft in de browser bewaard.
+Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
+De keuze blijft in de browser bewaard.
 
 - **Versie 1** is de opbouw met hoge kaarten en een zijpaneel rechts.
 - **Versie 2** zet de eerste 5 foto's om in compacte rijen, maakt de stand van
@@ -18,8 +18,16 @@ cijfertoetsen. De keuze blijft in de browser bewaard.
   uit een rij miniaturen. Een foto staat op maximaal één positie en laat op de
   andere posities zien waar hij al staat.
 
-Een versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
-`html[data-versie="3"]`.
+- **Versie 3** is versie 2 zonder de uitleg: geen blokomschrijvingen, geen
+  labels als Richtlijn of Harde eis, geen hints en geen specificatietabel, met
+  krappere marges. Het advies zelf blijft staan, de reden erachter verhuist naar
+  de tooltip van het adviesblok. Tekst die alleen in de uitgebreide versies
+  hoort staat in de markup in een `span.uitgebreid`.
+
+Alles wat geen versie 1 is deelt dezelfde opbouw, dus de CSS daarvoor staat
+achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een
+versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
+`html[data-versie="4"]`.
 
 ## Wat de tool doet
 

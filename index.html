@@ -506,6 +506,51 @@ html[data-versie="1"] #reeks{display:none}
 .reeks-vrij{display:flex; flex-wrap:wrap; gap:7px}
 .reeks-vrij .leegtekst{font-size:12.5px; color:var(--ink-3)}
 
+/* ---------- versie 3: minimaal ---------- */
+html[data-versie="3"] .paginakop .sub,
+html[data-versie="3"] .lead,
+html[data-versie="3"] .tag,
+html[data-versie="3"] .uitgebreid,
+html[data-versie="3"] .advice .a-lbl,
+html[data-versie="3"] .advice .a-why,
+html[data-versie="3"] .c-sub,
+html[data-versie="3"] .row .sub,
+html[data-versie="3"] .spec,
+html[data-versie="3"] .gauge .scale,
+html[data-versie="3"] .fkies-lbl,
+html[data-versie="3"] .mz-lbl,
+html[data-versie="3"] .ft-hint,
+html[data-versie="3"] .opt-hint,
+html[data-versie="3"] .opt-leeg,
+html[data-versie="3"] .bib-hint,
+html[data-versie="3"] .mz-hint,
+html[data-versie="3"] .reeks-hint,
+html[data-versie="3"] .ai-uitleg,
+html[data-versie="3"] .foot{display:none}
+
+html[data-versie="3"] .block{border-color:var(--line-soft)}
+html[data-versie="3"] .block-h{padding:13px 18px 9px}
+html[data-versie="3"] .block-b{padding:0 18px 14px}
+html[data-versie="3"] .block-h h2{font-size:17px}
+html[data-versie="3"] .block.hero .block-h h2{font-size:19px}
+html[data-versie="3"] .stack{gap:var(--s3)}
+html[data-versie="3"] .block.hero{margin-bottom:var(--s4)}
+html[data-versie="3"] .sv,
+html[data-versie="3"] .strip,
+html[data-versie="3"] #mz-wrap,
+html[data-versie="3"] .cards{padding-left:18px; padding-right:18px}
+html[data-versie="3"] .advice{border:0; background:none; padding:0; margin-top:6px}
+html[data-versie="3"] .advice .a-main{font-size:13.5px}
+html[data-versie="3"] .advice .a-alts{margin-top:6px}
+html[data-versie="3"] .barline{padding:11px 18px}
+html[data-versie="3"] .paginakop{padding-bottom:var(--s3)}
+html[data-versie="3"] .paginakop h1{font-size:23px}
+html[data-versie="3"] .sum{padding:14px 16px}
+html[data-versie="3"] .ov-h{padding:14px 18px 2px}
+html[data-versie="3"] .ov-col{padding:12px 18px}
+html[data-versie="3"] .opt-item{padding:10px}
+html[data-versie="3"] .row{padding:9px 0}
+
 /* ---------- versieschakelaar ---------- */
 .vsw{position:fixed; left:16px; bottom:16px; z-index:70; font-family:var(--font-body)}
 .vsw-knop{display:inline-flex; align-items:center; gap:7px; background:var(--ink); color:#FFFFFF;
@@ -530,53 +575,53 @@ html[data-versie="1"] #reeks{display:none}
 .vsw-uitleg{padding:4px 8px 2px; font-size:10.5px; color:#77726C}
 
 /* ---------- versie 2: compacte werkweergave ---------- */
-html[data-versie="2"] .cols{grid-template-columns:minmax(0,1fr); gap:var(--s4)}
-html[data-versie="2"] .side{order:-1; position:static; flex-direction:row; align-items:stretch; gap:var(--s3)}
-html[data-versie="2"] .sum{flex:1; display:grid; grid-template-columns:minmax(200px,1fr) minmax(0,1.4fr);
+html:not([data-versie="1"]) .cols{grid-template-columns:minmax(0,1fr); gap:var(--s4)}
+html:not([data-versie="1"]) .side{order:-1; position:static; flex-direction:row; align-items:stretch; gap:var(--s3)}
+html:not([data-versie="1"]) .sum{flex:1; display:grid; grid-template-columns:minmax(200px,1fr) minmax(0,1.4fr);
   column-gap:var(--s4); row-gap:4px; padding:14px 18px; align-content:center}
-html[data-versie="2"] .sum h2{grid-column:1; font-size:15px; margin-bottom:0}
-html[data-versie="2"] .sum .progress{grid-column:1; margin:6px 0 4px}
-html[data-versie="2"] .sum .prog-lbl{grid-column:1}
-html[data-versie="2"] .stats{grid-column:2; grid-row:1 / span 3; flex-direction:row; align-items:center; margin-top:0}
-html[data-versie="2"] .stat{flex:1; font-size:12.5px; padding:6px 9px}
-html[data-versie="2"] .stat b{font-size:16px}
-html[data-versie="2"] .verdict{grid-column:1 / -1; margin-top:6px; font-size:13px}
-html[data-versie="2"] .btn-row{flex:none; justify-content:center}
-html[data-versie="2"] .btn-row .btn{width:auto; white-space:nowrap}
+html:not([data-versie="1"]) .sum h2{grid-column:1; font-size:15px; margin-bottom:0}
+html:not([data-versie="1"]) .sum .progress{grid-column:1; margin:6px 0 4px}
+html:not([data-versie="1"]) .sum .prog-lbl{grid-column:1}
+html:not([data-versie="1"]) .stats{grid-column:2; grid-row:1 / span 3; flex-direction:row; align-items:center; margin-top:0}
+html:not([data-versie="1"]) .stat{flex:1; font-size:12.5px; padding:6px 9px}
+html:not([data-versie="1"]) .stat b{font-size:16px}
+html:not([data-versie="1"]) .verdict{grid-column:1 / -1; margin-top:6px; font-size:13px}
+html:not([data-versie="1"]) .btn-row{flex:none; justify-content:center}
+html:not([data-versie="1"]) .btn-row .btn{width:auto; white-space:nowrap}
 
-html[data-versie="2"] .block-h{padding:12px 20px 8px}
-html[data-versie="2"] .lead{padding-bottom:10px; font-size:13px}
-html[data-versie="2"] .block-b{padding:0 20px 14px}
-html[data-versie="2"] .cards{gap:6px}
-html[data-versie="2"] .card{grid-template-columns:auto minmax(0,1fr) minmax(0,430px); gap:var(--s3);
+html:not([data-versie="1"]) .block-h{padding:12px 20px 8px}
+html:not([data-versie="1"]) .lead{padding-bottom:10px; font-size:13px}
+html:not([data-versie="1"]) .block-b{padding:0 20px 14px}
+html:not([data-versie="1"]) .cards{gap:6px}
+html:not([data-versie="1"]) .card{grid-template-columns:auto minmax(0,1fr) minmax(0,430px); gap:var(--s3);
   padding:10px 12px; align-items:center}
-html[data-versie="2"] .c-num{flex-direction:row; align-items:center; gap:3px}
-html[data-versie="2"] .num{width:26px; height:26px; font-size:13px}
-html[data-versie="2"] .c-role{font-size:14.5px}
-html[data-versie="2"] .c-role + .c-sub{display:none}
-html[data-versie="2"] .advice{margin-top:6px; padding:8px 10px}
-html[data-versie="2"] .advice .a-main{font-size:13.5px}
-html[data-versie="2"] .advice .a-why{font-size:12px}
-html[data-versie="2"] .verdictline{margin-top:4px}
-html[data-versie="2"] .c-side{flex-direction:row; flex-wrap:wrap; align-items:flex-end; gap:var(--s2)}
-html[data-versie="2"] .pick{flex:1 1 150px; min-width:140px}
-html[data-versie="2"] .pick label{font-size:9.5px; margin-bottom:2px}
-html[data-versie="2"] .pick select{padding:6px 8px; font-size:13px}
-html[data-versie="2"] .seg{grid-template-columns:repeat(3,auto)}
-html[data-versie="2"] .seg button{padding:6px 9px; font-size:11.5px}
-html[data-versie="2"] .c-note{flex:1 1 100%}
+html:not([data-versie="1"]) .c-num{flex-direction:row; align-items:center; gap:3px}
+html:not([data-versie="1"]) .num{width:26px; height:26px; font-size:13px}
+html:not([data-versie="1"]) .c-role{font-size:14.5px}
+html:not([data-versie="1"]) .c-role + .c-sub{display:none}
+html:not([data-versie="1"]) .advice{margin-top:6px; padding:8px 10px}
+html:not([data-versie="1"]) .advice .a-main{font-size:13.5px}
+html:not([data-versie="1"]) .advice .a-why{font-size:12px}
+html:not([data-versie="1"]) .verdictline{margin-top:4px}
+html:not([data-versie="1"]) .c-side{flex-direction:row; flex-wrap:wrap; align-items:flex-end; gap:var(--s2)}
+html:not([data-versie="1"]) .pick{flex:1 1 150px; min-width:140px}
+html:not([data-versie="1"]) .pick label{font-size:9.5px; margin-bottom:2px}
+html:not([data-versie="1"]) .pick select{padding:6px 8px; font-size:13px}
+html:not([data-versie="1"]) .seg{grid-template-columns:repeat(3,auto)}
+html:not([data-versie="1"]) .seg button{padding:6px 9px; font-size:11.5px}
+html:not([data-versie="1"]) .c-note{flex:1 1 100%}
 
 @media (max-width:1100px){
-  html[data-versie="2"] .card{grid-template-columns:auto minmax(0,1fr)}
-  html[data-versie="2"] .c-side{grid-column:2}
+  html:not([data-versie="1"]) .card{grid-template-columns:auto minmax(0,1fr)}
+  html:not([data-versie="1"]) .c-side{grid-column:2}
 }
 @media (max-width:980px){
-  html[data-versie="2"] .side{flex-direction:column}
-  html[data-versie="2"] .btn-row .btn{width:100%}
+  html:not([data-versie="1"]) .side{flex-direction:column}
+  html:not([data-versie="1"]) .btn-row .btn{width:100%}
 }
 @media (max-width:760px){
-  html[data-versie="2"] .sum{grid-template-columns:minmax(0,1fr)}
-  html[data-versie="2"] .stats{grid-column:1; grid-row:auto; flex-direction:column; margin-top:var(--s2)}
+  html:not([data-versie="1"]) .sum{grid-template-columns:minmax(0,1fr)}
+  html:not([data-versie="1"]) .stats{grid-column:1; grid-row:auto; flex-direction:column; margin-top:var(--s2)}
 }
 </style>
 <script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"1");}catch(e){document.documentElement.setAttribute("data-versie","1");}</script>
@@ -664,7 +709,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     <p class="lead">Voeg de foto’s toe die je voor dit arrangement kunt gebruiken. Ze blijven in je browser, je kiest ze in de volgende stap.</p>
     <div class="block-b">
       <div class="drop" id="bib-drop" role="button" tabindex="0" aria-label="Foto’s toevoegen">
-        <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</p>
+        <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b><span class="uitgebreid"> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</span></p>
         <input type="file" id="bib-files" multiple accept="image/*,.heic,.avif">
       </div>
       <div class="bib-grid" id="bib-grid"></div>
@@ -1191,7 +1236,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
 
   /* ---------- fotobibliotheek, alleen versie 2 ---------- */
-  function v2(){ return document.documentElement.getAttribute("data-versie") === "2"; }
+  // alles behalve versie 1 werkt met de fotobibliotheek
+  function metFotos(){ return document.documentElement.getAttribute("data-versie") !== "1"; }
   function fotoVan(i){
     var id = state.pos[i].fotoId; if(!id) return null;
     return OPT.filter(function(x){ return x.id === id; })[0] || null;
@@ -1406,7 +1452,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       var a = advies(i), v = volgtAdvies(i), isHoofd = (i === state.hoofd);
       var advBlok = "";
       if(!p.cat){
-        advBlok = '<div class="advice">'
+        advBlok = '<div class="advice" title="'+esc(a.waarom)+'">'
           + '<p class="a-lbl">Aanbevolen voor foto '+(i+1)+'</p>'
           + '<p class="a-main">'+esc(a.titel)+'</p>'
           + '<p class="a-why">'+esc(a.waarom)+'</p>'
@@ -1439,7 +1485,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       }
 
       var fkies = "";
-      if(v2()){
+      if(metFotos()){
         var geenFoto = OPT.length && p.cat && !state.pos[i].fotoId;
         fkies = '<div class="fkies"><p class="fkies-lbl">Kies de foto</p>'
           + (geenFoto ? '<p class="fkies-open">'+ico("dev","ic-sm")
@@ -1817,8 +1863,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     var tops = state.filters.filter(function(f){ return f.top; }).map(function(f){ return FILTERS[f.id].label; });
     var regels = [];
     if(tops.length) regels.push("<b>Belangrijkste kenmerken:</b> " + esc(tops.join(", ")) + ".");
-    else if(state.filters.length) regels.push("Markeer hierboven maximaal 3 kenmerken als belangrijkste, die wegen het zwaarst in het advies.");
-    else regels.push("Nog geen kenmerken gekozen. Zonder kenmerken volgt het advies de standaardopbouw.");
+    else if(state.filters.length) regels.push('<span class="uitgebreid">Markeer hierboven maximaal 3 kenmerken als belangrijkste, die wegen het zwaarst in het advies.</span>');
+    else regels.push('<span class="uitgebreid">Nog geen kenmerken gekozen. Zonder kenmerken volgt het advies de standaardopbouw.</span>');
     sf.forEach(function(d){ regels.push("<b>" + esc(d.label) + ":</b> " + esc(d.sfeer)); });
     $("#fhint").innerHTML = regels.join("<br>");
   }
@@ -1995,7 +2041,9 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     fill.style.width = pct + "%";
     fill.className = (t.typen === 5) ? "klaar" : "";
     $("#sv-lbl").innerHTML = "<b>" + t.typen + " van 5 foto's ingevuld · " + pct + "%</b>"
-      + (t.typen < 5 ? " — nog " + (5 - t.typen) + " te gaan, elke foto is 20%" : " — de opbouw is compleet");
+      + '<span class="uitgebreid">'
+      + (t.typen < 5 ? " — nog " + (5 - t.typen) + " te gaan, elke foto is 20%" : " — de opbouw is compleet")
+      + '</span>';
 
     var cT = $("#chip-typen");
     cT.innerHTML = "<b>" + t.typen + " / 5</b> typen gekozen";
@@ -2018,7 +2066,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       hint.className = "barhint";
       var nx = volgendeLeeg();
       hint.textContent = "Volgende stap: foto " + (nx+1) + " — advies is " + advies(nx).titel.toLowerCase() + ".";
-    } else if(v2() && OPT.length && gekozenN < 5){
+    } else if(metFotos() && OPT.length && gekozenN < 5){
       hint.className = "barhint";
       hint.textContent = "Nog " + (5-gekozenN) + (5-gekozenN === 1 ? " foto kiezen" : " foto\u2019s kiezen") + " bij de eerste vijf.";
     } else {
@@ -2813,7 +2861,8 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   /* ---------- versieschakelaar ---------- */
   var VERSIES = [
     {id:"1", naam:"Versie 1", uitleg:"Hoge kaarten, zijpaneel rechts"},
-    {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"}
+    {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"},
+    {id:"3", naam:"Versie 3", uitleg:"Minimaal, alleen wat je nodig hebt"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
   var gestart = false;
@@ -2839,7 +2888,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   }
   function renderStapnummers(){
     each(document.querySelectorAll(".step"), function(el){
-      var s = el.getAttribute(v2() ? "data-s2" : "data-s1");
+      var s = el.getAttribute(metFotos() ? "data-s2" : "data-s1");
       if(s !== null) el.textContent = s;
     });
   }
