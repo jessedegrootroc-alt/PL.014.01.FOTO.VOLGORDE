@@ -75,6 +75,13 @@ Winselerhof, een kasteelhotel in de natuur". Foto's van de omgeving krijgen de
 locatie erbij, de rest blijft kort en beschrijvend, zodat er geen zoekwoorden
 worden gestapeld.
 
+De beschrijving volgt het onderwerp van die ene foto. Staat de foto op een van de
+eerste vijf posities, dan volgt hij het gekozen type. Is er nog geen type gekozen,
+of staat de foto verderop in de reeks, dan leest de tool het onderwerp uit de
+oorspronkelijke bestandsnaam: woorden als restaurant, sauna, suite, binnenplaats
+of fietsen wijzen het onderwerp aan, waarbij het laatste woord in de naam wint.
+Kies je Anders en typ je zelf een omschrijving, dan is dat het onderwerp.
+
 Elk onderwerp heeft meerdere formuleringen. Staan er twee kamerbeelden in de
 reeks, dan krijgt de tweede een andere zin, zodat geen twee foto's dezelfde
 beschrijving hebben. Hetzelfde geldt voor de bestandsnaam, die telt door als

@@ -1454,7 +1454,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       var anders = card.querySelector(".anders input");
       if(anders){
         anders.value = state.pos[i].anders || "";
-        anders.addEventListener("input", function(){ state.pos[i].anders = anders.value; save(); renderOverzicht(); });
+        anders.addEventListener("input", function(){ state.pos[i].anders = anders.value; save(); renderOverzicht(); renderOpt(); });
       }
 
       each(card.querySelectorAll(".seg button"), function(b){
@@ -1909,8 +1909,45 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
     "bezienswaardigheid":{slug:"bezienswaardigheid", alts:["Bezienswaardigheid in de omgeving van {h}","Uitje vlak bij {h}"]},
     "evenement":{slug:"concert", alts:["Concert tijdens het arrangement van {h}","Voorstelling in de omgeving van {h}"]},
     "museum":{slug:"museum", alts:["Museum in de omgeving van {h}","Tentoonstelling vlak bij {h}"]},
-    "anders":{slug:"foto", alts:["Beeld van {h}"]}
+    "anders":{slug:"sfeerbeeld", alts:["Sfeerbeeld van {h}","Beeld van {h}"]}
   };
+  // onderwerp herkennen aan de bestandsnaam die het hotel meestuurt,
+  // zodat ook foto's buiten de eerste vijf een beschrijving krijgen die klopt
+  var TREFWOORDEN = [
+    {cat:"diner",      woorden:["restaurant","diner","dinner","brasserie","gerecht","dining","keuken","eetzaal","bistro"]},
+    {cat:"ontbijt",    woorden:["ontbijt","breakfast","brunch"]},
+    {cat:"wellness",   woorden:["wellness","spa","sauna","massage","hamam","stoombad"]},
+    {cat:"zwembad",    woorden:["zwembad","pool","binnenbad","buitenbad","swimming"]},
+    {cat:"jacuzzi",    woorden:["jacuzzi","bubbelbad","hottub","whirlpool"]},
+    {cat:"suite",      woorden:["suite","penthouse"]},
+    {cat:"kamer",      woorden:["kamer","room","slaapkamer","badkamer","bathroom","balkon","tweepersoons"]},
+    {cat:"interieur",  woorden:["lobby","interieur","interior","receptie","lounge","hal","zithoek","trap","ontvangst","vergader"]},
+    {cat:"tuin",       woorden:["tuin","terras","garden","terrace","patio","binnenplaats","buitenruimte"]},
+    {cat:"gebouw",     woorden:["gevel","buitenaanzicht","exterieur","exterior","vooraanzicht","entree",
+                                "facade","gebouw","kasteel","landhuis","voorkant"]},
+    {cat:"zee",        woorden:["strand","beach","kust","duin","zeezicht"]},
+    {cat:"natuur",     woorden:["natuur","bos","heide","nature","landschap","wandelpad","wandel"]},
+    {cat:"stad",       woorden:["binnenstad","centrum","stadsgezicht","haven","markt","plein"]},
+    {cat:"fietsen",    woorden:["fiets","bike","cycling"]},
+    {cat:"activiteit", woorden:["activiteit","excursie","rondleiding","workshop"]},
+    {cat:"museum",     woorden:["museum","expositie","tentoonstelling","exhibition"]},
+    {cat:"evenement",  woorden:["concert","voorstelling","theater","festival"]},
+    {cat:"bezienswaardigheid", woorden:["bezienswaardigheid","monument","kerk","molen","landmark"]},
+    {cat:"omgeving",   woorden:["omgeving","uitzicht","surroundings","panorama"]}
+  ];
+  function catUitNaam(naam){
+    var t = slug(String(naam || "").replace(/\.[^.]+$/, ""));
+    var beste = null, plek = -1;
+    TREFWOORDEN.forEach(function(r){
+      r.woorden.forEach(function(w){
+        var p = t.lastIndexOf(w);
+        if(p > plek){ plek = p; beste = r.cat; }   // het laatste woord in de naam is meestal het onderwerp
+      });
+    });
+    return beste;
+  }
+  function hoofdletter(t){ return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
+
   // context uit de gekozen kenmerken, voor de beschrijving van het hoofdbeeld
   var SEO_SOORT = {kasteel:"een kasteelhotel", "5sterren":"een vijfsterrenhotel",
                    wellnesshotel:"een wellnesshotel", hotelwellness:"een hotel met wellness",
@@ -1932,7 +1969,12 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
   function isHoofdItem(it){ return it.onderwerp.type === "pos" && it.onderwerp.v === 0; }
   function eisen(it){ return isHoofdItem(it) ? {w:1920, kb:400} : {w:1600, kb:250}; }
   function catVan(it){
-    if(it.onderwerp.type === "pos") return state.pos[it.onderwerp.v].cat || "anders";
+    if(it.onderwerp.type === "pos"){
+      var c = state.pos[it.onderwerp.v].cat;
+      if(c && c !== "anders") return c;          // het gekozen type gaat voor
+      return it.herkend || "anders";             // anders het onderwerp uit de bestandsnaam
+    }
+    if(it.onderwerp.v === "anders" && it.herkend) return it.herkend;
     return it.onderwerp.v;
   }
   function onderwerpVan(it){ return ONDERWERP[catVan(it)] || ONDERWERP["anders"]; }
@@ -1967,7 +2009,14 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       if(catVan(OPT[i]) === cat) zelfde++;
     }
     var vormen = o.alts || [o.alt || "Beeld van {h}"];
-    var zin = vormen[zelfde % vormen.length].replace(/\{h\}/g, hotelNaam || "het hotel");
+    var sjabloon = vormen[zelfde % vormen.length];
+
+    // staat er een eigen omschrijving bij de positie, dan is dat het onderwerp
+    if(it.onderwerp.type === "pos"){
+      var p = state.pos[it.onderwerp.v];
+      if(p.cat === "anders" && (p.anders || "").trim()) sjabloon = hoofdletter(p.anders.trim()) + " in {h}";
+    }
+    var zin = sjabloon.replace(/\{h\}/g, hotelNaam || "het hotel");
 
     // het hoofdbeeld krijgt de context erbij, de rest blijft kort en beschrijvend
     var extra = "";
@@ -2112,6 +2161,7 @@ html[data-versie="2"] .c-note{flex:1 1 100%}
       var url = URL.createObjectURL(f);
       var it = {id:++optId, bestand:f, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
+                herkend:catUitNaam(f.name),
                 onderwerp:{type:"pos", v:Math.min(OPT.length, 4)}};
       OPT.push(it);
       herindexeer();
