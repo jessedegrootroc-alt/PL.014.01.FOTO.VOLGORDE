@@ -2622,6 +2622,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   var optLijst = $("#opt-lijst");
   function renderOpt(){
     herindexeer();                 // namen en beschrijvingen volgen de laatste stand
+    renderDeel();                  // ook zonder foto's, anders blijft het deelblok onzichtbaar
     var bar = $("#opt-bar");
     if(!OPT.length){
       optLijst.innerHTML = '<p class="opt-leeg">Nog geen foto’s toegevoegd. De controle op grootte, formaat, bestandsnaam en beschrijving doet de tool zelf.</p>';
@@ -2679,7 +2680,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       rij.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
     });
 
-    hotelHint(); renderDeel();
+    hotelHint();
     var aiKnop = $("#opt-ai");
     aiKnop.hidden = !SAMPLE;
     $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
