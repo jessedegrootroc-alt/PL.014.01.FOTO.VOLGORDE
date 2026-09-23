@@ -3054,37 +3054,166 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     + ".knoppen{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:sticky;bottom:0;background:#faf9f7;padding:12px 0}"
     + "button{border:1px solid #d9d4cd;background:#fff;border-radius:8px;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}"
     + "button.p{background:#fb862c;border-color:#fb862c;color:#fff}button.g{background:#00b67e;border-color:#00b67e;color:#fff}"
-    + ".melding{font-size:13px;color:#6b6660;margin:8px 0 0;min-height:1.2em}";
-  var REVIEW_JS = "(function(){"
-    + "var P=JSON.parse(document.getElementById('fotocheck-reeks').textContent);"
-    + "var sleutel='fotocheck-review-'+(P.id||'');"
-    + "function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}"
-    + "var grid=document.getElementById('grid');"
-    + "grid.innerHTML=P.fotos.map(function(f,i){return '<figure><img src=\"'+f.data+'\" alt=\"\"><figcaption><b>Foto '+(i+1)+'</b>'+(f.catLabel?' \u00b7 '+esc(f.catLabel):'')+'<br>'+esc(f.alt)+'</figcaption>'"
-    + "+'<textarea data-i=\"'+i+'\" placeholder=\"Opmerking bij foto '+(i+1)+' (optioneel)\"></textarea></figure>';}).join('');"
-    + "var velden=function(){return Array.prototype.slice.call(document.querySelectorAll('textarea[data-i]'));};"
-    + "var fb=P.feedback||null;var concept=null;try{concept=JSON.parse(localStorage.getItem(sleutel)||'null');}catch(e){}"
-    + "var bron=concept||fb;"
-    + "if(bron){document.getElementById('naam').value=bron.door||'';document.getElementById('alg').value=bron.algemeen||'';velden().forEach(function(t){t.value=(bron.perFoto||[])[+t.getAttribute('data-i')]||'';});}"
-    + "function lees(){return {door:document.getElementById('naam').value.trim(),algemeen:document.getElementById('alg').value.trim(),perFoto:velden().map(function(t){return t.value.trim();}),datum:new Date().toISOString()};}"
-    + "function bewaarConcept(){try{localStorage.setItem(sleutel,JSON.stringify(lees()));}catch(e){}}"
-    + "document.addEventListener('input',bewaarConcept);"
-    + "function tekst(){var f=lees(),r=['Feedback fotoreeks '+(P.hotel||'')+(f.door?' \u2014 '+f.door:'')];"
-    + "if(f.algemeen)r.push('Algemeen: '+f.algemeen);"
-    + "f.perFoto.forEach(function(t,i){if(t)r.push('Foto '+(i+1)+(P.fotos[i].catLabel?' ('+P.fotos[i].catLabel+')':'')+': '+t);});"
-    + "if(r.length===1)r.push('(nog geen opmerkingen)');return r.join('\\n');}"
-    + "function meld(t){document.getElementById('melding').textContent=t;}"
-    + "document.getElementById('kopieer').onclick=function(){var t=tekst();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){meld('Feedback gekopieerd, plak hem in Teams.');},function(){meld('Kopi\u00ebren lukt niet, selecteer de tekst zelf.');});}else{meld('Kopi\u00ebren lukt niet in deze browser.');}};"
-    + "document.getElementById('teams').onclick=function(){window.open('https://teams.microsoft.com/l/chat/0/0?message='+encodeURIComponent(tekst()),'_blank');};"
-    + "document.getElementById('download').onclick=function(){var f=lees();if(!f.algemeen&&!f.perFoto.some(Boolean)){meld('Zet eerst een opmerking neer.');return;}"
-    + "var kopie=JSON.parse(JSON.stringify(P));kopie.feedback=f;"
-    + "var scr=document.getElementById('fotocheck-reeks');var oud=scr.textContent;scr.textContent=JSON.stringify(kopie).replace(/</g,'\\u003c');"
-    + "var imgs=Array.prototype.slice.call(document.querySelectorAll('figure img')),srcs=imgs.map(function(i){return i.getAttribute('src');});imgs.forEach(function(i){i.removeAttribute('src');});"
-    + "var html='<!doctype html>\\n'+document.documentElement.outerHTML;"
-    + "imgs.forEach(function(i,k){i.setAttribute('src',srcs[k]);});scr.textContent=oud;"
-    + "var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=(P.bestand||'fotoreeks').replace(/\.html$/,'')+'-feedback.html';document.body.appendChild(a);a.click();document.body.removeChild(a);"
-    + "meld('Bestand met je feedback gedownload. Stuur het terug via Teams.');};"
-    + "})();";
+    + ".melding{font-size:13px;color:#6b6660;margin:8px 0 0;min-height:1.2em}"
+    + ".lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:18px 0 8px}.lbl span{font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px}"
+    + ".rij{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.rij .lbl{margin-bottom:6px}.rij button{padding:6px 10px;font-size:13px}"
+    + ".mozaiek{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border-radius:12px;overflow:hidden}"
+    + ".mz{position:relative;aspect-ratio:4/3;background:#e9e6e1}.mz.groot{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}"
+    + ".mz img{width:100%;height:100%;object-fit:cover;display:block}.mz span{position:absolute;left:8px;top:8px;background:rgba(20,20,20,.75);color:#fff;font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}"
+    + ".kop{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}.acties{display:flex;gap:4px}.acties button{padding:3px 8px;font-size:13px;line-height:1.2}"
+    + "figcaption i{color:#c96a12;font-style:normal;font-weight:600}"
+    + "@media(max-width:640px){.mozaiek{grid-template-columns:repeat(2,minmax(0,1fr))}.mz.groot{grid-column:span 2;grid-row:auto;aspect-ratio:4/3}}";
+  // Dit draait in het reviewbestand, niet in de tool. Het wordt met toString() in het bestand gezet,
+  // dus het mag nergens op de tool leunen: alleen wat hier binnen staat bestaat daar.
+  function reviewPaginaScript(){
+    var P = JSON.parse(document.getElementById("fotocheck-reeks").textContent);
+    P.fotos.forEach(function(f, i){ if(!f.id) f.id = "f" + i; });
+    var F = P.fotos.slice().sort(function(a, b){ return (a.pos == null ? 99 : a.pos) - (b.pos == null ? 99 : b.pos); });
+    var origineel = F.map(function(f){ return f.id; });
+    var fb = {door: "", algemeen: "", perFoto: {}};
+    var sleutel = "fotocheck-review-" + (P.id || "");
+    function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]; }); }
+    function el(id){ return document.getElementById(id); }
+    function meld(t){ el("melding").textContent = t; }
+
+    // eerder getypte opmerkingen: uit dit bestand (teruggestuurd) of uit de eigen browser (concept)
+    (function laad(){
+      var c = null; try{ c = JSON.parse(localStorage.getItem(sleutel) || "null"); }catch(e){}
+      var bron = c || P.feedback || null; if(!bron) return;
+      fb.door = bron.door || ""; fb.algemeen = bron.algemeen || "";
+      if(Array.isArray(bron.perFoto)) bron.perFoto.forEach(function(t, i){ if(t && F[i]) fb.perFoto[F[i].id] = t; });
+      else fb.perFoto = bron.perFoto || {};
+    })();
+    function bewaarConcept(){ try{ localStorage.setItem(sleutel, JSON.stringify(fb)); }catch(e){} }
+
+    function render(){
+      el("mozaiek").innerHTML = F.slice(0, 5).map(function(f, i){
+        return '<div class="mz' + (i === 0 ? ' groot' : '') + '"><img src="' + f.data + '" alt=""><span>' + (i + 1) + '</span></div>';
+      }).join("");
+      el("grid").innerHTML = F.map(function(f, i){
+        return '<figure data-id="' + f.id + '">'
+          + '<div class="kop"><b>Foto ' + (i + 1) + (i === 0 ? ', hoofdbeeld' : '') + '</b><span class="acties">'
+          + '<button type="button" data-act="links" title="Naar voren"' + (i === 0 ? ' disabled' : '') + '>&#8249;</button>'
+          + '<button type="button" data-act="rechts" title="Naar achteren"' + (i === F.length - 1 ? ' disabled' : '') + '>&#8250;</button>'
+          + '<button type="button" data-act="vervang" title="Vervangen door een andere foto">Vervang</button>'
+          + '<button type="button" data-act="weg" title="Uit de reeks halen">&times;</button></span></div>'
+          + '<img src="' + f.data + '" alt="">'
+          + '<figcaption>' + (f.catLabel ? esc(f.catLabel) + '<br>' : '') + esc(f.alt || '')
+          + (f.nieuw ? '<br><i>nieuw toegevoegd</i>' : (f.vervangen ? '<br><i>vervangen</i>' : '')) + '</figcaption>'
+          + '<textarea data-fb="' + f.id + '" placeholder="Opmerking bij foto ' + (i + 1) + ' (optioneel)">' + esc(fb.perFoto[f.id] || '') + '</textarea>'
+          + '</figure>';
+      }).join("");
+      el("naam").value = fb.door; el("alg").value = fb.algemeen;
+      el("teller").textContent = F.length + (F.length === 1 ? " foto" : " foto’s");
+    }
+
+    // nieuwe foto's: verkleinen tot 2000 px breed, anders wordt het bestand veel te groot
+    function verklein(file){
+      return new Promise(function(res){
+        var url = URL.createObjectURL(file), img = new Image();
+        img.onload = function(){
+          var w = Math.min(img.naturalWidth, 2000), h = Math.round(img.naturalHeight * w / img.naturalWidth);
+          var c = document.createElement("canvas"); c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", 0.85));
+        };
+        img.onerror = function(){ URL.revokeObjectURL(url); res(null); };
+        img.src = url;
+      });
+    }
+    function kies(meer){
+      return new Promise(function(res){
+        var inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = !!meer;
+        inp.onchange = function(){ res(Array.prototype.slice.call(inp.files)); };
+        inp.click();
+      });
+    }
+    el("grid").addEventListener("click", async function(e){
+      var b = e.target.closest("button[data-act]"); if(!b) return;
+      var id = b.closest("figure").getAttribute("data-id"), i = -1;
+      F.forEach(function(f, k){ if(f.id === id) i = k; });
+      if(i < 0) return;
+      var act = b.getAttribute("data-act"), t;
+      if(act === "links" && i > 0){ t = F[i - 1]; F[i - 1] = F[i]; F[i] = t; }
+      else if(act === "rechts" && i < F.length - 1){ t = F[i + 1]; F[i + 1] = F[i]; F[i] = t; }
+      else if(act === "weg"){ if(!window.confirm("Deze foto uit de reeks halen?")) return; F.splice(i, 1); }
+      else if(act === "vervang"){
+        var files = await kies(false); if(!files.length) return;
+        var data = await verklein(files[0]); if(!data){ meld("Deze foto kan niet worden gelezen."); return; }
+        F[i] = {id: "n" + Date.now(), naam: files[0].name, alt: "", cat: null, catLabel: "", data: data, vervangen: true};
+      }
+      render();
+    });
+    el("toevoegen").addEventListener("click", async function(){
+      var files = await kies(true), n = 0;
+      for(var k = 0; k < files.length; k++){
+        var data = await verklein(files[k]);
+        if(data){ F.push({id: "n" + Date.now() + "-" + k, naam: files[k].name, alt: "", cat: null, catLabel: "", data: data, nieuw: true}); n++; }
+      }
+      render(); if(n) meld(n + (n === 1 ? " foto toegevoegd" : " foto’s toegevoegd") + ", achteraan in de reeks. Schuif hem met de pijlen op zijn plek.");
+    });
+    document.addEventListener("input", function(e){
+      var t = e.target; if(!t) return;
+      if(t.id === "naam") fb.door = t.value;
+      else if(t.id === "alg") fb.algemeen = t.value;
+      else if(t.getAttribute && t.getAttribute("data-fb")) fb.perFoto[t.getAttribute("data-fb")] = t.value;
+      bewaarConcept();
+    });
+
+    function wijzigingen(){
+      var ids = F.map(function(f){ return f.id; });
+      var oudBlijft = origineel.filter(function(id){ return ids.indexOf(id) !== -1; });
+      var nuOud = ids.filter(function(id){ return origineel.indexOf(id) !== -1; });
+      var vervangen = F.filter(function(f){ return f.vervangen; }).length;
+      return {volgorde: oudBlijft.join() !== nuOud.join(),
+              vervangen: vervangen,
+              toegevoegd: F.filter(function(f){ return f.nieuw; }).length,
+              // een vervangen foto telt niet ook nog als verwijderd
+              verwijderd: Math.max(0, origineel.filter(function(id){ return ids.indexOf(id) === -1; }).length - vervangen)};
+    }
+    function wijzigingenTekst(w){
+      var d = [];
+      if(w.volgorde) d.push("volgorde aangepast");
+      if(w.vervangen) d.push(w.vervangen + " vervangen");
+      if(w.toegevoegd) d.push(w.toegevoegd + " toegevoegd");
+      if(w.verwijderd) d.push(w.verwijderd + " verwijderd");
+      return d.join(", ");
+    }
+    function tekst(){
+      var r = ["Feedback fotoreeks " + (P.hotel || "") + (fb.door ? " — " + fb.door : "")];
+      var w = wijzigingenTekst(wijzigingen()); if(w) r.push("Wijzigingen in het bestand: " + w);
+      if(fb.algemeen.trim()) r.push("Algemeen: " + fb.algemeen.trim());
+      F.forEach(function(f, i){ var t = (fb.perFoto[f.id] || "").trim(); if(t) r.push("Foto " + (i + 1) + (f.catLabel ? " (" + f.catLabel + ")" : "") + ": " + t); });
+      if(r.length === 1) r.push("(nog geen opmerkingen)");
+      return r.join("\n");
+    }
+    el("kopieer").onclick = function(){
+      var t = tekst();
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(function(){ meld("Feedback gekopieerd, plak hem in Teams."); }, function(){ meld("Kopiëren lukt niet, selecteer de tekst zelf."); });
+      } else meld("Kopiëren lukt niet in deze browser.");
+    };
+    el("teams").onclick = function(){ window.open("https://teams.microsoft.com/l/chat/0/0?message=" + encodeURIComponent(tekst()), "_blank"); };
+    el("download").onclick = function(){
+      var w = wijzigingen(), heeftTekst = fb.algemeen.trim() || Object.keys(fb.perFoto).some(function(k){ return (fb.perFoto[k] || "").trim(); });
+      if(!heeftTekst && !wijzigingenTekst(w)){ meld("Zet eerst een opmerking neer of pas iets aan."); return; }
+      var kopie = JSON.parse(JSON.stringify(P));
+      kopie.fotos = F.map(function(f, i){ var g = JSON.parse(JSON.stringify(f)); g.pos = i; return g; });
+      kopie.feedback = {door: fb.door.trim(), algemeen: fb.algemeen.trim(), perFoto: fb.perFoto, datum: new Date().toISOString(), wijzigingen: w};
+      var scr = el("fotocheck-reeks"), oud = scr.textContent;
+      scr.textContent = JSON.stringify(kopie).replace(/</g, "\\u003c");
+      // de beelden even zonder src, anders staan alle foto's twee keer in het bestand
+      var imgs = Array.prototype.slice.call(document.querySelectorAll("img")), srcs = imgs.map(function(i){ return i.getAttribute("src"); });
+      imgs.forEach(function(i){ i.removeAttribute("src"); });
+      var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+      imgs.forEach(function(i, k){ i.setAttribute("src", srcs[k]); }); scr.textContent = oud;
+      var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], {type: "text/html"}));
+      a.download = (P.bestand || "fotoreeks").replace(/\.html$/, "") + "-feedback.html";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      meld("Bestand met je feedback" + (wijzigingenTekst(w) ? " en wijzigingen" : "") + " gedownload. Stuur het terug via Teams.");
+    };
+    render();
+  }
   function reviewSjabloon(pakket){
     var json = JSON.stringify(pakket).replace(/</g, "\\u003c");
     return '<!doctype html>\n<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -3092,7 +3221,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       + '<script type="application/json" id="fotocheck-reeks">' + json + '<\/script>'
       + '<div class="wrap"><h1>Fotoreeks ' + esc(pakket.hotel || "zonder hotelnaam") + '</h1>'
       + '<p class="sub">' + pakket.fotos.length + ' foto\u2019s in de volgorde van de reeks \u00b7 gemaakt ' + esc(datumTekst(pakket.datum)) + '</p>'
-      + '<div class="uitleg">Zet je opmerkingen bij de foto\u2019s of onderaan bij Algemeen. Klik daarna op <b>Download met feedback</b> en stuur dat bestand terug via Teams, of kopieer de tekst. Je opmerkingen blijven in deze browser bewaard als je het bestand later weer opent.</div>'
+      + '<div class="uitleg">Zo komt de reeks op de detailpagina te staan: de eerste foto groot, de volgende vier ernaast. Zet de foto\u2019s in de goede volgorde met de pijlen, vervang of verwijder er een, of voeg er een toe. Zet je opmerkingen bij de foto\u2019s of onderaan bij Algemeen. Klik daarna op <b>Download met feedback</b> en stuur dat bestand terug via Teams. Je opmerkingen blijven in deze browser bewaard; een nieuwe volgorde of nieuwe foto\u2019s komen alleen mee in het gedownloade bestand.</div>'
+      + '<p class="lbl">Zo ziet het er op de website uit</p><div class="mozaiek" id="mozaiek"></div>'
+      + '<div class="rij"><p class="lbl">Alle foto\u2019s op volgorde <span id="teller"></span></p><button type="button" id="toevoegen">+ Foto toevoegen</button></div>'
       + '<div class="grid" id="grid"></div>'
       + '<div class="alg"><label for="alg">Algemeen</label><textarea id="alg" placeholder="Over de reeks als geheel: volgorde, wat mist, wat eruit kan"></textarea></div>'
       + '<div class="alg"><label for="naam">Je naam</label><input type="text" id="naam" placeholder="Zodat duidelijk is van wie de feedback is"></div>'
@@ -3100,7 +3231,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       + '<button type="button" class="p" id="kopieer">Kopieer feedback</button>'
       + '<button type="button" id="teams">Open Teams</button></div>'
       + '<p class="melding" id="melding"></p></div>'
-      + '<script>' + REVIEW_JS + '<\/script></body></html>';
+      + '<script>(' + reviewPaginaScript.toString() + ')();<\/script></body></html>';
   }
   function blobNaarDataUrl(blob){
     return new Promise(function(r, x){ var fr = new FileReader(); fr.onload = function(){ r(fr.result); }; fr.onerror = x; fr.readAsDataURL(blob); });
@@ -3118,7 +3249,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       for(var i=0;i<reeks.length;i++){
         var it = reeks[i], bron = it.blob || it.bestand, pos = posVanFoto(it.id), r = REST.indexOf(it.id);
         var data = await blobNaarDataUrl(bron); bytes += bron.size;
-        fotos.push({naam: downloadNaam(it), alt: it.alt || altVoorstel(it), cat: catVan(it), catLabel: CATS[catVan(it)] ? lbl(catVan(it)) : "",
+        fotos.push({id: "f" + it.id, naam: downloadNaam(it), alt: it.alt || altVoorstel(it), cat: catVan(it), catLabel: CATS[catVan(it)] ? lbl(catVan(it)) : "",
                     pos: pos !== -1 ? pos : (r !== -1 ? 5 + r : null), ext: it.ext || "jpg", data: data});
         toonVoortgang(i+1, reeks.length);
       }
@@ -3162,13 +3293,25 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       }catch(e){}
       toonVoortgang(i+1, pakket.fotos.length);
     }
+    // de fotos in het bestand staan op volgorde van pos; meta volgt die volgorde
+    meta.sort(opPositie);
     await zetReeksInTool(pakket, files, meta);
     var fbHost = $("#deel-feedback"), fb = pakket.feedback;
     if(fbHost){
-      fbHost.innerHTML = fb ? '<p class="review-lbl">Feedback uit het bestand' + (fb.door ? ' van ' + esc(fb.door) : '') + (fb.datum ? ' \u00b7 ' + esc(datumTekst(fb.datum)) : '') + '</p>'
-          + (fb.algemeen ? '<div class="fb-item">' + esc(fb.algemeen) + '<small>hele reeks</small></div>' : '')
-          + (fb.perFoto || []).map(function(t, k){ return t ? '<div class="fb-item">' + esc(t) + '<small>foto ' + (k+1) + (meta[k] && meta[k].catLabel ? ' \u00b7 ' + esc(meta[k].catLabel) : '') + '</small></div>' : ''; }).join("")
-        : "";
+      var regels = [];
+      if(fb){
+        var w = fb.wijzigingen || {}, d = [];
+        if(w.volgorde) d.push("volgorde aangepast"); if(w.vervangen) d.push(w.vervangen + " vervangen");
+        if(w.toegevoegd) d.push(w.toegevoegd + " toegevoegd"); if(w.verwijderd) d.push(w.verwijderd + " verwijderd");
+        if(d.length) regels.push('<div class="fb-item">' + esc("Wijzigingen in het bestand: " + d.join(", ")) + '<small>de reeks hierboven is al aangepast</small></div>');
+        if(fb.algemeen) regels.push('<div class="fb-item">' + esc(fb.algemeen) + '<small>hele reeks</small></div>');
+        var per = fb.perFoto || {};
+        meta.forEach(function(f, k){
+          var t = Array.isArray(per) ? per[k] : per[f.id];
+          if(t && String(t).trim()) regels.push('<div class="fb-item">' + esc(t) + '<small>foto ' + (k+1) + (f.catLabel ? ' \u00b7 ' + esc(f.catLabel) : '') + '</small></div>');
+        });
+      }
+      fbHost.innerHTML = fb ? '<p class="review-lbl">Feedback uit het bestand' + (fb.door ? ' van ' + esc(fb.door) : '') + (fb.datum ? ' \u00b7 ' + esc(datumTekst(fb.datum)) : '') + '</p>' + (regels.join("") || '<div class="fb-item">Geen opmerkingen.</div>') : "";
     }
     toast(fb ? "Reeks en feedback ingelezen" : "Reeks ingelezen, " + files.length + " foto\u2019s");
   }
@@ -3321,6 +3464,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         if(f.cat && CATS[f.cat]){ state.pos[f.pos].cat = f.cat; state.pos[f.pos].autoCat = false; }
       } else { REST[f.pos - 5] = it.id; }
     });
+    for(var q=0;q<5;q++){ if(state.pos[q].fotoId && !state.pos[q].cat) pasTypeToe(q); }   // nieuwe of vervangen foto's: type uit de naam
+    if(state.count < OPT.length) state.count = Math.min(14, OPT.length);
     herindexeer(); renderFilters(); renderCount(); renderBib(); renderAlles(); save();
     toonVoortgang(null);
     var blok = $("#blok-fotos"); if(blok) window.scrollTo({top: blok.offsetTop - 20, behavior: "smooth"});

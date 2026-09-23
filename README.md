@@ -63,14 +63,20 @@ de kop van het bestand, verander ze samen.
   foto's erin (te zware foto's worden eerst geoptimaliseerd), in de volgorde
   van de reeks, met type en beschrijving per foto. Je stuurt het via Teams
   (*Open Teams* zet een berichtje klaar, *Kopieer bericht* ook). De collega
-  opent het bestand in de browser, zet opmerkingen bij de foto's of bij
-  Algemeen, vult een naam in en klikt *Download met feedback*: hetzelfde
-  bestand, nu met de feedback erin. Onderweg blijven de opmerkingen in de
-  browser van de collega bewaard, ook als het bestand tussendoor dicht gaat.
-  Komt het bestand terug, sleep het dan in de tool (in de uploadzone van stap
-  01 of 05): de reeks staat er weer met posities, types en beschrijvingen, en de
-  feedback staat eronder bij Feedback vragen. Een reviewbestand van een reeks
-  van 12 foto's is grofweg 3 tot 5 MB.
+  opent het bestand in de browser en ziet bovenaan hoe de reeks op de
+  detailpagina komt (de eerste foto groot, de volgende vier ernaast). Ze kan
+  de volgorde aanpassen met de pijlen, een foto vervangen, verwijderen of
+  toevoegen (nieuwe foto's worden in het bestand verkleind tot 2000 px), en
+  opmerkingen zetten bij losse foto's of bij Algemeen. *Download met
+  feedback* geeft hetzelfde bestand terug met de nieuwe reeks en de
+  opmerkingen erin. De opmerkingen blijven ook in haar browser bewaard als het
+  bestand tussendoor dicht gaat; een nieuwe volgorde of nieuwe foto's komen
+  alleen mee in het gedownloade bestand. Komt het bestand terug, sleep het dan
+  in de tool (uploadzone van stap 01 of 05): de reeks staat er weer in de
+  nieuwe volgorde, met posities, types (voor nieuwe foto's uit de
+  bestandsnaam) en beschrijvingen, en onder Feedback vragen staat wat er is
+  veranderd en welke opmerkingen erbij zijn gezet. Een reviewbestand van een
+  reeks van 12 foto's is grofweg 3 tot 5 MB.
 
   Draait de tool in de claude.ai-artifact, dan staan daar bovenop *Bewaar bij
   claude.ai* en het blok *Bewaarde reeksen*: dezelfde flow, maar dan met de
