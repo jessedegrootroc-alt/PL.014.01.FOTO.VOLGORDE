@@ -461,6 +461,39 @@ html[data-versie="4"] .verdictline + .c-sub,
 html[data-versie="4"] section[aria-labelledby="h4a"],
 html[data-versie="4"] [data-rows="techniek"],
 html[data-versie="4"] .overview{display:none}
+
+/* reeks bewaren voor feedback (versie 4, alleen in de artifact) */
+.deel{margin:2px 0 12px; padding:12px 14px; border:1px dashed var(--line); border-radius:var(--r); background:var(--surface-2)}
+.deel[hidden]{display:none}
+.deel-kop{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:13px; color:var(--ink-2); margin-bottom:8px}
+.deel-kop b{color:var(--ink)}
+.deel-knoppen{display:flex; flex-wrap:wrap; gap:8px}
+.deel-stand{font-size:12.5px; color:var(--ink-2); margin-top:8px}
+.deel-stand:empty{display:none}
+.deel-stand b{color:var(--ink)}
+.reeks-rij{display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.reeks-rij:last-child{border-bottom:0}
+.reeks-rij img{width:120px; aspect-ratio:16/9; object-fit:cover; border-radius:5px; border:1px solid var(--line); background:var(--na-bg)}
+.reeks-info{flex:1 1 220px; min-width:0}
+.reeks-info b{display:block; font-size:14px}
+.reeks-info span{font-size:12.5px; color:var(--ink-2)}
+.reeks-acties{display:flex; gap:6px; flex-wrap:wrap}
+.review{position:fixed; inset:0; z-index:80; background:rgba(20,20,20,.55); display:flex; align-items:flex-start; justify-content:center; padding:24px 16px; overflow:auto}
+.review[hidden]{display:none}
+.review-paneel{background:var(--surface); border-radius:var(--r); width:min(1100px,100%); padding:18px 20px 24px; box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.review-kop{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px}
+.review-kop h2{font-size:19px}
+.review-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3); margin:14px 0 6px}
+.review-fotos{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr)); gap:12px}
+.review-foto img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; border:1px solid var(--line); display:block; background:var(--na-bg)}
+.review-foto p{font-size:12.5px; margin-top:4px; color:var(--ink-2); line-height:1.4}
+.review-foto p b{color:var(--ink)}
+.fb-item{padding:8px 10px; border:1px solid var(--line); border-radius:var(--r); margin-bottom:6px; font-size:13px; white-space:pre-wrap}
+.fb-item small{display:block; color:var(--ink-3); font-size:11.5px; margin-top:3px; white-space:normal}
+.fb-form{display:grid; gap:8px; margin-top:8px}
+.fb-form textarea{width:100%; min-height:80px; border:1px solid var(--line); border-radius:var(--r); padding:8px 10px; font:inherit; font-size:13px; background:var(--surface); resize:vertical}
+.fb-form select{border:1px solid var(--line); border-radius:var(--r); padding:6px 8px; font:inherit; font-size:13px; background:var(--surface); max-width:340px}
+.fb-rij{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 .fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
 .fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
@@ -710,6 +743,14 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     <button class="btn btn-reset" id="btn-reset" type="button">Resetten</button>
   </div>
 
+  <section class="block" id="blok-reeksen" hidden aria-labelledby="h-reeksen" style="margin-bottom:var(--s4)">
+    <div class="block-h"><h2 id="h-reeksen">Bewaarde reeksen</h2></div>
+    <div class="block-b">
+      <p class="lead">Reeksen die collega’s hebben bewaard voor feedback. Bekijk een reeks, zet je opmerkingen erbij, of open hem in de tool om verder te werken.</p>
+      <div id="reeksen-lijst"></div>
+    </div>
+  </section>
+
 
 
   <section class="block" aria-labelledby="h-usp" style="margin-bottom:var(--s4)">
@@ -857,6 +898,15 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
           <div class="zip-prog" id="zip-prog" hidden aria-live="polite">
             <div class="progress"><i id="zip-fill"></i></div><span id="zip-lbl">0%</span>
           </div>
+          <div class="deel" id="deel" hidden>
+            <div class="deel-kop"><b>Feedback vragen</b><span>Bewaar de reeks, dan kan een collega hem later bekijken en feedback geven, ook als deze pagina al dicht is.</span></div>
+            <div class="deel-knoppen">
+              <button class="btn" id="deel-bewaar" type="button">Bewaar reeks voor feedback</button>
+              <button class="btn" id="deel-teams" type="button" hidden>Deel via Teams</button>
+              <button class="btn" id="deel-kopieer" type="button" hidden>Kopieer bericht</button>
+            </div>
+            <p class="deel-stand" id="deel-stand"></p>
+          </div>
           <p class="ai-uitleg" id="ai-uitleg" hidden>Claude kijkt naar de foto’s zelf en schrijft de beschrijving die erbij hoort. Dat gebruikt je eigen Claude-tegoed. Wat je zelf hebt getypt blijft staan.</p>
           <div id="opt-lijst"></div>
           <p class="opt-hint" id="opt-hint"></p>
@@ -900,6 +950,13 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   <button class="vsw-knop" type="button" id="vsw-knop" aria-expanded="false" aria-haspopup="true">
     <span class="vsw-k">Weergave</span><b id="vsw-nu">Versie 1</b><svg class="ic ic-sm" aria-hidden="true"><use href="#ic-omhoog"></use></svg>
   </button>
+</div>
+
+<div class="review" id="review" hidden role="dialog" aria-modal="true" aria-labelledby="review-titel">
+  <div class="review-paneel">
+    <div class="review-kop"><h2 id="review-titel"></h2><button class="btn" id="review-sluit" type="button">Sluiten</button></div>
+    <div id="review-inhoud"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
@@ -2622,7 +2679,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       rij.querySelector('[data-act="weg"]').addEventListener("click", function(){ verwijderFoto(it); });
     });
 
-    hotelHint();
+    hotelHint(); renderDeel();
     var aiKnop = $("#opt-ai");
     aiKnop.hidden = !SAMPLE;
     $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
@@ -2875,6 +2932,257 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       }
     }
     knop.disabled = false; knop.textContent = oud;
+  }
+
+  /* ---------- reeks bewaren voor feedback, alleen in de artifact en in versie 4 ----------
+     De backoffice krijgt feedback op de selectie pas nadat het pakket in het CMS staat, en
+     wie de pagina sluit is de foto's kwijt. Daarom: de reeks met foto's bewaren bij de pagina
+     (assets + db), een collega bekijkt hem later en zet er feedback bij, en wie wil werkt er
+     in de tool aan verder. Delen gaat via een Teams-bericht met de link naar deze tool. */
+  var ARTIFACT_URL = "https://claude.ai/artifact/DcVKpcN6sgfpAM2zUDN55C";
+  var DB = null, ASSETS = null, USER = null, MIJN_ID = null;
+  var laatsteReeks = null, reeksenGeladen = false, reviewId = null, reviewStop = null;
+  if(window.claude && typeof window.claude.use === "function"){
+    window.claude.use("db").then(function(d){ DB = d || null; renderDeel(); openUitHash(); }, function(){});
+    window.claude.use("assets").then(function(a){ ASSETS = a || null; renderDeel(); }, function(){});
+    window.claude.use("user").then(function(u){
+      USER = u || null;
+      if(USER) USER.me().then(function(me){ MIJN_ID = me.id; }, function(){});
+    }, function(){});
+  }
+  function deelActief(){ return !metNummers() && !!DB; }
+  function renderDeel(){
+    var host = $("#deel"), blok = $("#blok-reeksen");
+    if(!host || !blok) return;
+    var aan = deelActief();
+    host.hidden = !aan; blok.hidden = !aan;
+    if(!aan){ reeksenGeladen = false; return; }
+    $("#deel-bewaar").hidden = !ASSETS;
+    if(!ASSETS && !$("#deel-stand").textContent){
+      $("#deel-stand").textContent = "Bewaren kan alleen wie deze pagina mag bewerken. Bekijken en feedback geven kan iedereen, onder Bewaarde reeksen bovenaan.";
+    }
+    if(!reeksenGeladen) renderReeksen();
+  }
+  function datumTekst(iso){
+    var d = iso ? new Date(iso) : null; if(!d || isNaN(d)) return "";
+    return d.toLocaleDateString("nl-NL", {day:"numeric", month:"short"}) + " " + d.toLocaleTimeString("nl-NL", {hour:"2-digit", minute:"2-digit"});
+  }
+  function deelFout(code){
+    if(code === "quota_or_state" || code === "quota_exceeded") return "De opslag van deze pagina is vol, verwijder eerst oude reeksen";
+    if(code === "too_large") return "Een foto is te groot om te bewaren, optimaliseer hem eerst";
+    if(code === "rate_limited" || code === "resource_exhausted") return "Even te veel tegelijk, probeer het zo opnieuw";
+    if(code === "not_granted" || code === "not_writer" || code === "invalid_argument") return "Je hebt geen rechten om dit hier te doen";
+    return "Het lukt nu niet, probeer het later opnieuw";
+  }
+  function kopieerTekst(t){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ toast("Bericht gekopieerd"); }, function(){ toast("Kopi\u00ebren lukt niet"); });
+      return;
+    }
+    var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("Bericht gekopieerd"); }catch(e){}
+    document.body.removeChild(ta);
+  }
+  function opPositie(a, b){ var x = (a.pos === null || a.pos === undefined) ? 99 : a.pos, y = (b.pos === null || b.pos === undefined) ? 99 : b.pos; return x - y; }
+
+  async function bewaarReeks(knop){
+    if(!DB || !ASSETS) return;
+    var reeks = reeksVolgorde().filter(function(it){ return it.blob || it.bestand; });
+    if(!reeks.length){ toast("Er zijn nog geen foto\u2019s in de reeks"); return; }
+    var oud = knop.innerHTML; knop.disabled = true; knop.textContent = "Bewaren\u2026";
+    try{
+      toonVoortgang(0, reeks.length);
+      var fotos = [];
+      for(var i=0;i<reeks.length;i++){
+        var it = reeks[i], bron = it.blob || it.bestand;
+        var up = await ASSETS.upload(bron, bron.type ? undefined : {type: it.ext === "png" ? "image/png" : "image/jpeg"});
+        var pos = posVanFoto(it.id), r = REST.indexOf(it.id);
+        fotos.push({asset: up.id, naam: it.naam, alt: it.alt || altVoorstel(it), cat: catVan(it),
+                    pos: pos !== -1 ? pos : (r !== -1 ? 5 + r : null), breedte: it.breedte || 0, grootte: it.grootte || 0, ext: it.ext || "jpg"});
+        toonVoortgang(i+1, reeks.length);
+      }
+      var ref = DB.collection("reeksen").doc();
+      await ref.set({hotel: hotelNaam || "", datum: new Date().toISOString(), door: MIJN_ID, aantal: state.count,
+                     kenmerken: state.filters, eigen: state.eigen, fotos: fotos, status: "open"});
+      laatsteReeks = {id: ref.id, hotel: hotelNaam};
+      toonVoortgang(reeks.length, reeks.length, "Bewaard \u00b7 100%");
+      setTimeout(function(){ toonVoortgang(null); }, 1200);
+      $("#deel-stand").innerHTML = "Bewaard als <b>" + esc(hotelNaam || "reeks zonder hotelnaam") + "</b> met " + fotos.length
+        + " foto\u2019s. Stuur het bericht via Teams; je collega opent de tool, kiest de reeks onder Bewaarde reeksen en zet daar de feedback bij.";
+      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
+      renderReeksen();
+    }catch(e){
+      toonVoortgang(null);
+      toast(deelFout(e && e.code));
+    }
+    knop.disabled = false; knop.innerHTML = oud;
+  }
+  function deelBericht(){
+    var h = (laatsteReeks && laatsteReeks.hotel) || hotelNaam || "arrangement";
+    return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
+  }
+  $("#deel-bewaar").addEventListener("click", function(){ bewaarReeks(this); });
+  $("#deel-teams").addEventListener("click", function(){
+    var url = "https://teams.microsoft.com/share?href=" + encodeURIComponent(ARTIFACT_URL) + "&msgText=" + encodeURIComponent(deelBericht());
+    var w = null; try{ w = window.open(url, "_blank", "noopener"); }catch(e){}
+    if(!w){ kopieerTekst(deelBericht()); toast("Teams openen lukt hier niet, het bericht staat op je klembord"); }
+  });
+  $("#deel-kopieer").addEventListener("click", function(){ kopieerTekst(deelBericht()); });
+
+  async function renderReeksen(){
+    var host = $("#reeksen-lijst"); if(!host || !deelActief()) return;
+    reeksenGeladen = true;
+    try{
+      var snap = await DB.collection("reeksen").orderBy("datum", "desc").limit(50).get();
+      if(snap.empty){ host.innerHTML = '<p class="opt-leeg">Nog geen bewaarde reeksen. Bewaar er een bij 05 Techniek met Bewaar reeks voor feedback.</p>'; return; }
+      var ids = []; snap.docs.forEach(function(d){ var b = d.data() || {}; if(b.door) ids.push(b.door); });
+      var namen = (USER && ids.length) ? await USER.profiles(ids) : {};
+      host.innerHTML = snap.docs.map(function(d){
+        var b = d.data() || {}, fotos = (b.fotos || []).slice().sort(opPositie), eerste = fotos[0];
+        var wie = b.door && namen[b.door] && namen[b.door].name ? namen[b.door].name : "";
+        return '<div class="reeks-rij" data-id="'+esc(d.id)+'">'
+          + (eerste ? '<img src="/_blob/'+esc(eerste.asset)+'" alt="">' : '')
+          + '<div class="reeks-info"><b>'+esc(b.hotel || "Zonder hotelnaam")+'</b>'
+          + '<span>'+esc(datumTekst(b.datum))+' \u00b7 '+fotos.length+' foto\u2019s'+(wie ? ' \u00b7 '+esc(wie) : '')+'</span></div>'
+          + '<div class="reeks-acties"><button type="button" class="btn btn-primary" data-act="bekijk">Bekijken en feedback</button>'
+          + (ASSETS ? '<button type="button" class="btn" data-act="open">Openen in de tool</button>'
+                    + '<button type="button" class="btn" data-act="weg">Verwijderen</button>' : '')
+          + '</div></div>';
+      }).join("");
+      each(host.querySelectorAll(".reeks-rij"), function(rij){
+        var id = rij.getAttribute("data-id");
+        rij.querySelector('[data-act="bekijk"]').addEventListener("click", function(){ toonReview(id); });
+        var o = rij.querySelector('[data-act="open"]'); if(o) o.addEventListener("click", function(){ laadReeks(id); });
+        var w = rij.querySelector('[data-act="weg"]'); if(w) w.addEventListener("click", function(){ verwijderReeks(id); });
+      });
+    }catch(e){ host.innerHTML = '<p class="opt-leeg">'+esc(deelFout(e && e.code))+'</p>'; }
+  }
+
+  async function toonReview(id){
+    if(!DB) return;
+    var snap;
+    try{ snap = await DB.doc("reeksen/" + id).get(); }catch(e){ toast(deelFout(e && e.code)); return; }
+    if(!snap.exists){ toast("Deze reeks bestaat niet meer"); return; }
+    var b = snap.data() || {}; reviewId = id;
+    var fotos = (b.fotos || []).slice().sort(opPositie);
+    $("#review-titel").textContent = "Fotoreeks " + (b.hotel || "zonder hotelnaam");
+    $("#review-inhoud").innerHTML =
+      '<p class="review-lbl">De reeks, in volgorde</p><div class="review-fotos">' + fotos.map(function(f, k){
+        return '<div class="review-foto"><img src="/_blob/'+esc(f.asset)+'" alt=""><p><b>Foto '+(k+1)+'</b>'
+          + (f.cat && CATS[f.cat] ? ' \u00b7 '+esc(lbl(f.cat)) : '') + '<br>' + esc(f.alt || "") + '</p></div>';
+      }).join("") + '</div>'
+      + '<p class="review-lbl">Feedback</p><div id="fb-lijst"><p class="opt-leeg">Nog geen feedback.</p></div>'
+      + '<div class="fb-form">'
+      + '<select id="fb-foto" aria-label="Waar gaat je feedback over"><option value="">Over de hele reeks</option>'
+      + fotos.map(function(f, k){ return '<option value="'+k+'">Over foto '+(k+1)+(f.cat && CATS[f.cat] ? ' \u00b7 '+esc(lbl(f.cat)) : '')+'</option>'; }).join("")
+      + '</select>'
+      + '<textarea id="fb-tekst" placeholder="Wat moet anders? Bijvoorbeeld: foto 3 en 4 omwisselen, of de kamerfoto vervangen door een lichtere."></textarea>'
+      + '<div class="fb-rij"><button type="button" class="btn btn-primary" id="fb-stuur">Feedback versturen</button>'
+      + (ASSETS ? '<button type="button" class="btn" id="fb-open">Openen in de tool</button>' : '') + '</div></div>';
+    $("#review").hidden = false;
+    if(reviewStop){ reviewStop(); reviewStop = null; }
+    try{
+      reviewStop = DB.collection("reeksen/" + id + "/feedback").orderBy("datum", "asc")
+        .onSnapshot(function(qs){ renderFeedback(qs); }, function(){});
+    }catch(e){}
+    $("#fb-stuur").addEventListener("click", stuurFeedback);
+    var op = $("#fb-open"); if(op) op.addEventListener("click", function(){ sluitReview(); laadReeks(id); });
+  }
+  async function renderFeedback(qs){
+    var host = $("#fb-lijst"); if(!host) return;
+    if(qs.empty){ host.innerHTML = '<p class="opt-leeg">Nog geen feedback.</p>'; return; }
+    var ids = []; qs.docs.forEach(function(d){ var b = d.data() || {}; if(b.door) ids.push(b.door); });
+    var namen = (USER && ids.length) ? await USER.profiles(ids) : {};
+    host.innerHTML = qs.docs.map(function(d){
+      var b = d.data() || {};
+      var wie = b.door && namen[b.door] && namen[b.door].name ? namen[b.door].name : "Collega";
+      var over = (b.foto === null || b.foto === undefined) ? "hele reeks" : "foto " + (b.foto + 1);
+      return '<div class="fb-item">'+esc(b.tekst || "")+'<small>'+esc(wie)+' \u00b7 '+esc(over)+' \u00b7 '+esc(datumTekst(b.datum))+'</small></div>';
+    }).join("");
+  }
+  async function stuurFeedback(){
+    if(!DB || !reviewId) return;
+    var t = ($("#fb-tekst").value || "").trim();
+    if(!t){ toast("Typ eerst je feedback"); return; }
+    var f = $("#fb-foto").value;
+    try{
+      await DB.collection("reeksen/" + reviewId + "/feedback").add({
+        tekst: t.slice(0, 2000), foto: f === "" ? null : parseInt(f, 10), door: MIJN_ID, datum: new Date().toISOString()
+      });
+      $("#fb-tekst").value = ""; toast("Feedback opgeslagen");
+    }catch(e){ toast(deelFout(e && e.code)); }
+  }
+  function sluitReview(){
+    $("#review").hidden = true;
+    if(reviewStop){ reviewStop(); reviewStop = null; }
+    reviewId = null;
+  }
+  $("#review-sluit").addEventListener("click", sluitReview);
+  $("#review").addEventListener("click", function(e){ if(e.target === this) sluitReview(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("#review").hidden) sluitReview(); });
+  function openUitHash(){
+    var m = /reeks=([A-Za-z0-9_.~:@+-]+)/.exec(location.hash || "");
+    if(m && DB) toonReview(m[1]);
+  }
+
+  // een bewaarde reeks terug in de tool: foto's ophalen en op hun plek zetten
+  async function laadReeks(id){
+    if(!DB) return;
+    var snap;
+    try{ snap = await DB.doc("reeksen/" + id).get(); }catch(e){ toast(deelFout(e && e.code)); return; }
+    if(!snap.exists){ toast("Deze reeks bestaat niet meer"); return; }
+    var b = snap.data() || {}, fotos = (b.fotos || []).slice().sort(opPositie);
+    if(OPT.length && !window.confirm("De foto\u2019s die nu in de tool staan worden vervangen door deze reeks. Doorgaan?")) return;
+    toonVoortgang(0, fotos.length, "Foto\u2019s ophalen\u2026");
+    var files = [], meta = [];
+    for(var i=0;i<fotos.length;i++){
+      var f = fotos[i];
+      try{
+        var res = await fetch("/_blob/" + f.asset);
+        if(!res.ok) continue;
+        var blob = await res.blob();
+        files.push(new File([blob], f.naam || ("foto-" + (i+1) + "." + (f.ext || "jpg")), {type: blob.type || "image/jpeg"}));
+        meta.push(f);
+      }catch(e){}
+      toonVoortgang(i+1, fotos.length);
+    }
+    // leegmaken zoals bij resetten, maar de versie en de bewaarde reeksen blijven
+    state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
+    state.checks = {}; state.hoofd = 0; state.gebouwNiet = false;
+    OPT.forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); });
+    OPT = []; REST = []; openKaart = null;
+    hotelNaam = b.hotel || ""; $("#hotelnaam").value = hotelNaam;
+    state.filters = Array.isArray(b.kenmerken) ? b.kenmerken : []; state.eigen = Array.isArray(b.eigen) ? b.eigen : [];
+    state.count = b.aantal || 10;
+    await voegToe(files);                       // vult OPT in dezelfde volgorde als meta
+    meta.forEach(function(f, k){
+      var it = OPT[k]; if(!it) return;
+      if(f.alt){ it.alt = f.alt; it.autoAlt = false; }
+      if(f.pos === null || f.pos === undefined) return;
+      if(f.pos < 5){
+        state.pos[f.pos].fotoId = it.id;
+        if(f.cat && CATS[f.cat]){ state.pos[f.pos].cat = f.cat; state.pos[f.pos].autoCat = false; }
+      } else { REST[f.pos - 5] = it.id; }
+    });
+    laatsteReeks = {id: id, hotel: hotelNaam};
+    herindexeer(); renderFilters(); renderCount(); renderBib(); renderAlles(); save();
+    toonVoortgang(null);
+    toast("Reeks geladen, " + files.length + " foto\u2019s");
+    var blok = $("#blok-fotos"); if(blok) window.scrollTo({top: blok.offsetTop - 20, behavior: "smooth"});
+  }
+  async function verwijderReeks(id){
+    if(!DB || !ASSETS) return;
+    if(!window.confirm("Deze bewaarde reeks en de feedback erop verwijderen? Dit kan niet ongedaan worden gemaakt.")) return;
+    try{
+      var snap = await DB.doc("reeksen/" + id).get(), b = snap.exists ? (snap.data() || {}) : {};
+      await DB.doc("reeksen/" + id).delete();
+      var fb = await DB.collection("reeksen/" + id + "/feedback").get();
+      for(var j=0;j<fb.docs.length;j++){ await DB.doc("reeksen/" + id + "/feedback/" + fb.docs[j].id).delete(); }
+      var fotos = b.fotos || [];
+      for(var i=0;i<fotos.length;i++){ try{ await ASSETS.delete(fotos[i].asset); }catch(e){} }
+      if(laatsteReeks && laatsteReeks.id === id) laatsteReeks = null;
+      toast("Reeks verwijderd"); renderReeksen();
+    }catch(e){ toast(deelFout(e && e.code)); }
   }
 
   var DOWNLOADS = null;

@@ -57,9 +57,25 @@ de kop van het bestand, verander ze samen.
     positie blijft staan, het is alleen geen check meer die je moet afwerken.
     Kiezen, ordenen, optimaliseren, downloaden.
 
+  Wat versie 4 erbij heeft, alleen in de artifact-versie: **feedback vragen
+  zonder dat de pagina open moet blijven.** Bij 05 Techniek staat *Bewaar reeks
+  voor feedback*: de foto's gaan naar de opslag van de pagina (`assets`), de
+  samenstelling (hotel, kenmerken, posities, beschrijvingen) naar de gedeelde
+  database (`db`). Daarna staan *Deel via Teams* (opent het Teams-deelvenster
+  met een kant-en-klaar bericht en de link naar de tool) en *Kopieer bericht*
+  klaar. De collega opent de tool, kiest de reeks bovenaan onder **Bewaarde
+  reeksen**, ziet de foto's in volgorde met hun beschrijving en zet er feedback
+  bij, over de hele reeks of over één foto; die feedback komt live bij iedereen
+  die de reeks open heeft. Met *Openen in de tool* haalt wie mag bewerken de
+  hele reeks terug in de tool om hem aan te passen. Bewaren en verwijderen kan
+  alleen wie de pagina mag bewerken, bekijken en feedback geven kan iedereen in
+  de organisatie met toegang. Er gaat alleen iets naar de opslag als iemand op
+  bewaren klikt; de gewone flow zonder bewaren blijft in de browser. Draait de
+  tool als los bestand, dan is dit hele onderdeel onzichtbaar.
+
   De CSS van versie 3 staat achter `html:is([data-versie="3"],[data-versie="4"])`,
   wat alleen voor versie 4 geldt achter `html[data-versie="4"]`; in het script
-  is `metNummers()` het enige onderscheid.
+  zijn `metNummers()` en `deelActief()` het onderscheid.
 
 Alles wat geen versie 1 is deelt dezelfde opbouw, dus de CSS daarvoor staat
 achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een
