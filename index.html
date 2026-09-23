@@ -1746,7 +1746,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     if(cat !== "anders") state.pos[i].anders = "";
     if(cat === "anders"){
       state.pos[i].status = "ok";           // een eigen onderwerp is een bewuste keuze, dus klopt
-    } else if(cat && state.pos[i].status === null){
+    } else if(cat){
+      // een nieuwe keuze krijgt een verse status: volgt of alternatief is klopt, alleen echt afwijkend is afwijking.
+      // Zo blijft er geen oude afwijking hangen van het type dat hier eerder stond.
       var v = volgtAdvies(i);
       state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
     }
