@@ -283,12 +283,10 @@ main{padding-block:var(--s5) var(--s6)}
 .ft-hint{font-size:12.5px; color:var(--ink-2); padding-bottom:var(--s3); margin-top:-8px}
 
 /* ---------- techniek en optimalisatie ---------- */
-.opt-hotel{display:grid; grid-template-columns:repeat(2,minmax(0,340px)); gap:var(--s3); margin:0 0 var(--s4)}
-.opt-hotel .hotel-hint{grid-column:1 / -1; margin-top:0}
-@media (max-width:760px){ .opt-hotel{grid-template-columns:minmax(0,1fr)} }
+.opt-hotel{margin:0 0 var(--s4)}
 .opt-hotel label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
   color:var(--ink-3); font-weight:700; margin-bottom:4px}
-.opt-hotel input{width:100%; border:1px solid var(--line); background:var(--surface);
+.opt-hotel input{width:100%; max-width:340px; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:8px 10px; font-size:14px}
 .hotel-hint{font-size:12.5px; color:var(--dev); margin-top:4px}
 .hotel-hint:empty{display:none}
@@ -780,10 +778,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     <p class="lead">Waarom boekt iemand dit arrangement? Kies de gekoppelde filters en markeer er hoogstens drie als belangrijkste. Die sturen het advies hieronder.</p>
     <div class="block-b">
       <div class="opt-hotel">
-        <div><label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
-        <input id="hotelnaam" placeholder="Hotel Winselerhof"></div>
-        <div><label for="arrnaam">Arrangement, voor de naam van reviewbestand en zip</label>
-        <input id="arrnaam" placeholder="Wellnessweekend met diner"></div>
+        <label for="hotelnaam">Hotelnaam, voor bestandsnaam en alt-tekst</label>
+        <input id="hotelnaam" placeholder="Hotel Winselerhof">
         <p class="hotel-hint" id="hotel-hint"></p>
       </div>
       <div id="filters"></div>
@@ -2405,10 +2401,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
   var SEO_PLEK = {zee:{t:"aan zee", w:"zee"}, natuur:{t:"in de natuur", w:"natuur"},
                   stedentrip:{t:"in de stad", w:"stad"}, frankrijk:{t:"in Frankrijk", w:"Frankrijk"},
                   belgie:{t:"in Belgi\u00eb", w:"Belgi\u00eb"}};
-  var OPT = [], optId = 0, hotelNaam = "", arrNaam = "";
-  // basis voor bestandsnamen: hotel en arrangement, zodat twintig reeksen op een dag uit elkaar te houden zijn
-  function reeksBasis(){ return [slug(hotelNaam), slug(arrNaam)].filter(Boolean).join("-") || "arrangement"; }
-  function reeksTitel(){ return (hotelNaam || "zonder hotelnaam") + (arrNaam ? " \u00b7 " + arrNaam : ""); }
+  var OPT = [], optId = 0, hotelNaam = "";
   var SLECHTE_NAAM = /^(img|dsc|dscn|foto|image|photo|pxl|screenshot|schermafbeelding|untitled|final)[\s_\-]*\d*$/i;
 
   function slug(t){
@@ -2867,7 +2860,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       if(!bestanden.length){ toonVoortgang(null); knop.disabled = false; knop.innerHTML = oud; return; }
       toonVoortgang(reeks.length, reeks.length, "Zip inpakken\u2026");
       await new Promise(function(r){ setTimeout(r, 0); });
-      var zipNaam = "fotos-" + reeksBasis() + ".zip";
+      var zipNaam = ["fotos", slug(hotelNaam) || "arrangement"].join("-") + ".zip";
       var blob = await maakZip(bestanden);
       toonVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
       await bewaarBlob(blob, zipNaam);
@@ -3102,7 +3095,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     knop.disabled = false; knop.innerHTML = oud;
   }
   function deelBericht(){
-    var h = (laatsteReeks && laatsteReeks.hotel) || reeksTitel();
+    var h = (laatsteReeks && laatsteReeks.hotel) || hotelNaam || "arrangement";
     if(laatsteReeks && laatsteReeks.id){
       return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
     }
@@ -3276,7 +3269,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     }
     function tekst(){
       var w = wijzigingen();
-      var r = ["Fotoreeks " + (P.hotel || "") + (P.arrangement ? " \u00b7 " + P.arrangement : "") + (fb.door ? " \u2014 " + fb.door : "")];
+      var r = ["Fotoreeks " + (P.hotel || "") + (fb.door ? " — " + fb.door : "")];
       var o = oordeelTekst(w); if(o) r.push(o);
       var wt = wijzigingenTekst(w); if(wt) r.push("Aangepast: " + wt);
       if(fb.algemeen.trim()) r.push(fb.algemeen.trim());
@@ -3313,9 +3306,9 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
   function reviewSjabloon(pakket){
     var json = JSON.stringify(pakket).replace(/</g, "\\u003c");
     return '<!doctype html>\n<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-      + '<title>Fotoreeks ' + esc((pakket.hotel || "") + (pakket.arrangement ? " \u00b7 " + pakket.arrangement : "")) + '</title><style>' + REVIEW_CSS + '</style></head><body>'
+      + '<title>Fotoreeks ' + esc(pakket.hotel || "") + '</title><style>' + REVIEW_CSS + '</style></head><body>'
       + '<script type="application/json" id="fotocheck-reeks">' + json + '<\/script>'
-      + '<div class="wrap"><h1>Fotoreeks ' + esc((pakket.hotel || "zonder hotelnaam") + (pakket.arrangement ? " \u00b7 " + pakket.arrangement : "")) + '</h1>'
+      + '<div class="wrap"><h1>Fotoreeks ' + esc(pakket.hotel || "zonder hotelnaam") + '</h1>'
       + '<p class="sub">' + pakket.fotos.length + ' foto’s · gemaakt ' + esc(datumTekst(pakket.datum)) + '</p>'
       + '<p class="intro">Zo komt de reeks op de detailpagina te staan. Pas aan wat beter kan, geef onderaan je oordeel en stuur het bestand terug via Teams.</p>'
       + '<p class="lbl">Zo ziet de gast het</p><div class="mozaiek" id="mozaiek"></div>'
@@ -3353,9 +3346,9 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         toonVoortgang(i+1, reeks.length);
       }
       var stempel = new Date().toISOString();
-      var basis = "fotoreeks-" + reeksBasis();
+      var basis = "fotoreeks-" + (slug(hotelNaam) || "arrangement");
       var pakket = {soort: "fotocheck-reeks", versie: 1, id: basis + "-" + stempel.slice(0,16).replace(/[^0-9]/g, ""), bestand: basis + ".html",
-                    hotel: hotelNaam || "", arrangement: arrNaam || "", datum: stempel, aantal: state.count, kenmerken: state.filters, eigen: state.eigen, fotos: fotos};
+                    hotel: hotelNaam || "", datum: stempel, aantal: state.count, kenmerken: state.filters, eigen: state.eigen, fotos: fotos};
       var html = reviewSjabloon(pakket);
       await bewaarBlob(new Blob([html], {type: "text/html"}), basis + ".html");
       toonVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
@@ -3553,7 +3546,6 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     OPT.forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); if(it.thumbUrl) URL.revokeObjectURL(it.thumbUrl); });
     OPT = []; REST = []; openKaart = null;
     hotelNaam = b.hotel || ""; $("#hotelnaam").value = hotelNaam;
-    arrNaam = b.arrangement || ""; $("#arrnaam").value = arrNaam;
     state.filters = Array.isArray(b.kenmerken) ? b.kenmerken : []; state.eigen = Array.isArray(b.eigen) ? b.eigen : [];
     state.count = b.aantal || 10;
     await voegToe(files);                       // vult OPT in dezelfde volgorde als meta
@@ -3652,7 +3644,6 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     if(e.dataTransfer && e.dataTransfer.files.length) voegToe(e.dataTransfer.files);
   });
   $("#hotelnaam").addEventListener("input", function(){ hotelNaam = this.value; renderOpt(); });
-  $("#arrnaam").addEventListener("input", function(){ arrNaam = this.value; });
   function hotelHint(){
     var el = $("#hotel-hint");
     el.textContent = (!hotelNaam.trim() && OPT.length)
@@ -3721,9 +3712,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     });
     OPT = [];
     REST = [];
-    hotelNaam = ""; arrNaam = "";
+    hotelNaam = "";
     var hnVeld = $("#hotelnaam"); if(hnVeld) hnVeld.value = "";
-    var arVeld = $("#arrnaam"); if(arVeld) arVeld.value = "";
     try{ localStorage.removeItem(STORE); }catch(e){}
     renderRows(); renderCount(); renderFilters(); renderOpt(); renderBib(); renderAlles();
     toast("Alles is gereset, klaar voor het volgende arrangement");
