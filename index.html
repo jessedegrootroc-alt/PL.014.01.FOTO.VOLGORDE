@@ -2964,7 +2964,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       host.hidden = !los;
       if(los){
         $("#deel-bewaar").hidden = true; $("#deel-teams").hidden = true; $("#deel-kopieer").hidden = true;
-        $("#deel-stand").textContent = "Bewaren en delen via Teams werkt alleen in de claude.ai-versie van deze tool; daar hoort de opslag bij. Hier blijft alles in je browser.";
+        $("#deel-stand").textContent = "Bewaren en delen via Teams werkt alleen in de claude.ai-versie van deze tool; daar hoort de opslag bij. Hier blijft alles in je browser. "
+          + "Je kijkt nu via " + (location.protocol === "file:" ? "een los bestand" : (location.hostname || "een onbekende plek")) + ".";
       }
       return;
     }
