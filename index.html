@@ -1285,10 +1285,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     if(!p.cat) return "Kies eerst een type beeld, dan legt de tool uit wat er nog mist.";
     var a = advies(i), v = volgtAdvies(i), stukken = [];
 
-    if(v === "anders"){
-      return "Je omschrijft dit beeld zelf" + (p.anders ? " als " + p.anders : "")
-        + ". De tool vergelijkt het niet met het advies, kijk zelf of het bij deze positie past.";
-    }
+    if(v === "anders") return "";           // eigen onderwerp, daar is niets over te melden
     if(i === 0 && !isDroom(p.cat)){
       stukken.push("Foto 1 is het hoofdbeeld en is bij voorkeur een droombeeld, een beeld waarvan de gast denkt: hier wil ik heen.");
     }
@@ -1598,10 +1595,11 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
           + '</div>';
       } else {
         var cls, tekst, bijzin = "";
-        if(v === "anders"){
-          cls = p.status === "ok" ? "ok" : (p.status === "dev" ? "dev" : "na");
-          tekst = p.status === "ok" ? "Eigen keuze, staat op klopt"
-                : p.status === "dev" ? "Eigen keuze, gemarkeerd als afwijking"
+        if(v === "anders" && p.status === "ok"){
+          cls = null;                       // eigen onderwerp op klopt, niets te melden
+        } else if(v === "anders"){
+          cls = p.status === "dev" ? "dev" : "na";
+          tekst = p.status === "dev" ? "Eigen keuze, gemarkeerd als afwijking"
                 : "Eigen keuze, hier geeft de tool geen advies over";
         } else if(v === "afwijkend" && p.status === "ok"){
           cls = null;                       // bewust op klopt gezet, dan is de waarschuwing klaar
@@ -1669,7 +1667,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         +     '<button type="button" data-v="dev" aria-pressed="'+(p.status==="dev")+'">Afwijking</button>'
         +     '<button type="button" data-v="na" aria-pressed="'+(p.status==="na")+'">N.v.t.</button>'
         +   '</div>'
-        +   '<div class="c-note"><p class="uitleg">'+esc(redenAfwijking(i))+'</p></div>'
+        +   (redenAfwijking(i) ? '<div class="c-note"><p class="uitleg">'+esc(redenAfwijking(i))+'</p></div>' : '')
         + '</div>'
         + '</div>';
     }).join("");
@@ -1742,7 +1740,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     state.pos[i].cat = cat;
     state.pos[i].autoCat = false;          // zelf gekozen gaat voor wat de tool herkende
     if(cat !== "anders") state.pos[i].anders = "";
-    if(cat && state.pos[i].status === null){
+    if(cat === "anders"){
+      state.pos[i].status = "ok";           // een eigen onderwerp is een bewuste keuze, dus klopt
+    } else if(cat && state.pos[i].status === null){
       var v = volgtAdvies(i);
       state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
     }
