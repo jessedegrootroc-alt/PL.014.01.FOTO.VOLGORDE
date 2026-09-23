@@ -494,6 +494,8 @@ html[data-versie="4"] .overview{display:none}
 .fb-form textarea{width:100%; min-height:80px; border:1px solid var(--line); border-radius:var(--r); padding:8px 10px; font:inherit; font-size:13px; background:var(--surface); resize:vertical}
 .fb-form select{border:1px solid var(--line); border-radius:var(--r); padding:6px 8px; font:inherit; font-size:13px; background:var(--surface); max-width:340px}
 .fb-rij{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+#deel-feedback:not(:empty){margin-top:10px}
+#deel-feedback .fb-item{background:var(--surface)}
 .fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
 .fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
@@ -787,7 +789,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     <div class="block-b">
       <div class="drop" id="bib-drop" role="button" tabindex="0" aria-label="Foto’s toevoegen">
         <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b><span class="uitgebreid"> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</span></p>
-        <input type="file" id="bib-files" multiple accept="image/*,.heic,.avif">
+        <input type="file" id="bib-files" multiple accept="image/*,.heic,.avif,.html,.json">
       </div>
       <div class="bib-grid" id="bib-grid"></div>
       <p class="bib-hint" id="bib-hint"></p>
@@ -886,7 +888,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
 
           <div class="drop" id="drop" role="button" tabindex="0" aria-label="Foto's toevoegen">
             <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto's hierheen</b> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</p>
-            <input type="file" id="files" multiple accept="image/*,.heic,.avif">
+            <input type="file" id="files" multiple accept="image/*,.heic,.avif,.html,.json">
           </div>
 
           <div class="opt-bar" id="opt-bar" hidden>
@@ -899,13 +901,15 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
             <div class="progress"><i id="zip-fill"></i></div><span id="zip-lbl">0%</span>
           </div>
           <div class="deel" id="deel" hidden>
-            <div class="deel-kop"><b>Feedback vragen</b><span>Bewaar de reeks, dan kan een collega hem later bekijken en feedback geven, ook als deze pagina al dicht is.</span></div>
+            <div class="deel-kop"><b>Feedback vragen</b><span>Maak een reviewbestand en stuur het via Teams. Je collega opent het in de browser, zet er opmerkingen bij en stuurt het terug. Sleep dat bestand hier in de tool en de reeks staat er weer, met de feedback erbij.</span></div>
             <div class="deel-knoppen">
-              <button class="btn" id="deel-bewaar" type="button">Bewaar reeks voor feedback</button>
-              <button class="btn" id="deel-teams" type="button" hidden>Deel via Teams</button>
+              <button class="btn btn-primary" id="deel-bestand" type="button">Maak reviewbestand</button>
+              <button class="btn" id="deel-teams" type="button" hidden>Open Teams</button>
               <button class="btn" id="deel-kopieer" type="button" hidden>Kopieer bericht</button>
+              <button class="btn" id="deel-bewaar" type="button" hidden>Bewaar bij claude.ai</button>
             </div>
             <p class="deel-stand" id="deel-stand"></p>
+            <div id="deel-feedback"></div>
           </div>
           <p class="ai-uitleg" id="ai-uitleg" hidden>Claude kijkt naar de foto’s zelf en schrijft de beschrijving die erbij hoort. Dat gebruikt je eigen Claude-tegoed. Wat je zelf hebt getypt blijft staan.</p>
           <div id="opt-lijst"></div>
@@ -2570,8 +2574,15 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     renderOpt();
   }
 
+  function isReviewBestand(f){ return /\.(html?|json)$/i.test(f.name || "") || f.type === "text/html" || f.type === "application/json"; }
   async function voegToe(lijst){
     var bestanden = Array.prototype.slice.call(lijst), nieuw = [];
+    var review = bestanden.filter(isReviewBestand);
+    if(review.length){
+      bestanden = bestanden.filter(function(f){ return !isReviewBestand(f); });
+      await importeerReeks(review[0]);           // de reeks uit het bestand komt in de tool, met eventuele feedback
+      if(!bestanden.length) return;
+    }
     for(var i=0;i<bestanden.length;i++){
       var f = bestanden[i];
       if(!/^image\//.test(f.type) && ["heic","avif","webp"].indexOf(extVan(f.name)) === -1) continue;
@@ -2955,25 +2966,11 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   function renderDeel(){
     var host = $("#deel"), blok = $("#blok-reeksen");
     if(!host || !blok) return;
-    var aan = deelActief();
-    host.hidden = !aan; blok.hidden = !aan;
-    if(!aan){
-      reeksenGeladen = false;
-      // buiten claude.ai (los bestand, eigen server) is er geen opslag; zeg dat in plaats van stil te blijven
-      var los = !metNummers() && !(window.claude && typeof window.claude.use === "function");
-      host.hidden = !los;
-      if(los){
-        $("#deel-bewaar").hidden = true; $("#deel-teams").hidden = true; $("#deel-kopieer").hidden = true;
-        $("#deel-stand").textContent = "Bewaren en delen via Teams werkt alleen in de claude.ai-versie van deze tool; daar hoort de opslag bij. Hier blijft alles in je browser. "
-          + "Je kijkt nu via " + (location.protocol === "file:" ? "een los bestand" : (location.hostname || "een onbekende plek")) + ".";
-      }
-      return;
-    }
-    $("#deel-stand").textContent = "";
-    $("#deel-bewaar").hidden = !ASSETS;
-    if(!ASSETS && !$("#deel-stand").textContent){
-      $("#deel-stand").textContent = "Bewaren kan alleen wie deze pagina mag bewerken. Bekijken en feedback geven kan iedereen, onder Bewaarde reeksen bovenaan.";
-    }
+    host.hidden = metNummers();                 // het paneel hoort bij versie 4, en werkt overal via het reviewbestand
+    var aan = deelActief();                     // de claude.ai-opslag is een extra, alleen als die er is
+    blok.hidden = !aan;
+    $("#deel-bewaar").hidden = !(aan && ASSETS);
+    if(!aan){ reeksenGeladen = false; return; }
     if(!reeksenGeladen) renderReeksen();
   }
   function datumTekst(iso){
@@ -3032,7 +3029,146 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   }
   function deelBericht(){
     var h = (laatsteReeks && laatsteReeks.hotel) || hotelNaam || "arrangement";
-    return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
+    if(laatsteReeks && laatsteReeks.id){
+      return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
+    }
+    return "Fotoreeks " + h + " staat klaar voor feedback, zie het bijgevoegde bestand. Open het in je browser, zet je opmerkingen erbij en stuur het terug.";
+  }
+
+  /* ---------- reviewbestand: een los HTML-bestand met de foto's erin, dat overal opent ----------
+     Collega's hebben geen claude.ai nodig, alleen een browser. Ze zetten er hun opmerkingen bij,
+     downloaden het bestand opnieuw en sturen het terug; de tool leest het weer in, met feedback. */
+  var REVIEW_CSS = "body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1c1b19;background:#faf9f7}"
+    + ".wrap{max-width:1140px;margin:0 auto;padding:24px 16px 60px}h1{font-size:24px;margin:0 0 4px}.sub{color:#6b6660;margin:0 0 18px;font-size:14px}"
+    + ".uitleg{background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:12px 14px;font-size:14px;margin:0 0 18px}"
+    + ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}"
+    + "figure{margin:0;background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}"
+    + "figure img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;display:block;background:#eee}"
+    + "figcaption{font-size:13px;color:#6b6660}figcaption b{color:#1c1b19;font-size:14px}"
+    + "textarea{width:100%;box-sizing:border-box;min-height:64px;border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;resize:vertical;background:#fff}"
+    + "textarea:focus{outline:2px solid #fb862c;outline-offset:1px}.alg{margin-top:22px}.alg textarea{min-height:110px}"
+    + "label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:0 0 6px}"
+    + "input[type=text]{border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;width:min(360px,100%);background:#fff}"
+    + ".knoppen{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:sticky;bottom:0;background:#faf9f7;padding:12px 0}"
+    + "button{border:1px solid #d9d4cd;background:#fff;border-radius:8px;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}"
+    + "button.p{background:#fb862c;border-color:#fb862c;color:#fff}button.g{background:#00b67e;border-color:#00b67e;color:#fff}"
+    + ".melding{font-size:13px;color:#6b6660;margin:8px 0 0;min-height:1.2em}";
+  var REVIEW_JS = "(function(){"
+    + "var P=JSON.parse(document.getElementById('fotocheck-reeks').textContent);"
+    + "var sleutel='fotocheck-review-'+(P.id||'');"
+    + "function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}"
+    + "var grid=document.getElementById('grid');"
+    + "grid.innerHTML=P.fotos.map(function(f,i){return '<figure><img src=\"'+f.data+'\" alt=\"\"><figcaption><b>Foto '+(i+1)+'</b>'+(f.catLabel?' \u00b7 '+esc(f.catLabel):'')+'<br>'+esc(f.alt)+'</figcaption>'"
+    + "+'<textarea data-i=\"'+i+'\" placeholder=\"Opmerking bij foto '+(i+1)+' (optioneel)\"></textarea></figure>';}).join('');"
+    + "var velden=function(){return Array.prototype.slice.call(document.querySelectorAll('textarea[data-i]'));};"
+    + "var fb=P.feedback||null;var concept=null;try{concept=JSON.parse(localStorage.getItem(sleutel)||'null');}catch(e){}"
+    + "var bron=concept||fb;"
+    + "if(bron){document.getElementById('naam').value=bron.door||'';document.getElementById('alg').value=bron.algemeen||'';velden().forEach(function(t){t.value=(bron.perFoto||[])[+t.getAttribute('data-i')]||'';});}"
+    + "function lees(){return {door:document.getElementById('naam').value.trim(),algemeen:document.getElementById('alg').value.trim(),perFoto:velden().map(function(t){return t.value.trim();}),datum:new Date().toISOString()};}"
+    + "function bewaarConcept(){try{localStorage.setItem(sleutel,JSON.stringify(lees()));}catch(e){}}"
+    + "document.addEventListener('input',bewaarConcept);"
+    + "function tekst(){var f=lees(),r=['Feedback fotoreeks '+(P.hotel||'')+(f.door?' \u2014 '+f.door:'')];"
+    + "if(f.algemeen)r.push('Algemeen: '+f.algemeen);"
+    + "f.perFoto.forEach(function(t,i){if(t)r.push('Foto '+(i+1)+(P.fotos[i].catLabel?' ('+P.fotos[i].catLabel+')':'')+': '+t);});"
+    + "if(r.length===1)r.push('(nog geen opmerkingen)');return r.join('\\n');}"
+    + "function meld(t){document.getElementById('melding').textContent=t;}"
+    + "document.getElementById('kopieer').onclick=function(){var t=tekst();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){meld('Feedback gekopieerd, plak hem in Teams.');},function(){meld('Kopi\u00ebren lukt niet, selecteer de tekst zelf.');});}else{meld('Kopi\u00ebren lukt niet in deze browser.');}};"
+    + "document.getElementById('teams').onclick=function(){window.open('https://teams.microsoft.com/l/chat/0/0?message='+encodeURIComponent(tekst()),'_blank');};"
+    + "document.getElementById('download').onclick=function(){var f=lees();if(!f.algemeen&&!f.perFoto.some(Boolean)){meld('Zet eerst een opmerking neer.');return;}"
+    + "var kopie=JSON.parse(JSON.stringify(P));kopie.feedback=f;"
+    + "var scr=document.getElementById('fotocheck-reeks');var oud=scr.textContent;scr.textContent=JSON.stringify(kopie).replace(/</g,'\\u003c');"
+    + "var imgs=Array.prototype.slice.call(document.querySelectorAll('figure img')),srcs=imgs.map(function(i){return i.getAttribute('src');});imgs.forEach(function(i){i.removeAttribute('src');});"
+    + "var html='<!doctype html>\\n'+document.documentElement.outerHTML;"
+    + "imgs.forEach(function(i,k){i.setAttribute('src',srcs[k]);});scr.textContent=oud;"
+    + "var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=(P.bestand||'fotoreeks').replace(/\.html$/,'')+'-feedback.html';document.body.appendChild(a);a.click();document.body.removeChild(a);"
+    + "meld('Bestand met je feedback gedownload. Stuur het terug via Teams.');};"
+    + "})();";
+  function reviewSjabloon(pakket){
+    var json = JSON.stringify(pakket).replace(/</g, "\\u003c");
+    return '<!doctype html>\n<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+      + '<title>Fotoreeks ' + esc(pakket.hotel || "") + '</title><style>' + REVIEW_CSS + '</style></head><body>'
+      + '<script type="application/json" id="fotocheck-reeks">' + json + '<\/script>'
+      + '<div class="wrap"><h1>Fotoreeks ' + esc(pakket.hotel || "zonder hotelnaam") + '</h1>'
+      + '<p class="sub">' + pakket.fotos.length + ' foto\u2019s in de volgorde van de reeks \u00b7 gemaakt ' + esc(datumTekst(pakket.datum)) + '</p>'
+      + '<div class="uitleg">Zet je opmerkingen bij de foto\u2019s of onderaan bij Algemeen. Klik daarna op <b>Download met feedback</b> en stuur dat bestand terug via Teams, of kopieer de tekst. Je opmerkingen blijven in deze browser bewaard als je het bestand later weer opent.</div>'
+      + '<div class="grid" id="grid"></div>'
+      + '<div class="alg"><label for="alg">Algemeen</label><textarea id="alg" placeholder="Over de reeks als geheel: volgorde, wat mist, wat eruit kan"></textarea></div>'
+      + '<div class="alg"><label for="naam">Je naam</label><input type="text" id="naam" placeholder="Zodat duidelijk is van wie de feedback is"></div>'
+      + '<div class="knoppen"><button type="button" class="g" id="download">Download met feedback</button>'
+      + '<button type="button" class="p" id="kopieer">Kopieer feedback</button>'
+      + '<button type="button" id="teams">Open Teams</button></div>'
+      + '<p class="melding" id="melding"></p></div>'
+      + '<script>' + REVIEW_JS + '<\/script></body></html>';
+  }
+  function blobNaarDataUrl(blob){
+    return new Promise(function(r, x){ var fr = new FileReader(); fr.onload = function(){ r(fr.result); }; fr.onerror = x; fr.readAsDataURL(blob); });
+  }
+  async function maakReviewBestand(knop){
+    var reeks = reeksVolgorde().filter(function(it){ return it.blob || it.bestand; });
+    if(!reeks.length){ toast("Er zijn nog geen foto\u2019s in de reeks"); return; }
+    var oud = knop.innerHTML; knop.disabled = true; knop.textContent = "Bestand maken\u2026";
+    try{
+      // eerst optimaliseren wat nog te zwaar is, anders wordt het bestand onnodig groot
+      var teDoen = reeks.filter(function(it){ return problemen(it).length; });
+      for(var q=0;q<teDoen.length;q++){ toonVoortgang(q, teDoen.length, "Foto\u2019s optimaliseren\u2026 " + q + " van " + teDoen.length); await optimaliseer(teDoen[q]); }
+      toonVoortgang(0, reeks.length);
+      var fotos = [], bytes = 0;
+      for(var i=0;i<reeks.length;i++){
+        var it = reeks[i], bron = it.blob || it.bestand, pos = posVanFoto(it.id), r = REST.indexOf(it.id);
+        var data = await blobNaarDataUrl(bron); bytes += bron.size;
+        fotos.push({naam: downloadNaam(it), alt: it.alt || altVoorstel(it), cat: catVan(it), catLabel: CATS[catVan(it)] ? lbl(catVan(it)) : "",
+                    pos: pos !== -1 ? pos : (r !== -1 ? 5 + r : null), ext: it.ext || "jpg", data: data});
+        toonVoortgang(i+1, reeks.length);
+      }
+      var stempel = new Date().toISOString();
+      var basis = "fotoreeks-" + (slug(hotelNaam) || "arrangement");
+      var pakket = {soort: "fotocheck-reeks", versie: 1, id: basis + "-" + stempel.slice(0,16).replace(/[^0-9]/g, ""), bestand: basis + ".html",
+                    hotel: hotelNaam || "", datum: stempel, aantal: state.count, kenmerken: state.filters, eigen: state.eigen, fotos: fotos};
+      var html = reviewSjabloon(pakket);
+      await bewaarBlob(new Blob([html], {type: "text/html"}), basis + ".html");
+      toonVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
+      setTimeout(function(){ toonVoortgang(null); }, 1200);
+      laatsteReeks = {id: null, hotel: hotelNaam};
+      $("#deel-stand").innerHTML = "Reviewbestand gemaakt: <b>" + esc(basis + ".html") + "</b> (" + fotos.length + " foto\u2019s, " + (bytes/1048576).toFixed(1).replace(".", ",") + " MB). "
+        + "Stuur het via Teams. Komt het terug met feedback, sleep het dan in de tool.";
+      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
+    }catch(e){
+      toonVoortgang(null); toast("Het reviewbestand maken lukt niet");
+    }
+    knop.disabled = false; knop.innerHTML = oud;
+  }
+  $("#deel-bestand").addEventListener("click", function(){ maakReviewBestand(this); });
+
+  function pakketUitTekst(tekst){
+    var m = /<script type="application\/json" id="fotocheck-reeks">([\s\S]*?)<\/script>/.exec(tekst);
+    var raw = m ? m[1] : tekst;
+    try{ var p = JSON.parse(raw); return (p && p.soort === "fotocheck-reeks" && Array.isArray(p.fotos)) ? p : null; }catch(e){ return null; }
+  }
+  async function importeerReeks(file){
+    var tekst = await file.text();
+    var pakket = pakketUitTekst(tekst);
+    if(!pakket){ toast("Dit is geen reviewbestand van de Fotocheck"); return; }
+    if(OPT.length && !window.confirm("De foto\u2019s die nu in de tool staan worden vervangen door de reeks uit dit bestand. Doorgaan?")) return;
+    toonVoortgang(0, pakket.fotos.length, "Foto\u2019s inlezen\u2026");
+    var files = [], meta = [];
+    for(var i=0;i<pakket.fotos.length;i++){
+      var f = pakket.fotos[i];
+      try{
+        var blob = await (await fetch(f.data)).blob();
+        files.push(new File([blob], f.naam || ("foto-" + (i+1) + "." + (f.ext || "jpg")), {type: blob.type || "image/jpeg"}));
+        meta.push(f);
+      }catch(e){}
+      toonVoortgang(i+1, pakket.fotos.length);
+    }
+    await zetReeksInTool(pakket, files, meta);
+    var fbHost = $("#deel-feedback"), fb = pakket.feedback;
+    if(fbHost){
+      fbHost.innerHTML = fb ? '<p class="review-lbl">Feedback uit het bestand' + (fb.door ? ' van ' + esc(fb.door) : '') + (fb.datum ? ' \u00b7 ' + esc(datumTekst(fb.datum)) : '') + '</p>'
+          + (fb.algemeen ? '<div class="fb-item">' + esc(fb.algemeen) + '<small>hele reeks</small></div>' : '')
+          + (fb.perFoto || []).map(function(t, k){ return t ? '<div class="fb-item">' + esc(t) + '<small>foto ' + (k+1) + (meta[k] && meta[k].catLabel ? ' \u00b7 ' + esc(meta[k].catLabel) : '') + '</small></div>' : ''; }).join("")
+        : "";
+    }
+    toast(fb ? "Reeks en feedback ingelezen" : "Reeks ingelezen, " + files.length + " foto\u2019s");
   }
   $("#deel-bewaar").addEventListener("click", function(){ bewaarReeks(this); });
   $("#deel-teams").addEventListener("click", function(){
@@ -3159,6 +3295,12 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
       }catch(e){}
       toonVoortgang(i+1, fotos.length);
     }
+    await zetReeksInTool(b, files, meta);
+    laatsteReeks = {id: id, hotel: hotelNaam};
+    toast("Reeks geladen, " + files.length + " foto\u2019s");
+  }
+  // een reeks (uit de claude.ai-opslag of uit een reviewbestand) terug in de tool zetten
+  async function zetReeksInTool(b, files, meta){
     // leegmaken zoals bij resetten, maar de versie en de bewaarde reeksen blijven
     state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
     state.checks = {}; state.hoofd = 0; state.gebouwNiet = false;
@@ -3177,10 +3319,8 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
         if(f.cat && CATS[f.cat]){ state.pos[f.pos].cat = f.cat; state.pos[f.pos].autoCat = false; }
       } else { REST[f.pos - 5] = it.id; }
     });
-    laatsteReeks = {id: id, hotel: hotelNaam};
     herindexeer(); renderFilters(); renderCount(); renderBib(); renderAlles(); save();
     toonVoortgang(null);
-    toast("Reeks geladen, " + files.length + " foto\u2019s");
     var blok = $("#blok-fotos"); if(blok) window.scrollTo({top: blok.offsetTop - 20, behavior: "smooth"});
   }
   async function verwijderReeks(id){

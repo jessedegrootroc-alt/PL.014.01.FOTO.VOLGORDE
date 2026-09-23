@@ -57,21 +57,26 @@ de kop van het bestand, verander ze samen.
     positie blijft staan, het is alleen geen check meer die je moet afwerken.
     Kiezen, ordenen, optimaliseren, downloaden.
 
-  Wat versie 4 erbij heeft, alleen in de artifact-versie: **feedback vragen
-  zonder dat de pagina open moet blijven.** Bij 05 Techniek staat *Bewaar reeks
-  voor feedback*: de foto's gaan naar de opslag van de pagina (`assets`), de
-  samenstelling (hotel, kenmerken, posities, beschrijvingen) naar de gedeelde
-  database (`db`). Daarna staan *Deel via Teams* (opent het Teams-deelvenster
-  met een kant-en-klaar bericht en de link naar de tool) en *Kopieer bericht*
-  klaar. De collega opent de tool, kiest de reeks bovenaan onder **Bewaarde
-  reeksen**, ziet de foto's in volgorde met hun beschrijving en zet er feedback
-  bij, over de hele reeks of over één foto; die feedback komt live bij iedereen
-  die de reeks open heeft. Met *Openen in de tool* haalt wie mag bewerken de
-  hele reeks terug in de tool om hem aan te passen. Bewaren en verwijderen kan
-  alleen wie de pagina mag bewerken, bekijken en feedback geven kan iedereen in
-  de organisatie met toegang. Er gaat alleen iets naar de opslag als iemand op
-  bewaren klikt; de gewone flow zonder bewaren blijft in de browser. Draait de
-  tool als los bestand, dan is dit hele onderdeel onzichtbaar.
+  Wat versie 4 erbij heeft: **feedback vragen zonder dat de pagina open moet
+  blijven**, en zonder dat collega's iets anders nodig hebben dan een browser.
+  Bij 05 Techniek staat *Maak reviewbestand*. Dat maakt één HTML-bestand met de
+  foto's erin (te zware foto's worden eerst geoptimaliseerd), in de volgorde
+  van de reeks, met type en beschrijving per foto. Je stuurt het via Teams
+  (*Open Teams* zet een berichtje klaar, *Kopieer bericht* ook). De collega
+  opent het bestand in de browser, zet opmerkingen bij de foto's of bij
+  Algemeen, vult een naam in en klikt *Download met feedback*: hetzelfde
+  bestand, nu met de feedback erin. Onderweg blijven de opmerkingen in de
+  browser van de collega bewaard, ook als het bestand tussendoor dicht gaat.
+  Komt het bestand terug, sleep het dan in de tool (in de uploadzone van stap
+  01 of 05): de reeks staat er weer met posities, types en beschrijvingen, en de
+  feedback staat eronder bij Feedback vragen. Een reviewbestand van een reeks
+  van 12 foto's is grofweg 3 tot 5 MB.
+
+  Draait de tool in de claude.ai-artifact, dan staan daar bovenop *Bewaar bij
+  claude.ai* en het blok *Bewaarde reeksen*: dezelfde flow, maar dan met de
+  opslag van claude.ai (`assets` en `db`) in plaats van een bestand, met live
+  feedback en *Openen in de tool*. Dat werkt alleen voor wie de artifact kan
+  openen; het reviewbestand werkt voor iedereen.
 
   De CSS van versie 3 staat achter `html:is([data-versie="3"],[data-versie="4"])`,
   wat alleen voor versie 4 geldt achter `html[data-versie="4"]`; in het script
