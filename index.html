@@ -2956,7 +2956,18 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     if(!host || !blok) return;
     var aan = deelActief();
     host.hidden = !aan; blok.hidden = !aan;
-    if(!aan){ reeksenGeladen = false; return; }
+    if(!aan){
+      reeksenGeladen = false;
+      // buiten claude.ai (los bestand, eigen server) is er geen opslag; zeg dat in plaats van stil te blijven
+      var los = !metNummers() && !(window.claude && typeof window.claude.use === "function");
+      host.hidden = !los;
+      if(los){
+        $("#deel-bewaar").hidden = true; $("#deel-teams").hidden = true; $("#deel-kopieer").hidden = true;
+        $("#deel-stand").textContent = "Bewaren en delen via Teams werkt alleen in de claude.ai-versie van deze tool; daar hoort de opslag bij. Hier blijft alles in je browser.";
+      }
+      return;
+    }
+    $("#deel-stand").textContent = "";
     $("#deel-bewaar").hidden = !ASSETS;
     if(!ASSETS && !$("#deel-stand").textContent){
       $("#deel-stand").textContent = "Bewaren kan alleen wie deze pagina mag bewerken. Bekijken en feedback geven kan iedereen, onder Bewaarde reeksen bovenaan.";
