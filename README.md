@@ -144,6 +144,15 @@ Daarna http://localhost:8014 openen. Serveer het bestand via een server met
 ## Foto's optimaliseren
 
 Alles gebeurt in de browser, met canvas. Er gaat geen enkele foto naar een server.
+Het zware werk gebeurt al bij het toevoegen in stap 01: elke foto krijgt daar
+meteen een werkversie van maximaal 2400 px (een origineel van 20 MB wordt zo
+ruim 1 MB) en een miniatuur van 720 px die de tool overal toont. Zonder dat
+moest de browser de originelen bij elke tekenbeurt opnieuw decoderen en werd de
+pagina traag. Onder de uploadzone loopt daarbij een balk `Foto's klaarzetten`.
+Bij 05 werkt `Alles optimaliseren` verder op die werkversie tot de echte eisen
+(1920 px en 400 KB voor het hoofdbeeld, 1600 px en 250 KB voor de rest). Dat
+gaat snel, dus de balk houdt per foto even aan zodat je ziet wat er gebeurt;
+`Opnieuw controleren` loopt op dezelfde manier kort door de reeks.
 Foto's sla je los op, of samen met `Download afbeeldingen in zip`. Elke
 bestandsnaam begint (behalve in versie 4) met het volgnummer in de reeks, `01-`, `02-` enzovoort, zodat
 de map na het downloaden in de volgorde van de reeks staat: eerst foto 1 t/m 5,

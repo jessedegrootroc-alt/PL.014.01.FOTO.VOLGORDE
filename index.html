@@ -813,6 +813,9 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b><span class="uitgebreid"> of klik om ze te kiezen. Ze blijven in je browser, er wordt niets geüpload.</span></p>
         <input type="file" id="bib-files" multiple accept="image/*,.heic,.avif,.html,.json">
       </div>
+      <div class="zip-prog" id="bib-prog" hidden aria-live="polite">
+        <div class="progress"><i id="bib-fill"></i></div><span id="bib-lbl">0%</span>
+      </div>
       <div class="bib-grid" id="bib-grid"></div>
       <p class="bib-hint" id="bib-hint"></p>
     </div>
@@ -1409,6 +1412,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     for(var i=0;i<5;i++){ if(state.pos[i].fotoId === it.id) state.pos[i].fotoId = null; }
     if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
     URL.revokeObjectURL(it.bronUrl);
+    if(it.thumbUrl) URL.revokeObjectURL(it.thumbUrl);
     OPT = OPT.filter(function(x){ return x !== it; });
     herindexeer(); renderBib(); renderAlles(); save();
   }
@@ -1427,8 +1431,10 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       return '<div class="geenbeeld'+(klasse ? " "+klasse : "")+'" aria-hidden="true">'
         + esc(it.bezig ? it.bezig : (it.ext || "?").toUpperCase()) + '</div>';
     }
-    return '<img'+(klasse ? ' class="'+klasse+'"' : '')+' src="'+it.url+'" alt="">';
+    return '<img'+(klasse ? ' class="'+klasse+'"' : '')+' src="'+weergaveUrl(it)+'" alt="">';
   }
+  // in de tool zelf tonen we een miniatuur, het echte bestand blijft voor download en zip
+  function weergaveUrl(it){ return it.thumbUrl || it.url; }
   // libheif, alleen opgehaald zodra er echt een heic-bestand binnenkomt
   var HEIC_SCRIPT = "https://cdn.jsdelivr.net/npm/libheif-js@1.18.2/libheif-wasm/libheif-bundle.js";
   var heicMod = null, heicBezig = null;
@@ -1833,7 +1839,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         +   (i === nxt ? " volgende" : "")+'" data-i="'+i+'"'
         +   ' aria-label="Foto '+(i+1)+', '+esc(onder)+'">'
         + (toonbaar
-            ? '<img src="'+f.url+'" alt="">'
+            ? '<img src="'+weergaveUrl(f)+'" alt="">'
             : '<span class="mz-leeg"><b>Foto '+(i+1)+(i === 0 ? ", hoofdbeeld" : "")+'</b>'
               + '<span>'+esc(f ? f.naam : onder)+'</span></span>')
         + (i === 4 ? '<span class="mz-alle" aria-hidden="true">'
@@ -1946,7 +1952,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       el.setAttribute("data-i", String(i));
       el.innerHTML = '<p class="slot-n">Foto '+(i+6)+'</p>'
         + (f && f.kanTonen !== false
-            ? '<img src="'+f.url+'" alt="">'
+            ? '<img src="'+weergaveUrl(f)+'" alt="">'
             : '<div class="slot-leeg">'+esc(f ? f.naam : "Advies: " + wil.toLowerCase())+'</div>')
         + '<p class="slot-txt'+(pastNiet ? " let" : "")+'">'
         +   (f ? (pastNiet
@@ -2606,6 +2612,34 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     renderOpt();
   }
 
+  // Zware originelen maken de pagina traag: elke keer dat de kaarten opnieuw getekend worden,
+  // moet de browser ze opnieuw decoderen. Daarom krijgt elke foto meteen bij het toevoegen een
+  // werkversie van maximaal 2400 px (daar werkt de optimalisatie bij 05 verder op) en een
+  // miniatuur voor de weergave in de tool.
+  var WERK_BREEDTE = 2400, MINI_BREEDTE = 720;
+  async function zetKlaar(it, img){
+    if(it.kanTonen === false || it.fout) return;
+    try{
+      if(!img || !img.naturalWidth) img = await laadAfbeelding(it.url);
+      var type = it.alpha ? "image/png" : "image/jpeg";
+      if(img.naturalWidth > WERK_BREEDTE || kb(it.grootte) > 900){
+        var breedte = Math.min(WERK_BREEDTE, img.naturalWidth);
+        var werk = await naarBlob(tekenNaar(img, breedte), type, 0.86);
+        if(werk && werk.size < it.grootte){
+          if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
+          it.blob = werk; it.url = URL.createObjectURL(werk); it.grootte = werk.size;
+          it.breedte = breedte; it.hoogte = Math.round(img.naturalHeight * breedte / img.naturalWidth);
+          it.ext = it.alpha ? "png" : "jpg";
+          it.naam = it.naam.replace(/\.[^.]+$/, "") + "." + it.ext;
+        }
+      }
+      if(img.naturalWidth > MINI_BREEDTE){
+        var mini = await naarBlob(tekenNaar(img, MINI_BREEDTE), type, 0.82);
+        if(mini){ if(it.thumbUrl) URL.revokeObjectURL(it.thumbUrl); it.thumbUrl = URL.createObjectURL(mini); }
+      }
+    }catch(e){}
+  }
+
   function isReviewBestand(f){ return /\.(html?|json)$/i.test(f.name || "") || f.type === "text/html" || f.type === "application/json"; }
   async function voegToe(lijst){
     var bestanden = Array.prototype.slice.call(lijst), nieuw = [];
@@ -2615,9 +2649,10 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       await importeerReeks(review[0]);           // de reeks uit het bestand komt in de tool, met eventuele feedback
       if(!bestanden.length) return;
     }
-    for(var i=0;i<bestanden.length;i++){
-      var f = bestanden[i];
-      if(!/^image\//.test(f.type) && ["heic","avif","webp"].indexOf(extVan(f.name)) === -1) continue;
+    var fotos = bestanden.filter(function(f){ return /^image\//.test(f.type) || ["heic","avif","webp"].indexOf(extVan(f.name)) !== -1; });
+    if(fotos.length) toonVoortgang(0, fotos.length, "Foto\u2019s klaarzetten \u00b7 0 van " + fotos.length, "bib");
+    for(var i=0;i<fotos.length;i++){
+      var f = fotos[i], img = null;
       var url = URL.createObjectURL(f);
       var it = {id:++optId, bestand:f, naam:f.name, ext:extVan(f.name), grootte:f.size, breedte:0, hoogte:0,
                 url:url, bronUrl:url, alpha:false, alt:"", fout:null, geoptimaliseerd:false, blob:null,
@@ -2626,7 +2661,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       OPT.push(it); nieuw.push(it);
       herindexeer();
       try{
-        var img = await laadAfbeelding(url);
+        img = await laadAfbeelding(url);
         it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
         it.alpha = (["png","webp","avif"].indexOf(it.ext) !== -1) && heeftTransparantie(img);
         it.kanTonen = true;
@@ -2644,7 +2679,13 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         it.bezig = null;
         if(!gelukt) it.fout = foutTekst(it);
       }
+      await zetKlaar(it, img);
+      toonVoortgang(i+1, fotos.length, "Foto\u2019s klaarzetten \u00b7 " + (i+1) + " van " + fotos.length, "bib");
       renderOpt(); renderBib();
+    }
+    if(fotos.length){
+      toonVoortgang(fotos.length, fotos.length, "Klaar \u00b7 100%", "bib");
+      setTimeout(function(){ toonVoortgang(null, 0, "", "bib"); }, 1200);
     }
     renderAlles();
     if(SAMPLE) herkenMetClaude(nieuw);   // alleen in de artifact, en alleen voor namen die niets zeggen
@@ -2794,14 +2835,16 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     return new Blob(delen.concat(centraal, [eind]), {type:"application/zip"});
   }
 
-  function toonVoortgang(n, totaal, tekst){
-    var host = $("#zip-prog"); if(!host) return;
+  function toonVoortgang(n, totaal, tekst, waar){
+    waar = waar || "zip";
+    var host = $("#" + waar + "-prog"); if(!host) return;
     if(n === null){ host.hidden = true; return; }
     var pct = totaal ? Math.round((n/totaal)*100) : 0;
     host.hidden = false;
-    $("#zip-fill").style.width = pct + "%";
-    $("#zip-lbl").textContent = tekst || (n + " van " + totaal + " \u00b7 " + pct + "%");
+    $("#" + waar + "-fill").style.width = pct + "%";
+    $("#" + waar + "-lbl").textContent = tekst || (n + " van " + totaal + " \u00b7 " + pct + "%");
   }
+  function wacht(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
   async function downloadAlles(knop){
     if(!OPT.length) return;
     var oud = knop.innerHTML;
@@ -3479,7 +3522,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     // leegmaken zoals bij resetten, maar de versie en de bewaarde reeksen blijven
     state.pos = [leegPos(),leegPos(),leegPos(),leegPos(),leegPos()];
     state.checks = {}; state.hoofd = 0; state.gebouwNiet = false;
-    OPT.forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); });
+    OPT.forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); if(it.thumbUrl) URL.revokeObjectURL(it.thumbUrl); });
     OPT = []; REST = []; openKaart = null;
     hotelNaam = b.hotel || ""; $("#hotelnaam").value = hotelNaam;
     state.filters = Array.isArray(b.kenmerken) ? b.kenmerken : []; state.eigen = Array.isArray(b.eigen) ? b.eigen : [];
@@ -3545,13 +3588,20 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
   $("#opt-alles").addEventListener("click", async function(){
     var b = this; b.disabled = true; b.textContent = "Bezig…";
     var teDoen = reeksFotos().filter(function(it){ return problemen(it).length; });
-    if(teDoen.length) toonVoortgang(0, teDoen.length);
-    for(var i=0;i<teDoen.length;i++){
-      await optimaliseer(teDoen[i]);
-      toonVoortgang(i+1, teDoen.length);
+    var lijst = teDoen.length ? teDoen : reeksFotos(), woord = teDoen.length ? "Optimaliseren" : "Controleren";
+    // de foto's zijn bij het toevoegen al klaargezet, dus dit gaat snel; de balk houdt
+    // per foto even aan zodat je ziet wat er gebeurt
+    var perFoto = teDoen.length ? 420 : 140;
+    if(lijst.length) toonVoortgang(0, lijst.length, woord + " \u00b7 0 van " + lijst.length);
+    for(var i=0;i<lijst.length;i++){
+      var t0 = Date.now();
+      if(teDoen.length) await optimaliseer(lijst[i]);
+      var rest = perFoto - (Date.now() - t0);
+      if(rest > 0) await wacht(rest);
+      toonVoortgang(i+1, lijst.length, woord + " \u00b7 " + (i+1) + " van " + lijst.length + " \u00b7 " + Math.round(((i+1)/lijst.length)*100) + "%");
     }
-    if(teDoen.length){
-      toonVoortgang(teDoen.length, teDoen.length, "Klaar \u00b7 100%");
+    if(lijst.length){
+      toonVoortgang(lijst.length, lijst.length, "Klaar \u00b7 100%");
       setTimeout(function(){ toonVoortgang(null); }, 1200);
     }
     b.disabled = false; renderOpt(); renderSamenvatting();
@@ -3637,6 +3687,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     OPT.forEach(function(it){
       if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url);
       URL.revokeObjectURL(it.bronUrl);
+      if(it.thumbUrl) URL.revokeObjectURL(it.thumbUrl);
     });
     OPT = [];
     REST = [];
