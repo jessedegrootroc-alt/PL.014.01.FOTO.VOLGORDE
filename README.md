@@ -66,7 +66,11 @@ de kop van het bestand, verander ze samen.
   blijven**, en zonder dat collega's iets anders nodig hebben dan een browser.
   Bij 05 Techniek staat *Maak reviewbestand*. Dat maakt één HTML-bestand met de
   foto's erin (te zware foto's worden eerst geoptimaliseerd), in de volgorde
-  van de reeks. Je stuurt het via Teams; de collega heeft alleen een browser
+  van de reeks. De bestandsnaam volgt hotel en arrangement uit stap 00, bijvoorbeeld
+  `fotoreeks-kasteel-winselerhof-wellnessweekend-met-diner.html`, en de zip heet
+  `fotos-kasteel-winselerhof-wellnessweekend-met-diner.zip`, zodat tien of twintig
+  reeksen op een dag uit elkaar te houden blijven; het arrangement staat ook in
+  de titel van het bestand en komt bij inlezen weer in het veld terug. Je stuurt het via Teams; de collega heeft alleen een browser
   nodig. Het bestand is bewust kaal: één zin uitleg, het voorbeeld zoals de
   gast het op de detailpagina ziet (foto 1 groot, 2 t/m 5 ernaast) met vier
   aandachtspunten eronder (foto 1 is het droombeeld, 2 t/m 5 hotel, kamer en
