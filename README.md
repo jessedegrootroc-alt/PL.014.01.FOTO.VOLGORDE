@@ -42,10 +42,24 @@ de kop van het bestand, verander ze samen.
   erachter verhuist naar de tooltip van het adviesblok. Tekst die alleen in de
   uitgebreide versies hoort staat in de markup in een `span.uitgebreid`.
 
-- **Versie 4** is op dit moment een exacte kopie van versie 3, bedoeld om
-  verder op te bouwen zonder versie 3 te raken. De CSS van versie 3 staat
-  achter `html:is([data-versie="3"],[data-versie="4"])`, dus alles wat je
-  alleen voor versie 4 wilt zet je achter `html[data-versie="4"]`.
+- **Versie 4** is versie 3 zonder controlestap, gebouwd op feedback van de
+  backoffice: de feedback op de fotoselectie komt in de praktijk pas nadat het
+  pakket in het CMS staat, de volgorde verandert dan nog wel eens en er komen
+  op pakketniveau foto's bij. Een extra controlemoment vooraf vertraagt het
+  aanmaken alleen maar. Daarom in versie 4:
+  - **geen volgnummer in de bestandsnaam**: de naam is alleen de beschrijving,
+    dus een latere andere volgorde of een extra foto maakt geen enkele naam
+    fout. De zip staat nog wel in de volgorde van de reeks, en elk bestand
+    krijgt een oplopende tijd, zodat sorteren op datum in de map dezelfde
+    volgorde geeft;
+  - **geen Klopt / Afwijking / N.v.t.**, geen blok Visuele kwaliteit, geen
+    Overzicht onderaan en geen controlepunt bij Techniek. Het advies per
+    positie blijft staan, het is alleen geen check meer die je moet afwerken.
+    Kiezen, ordenen, optimaliseren, downloaden.
+
+  De CSS van versie 3 staat achter `html:is([data-versie="3"],[data-versie="4"])`,
+  wat alleen voor versie 4 geldt achter `html[data-versie="4"]`; in het script
+  is `metNummers()` het enige onderscheid.
 
 Alles wat geen versie 1 is deelt dezelfde opbouw, dus de CSS daarvoor staat
 achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een
@@ -99,7 +113,7 @@ Daarna http://localhost:8014 openen. Serveer het bestand via een server met
 
 Alles gebeurt in de browser, met canvas. Er gaat geen enkele foto naar een server.
 Foto's sla je los op, of samen met `Download afbeeldingen in zip`. Elke
-bestandsnaam begint met het volgnummer in de reeks, `01-`, `02-` enzovoort, zodat
+bestandsnaam begint (behalve in versie 4) met het volgnummer in de reeks, `01-`, `02-` enzovoort, zodat
 de map na het downloaden in de volgorde van de reeks staat: eerst foto 1 t/m 5,
 dan de rest van de reeks. Blok 05 toont de foto's in dezelfde volgorde. De zip bevat
 alleen de foto's; de beschrijvingen staan in blok 05 bij elke foto. Tijdens het

@@ -452,6 +452,15 @@ html[data-versie="1"] #chip-fotos{display:none}
   border:1px solid var(--line); display:block; background:var(--na-bg)}
 .fkies-klein .mini-link{font-size:12.5px}
 html:not([data-versie="1"]) .card.open{border-color:var(--accent)}
+
+/* versie 4: geen controlestap. De backoffice krijgt de feedback op de selectie toch pas na het
+   aanmaken in het CMS, dus hier alleen kiezen, ordenen, optimaliseren en downloaden. */
+html[data-versie="4"] .seg,
+html[data-versie="4"] .c-note,
+html[data-versie="4"] .verdictline + .c-sub,
+html[data-versie="4"] section[aria-labelledby="h4a"],
+html[data-versie="4"] [data-rows="techniek"],
+html[data-versie="4"] .overview{display:none}
 .fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
 .fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
@@ -1790,7 +1799,11 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     return uit;
   }
   // bestandsnaam met volgnummer, zodat de map na het downloaden op volgorde van de reeks staat
+  // versie 4 zet geen volgnummer voor de naam: de volgorde verandert later in het CMS nog wel eens,
+  // en er komen op pakketniveau foto's bij, dan gaan nummers in de naam liegen
+  function metNummers(){ return document.documentElement.getAttribute("data-versie") !== "4"; }
   function downloadNaam(it){
+    if(!metNummers()) return it.naam;
     var n = reeksVolgorde().indexOf(it);
     return (n === -1 ? "" : (n < 9 ? "0" : "") + (n+1) + "-") + it.naam;
   }
@@ -2615,7 +2628,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     $("#ai-uitleg").hidden = !SAMPLE || !lijst.length;
     $("#opt-hint").textContent = lijst.some(function(it){ return it.geoptimaliseerd; })
       ? "Sla foto's los op met de knop ernaast, of alles samen met Download afbeeldingen in zip."
-      : (lijst.length ? "Met Download afbeeldingen in zip haal je de hele reeks in één keer binnen, op volgorde genummerd." : "");
+      : (lijst.length ? "Met Download afbeeldingen in zip haal je de hele reeks in één keer binnen" + (metNummers() ? ", op volgorde genummerd." : ", in de volgorde van de reeks.") : "");
   }
 
 
@@ -2647,8 +2660,9 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
   }
   async function maakZip(bestanden){
     // bestanden: [{naam, data:Uint8Array}] — opgeslagen zonder compressie
-    var nu = dosTijd(new Date()), delen = [], centraal = [], offset = 0;
-    bestanden.forEach(function(f){
+    var start = Date.now() - bestanden.length * 60000, delen = [], centraal = [], offset = 0;
+    bestanden.forEach(function(f, i){
+      var nu = dosTijd(new Date(start + i * 60000));   // oplopende tijd, dan klopt sorteren op datum ook
       var naam = new TextEncoder().encode(f.naam);
       var crc = crc32(f.data), n = f.data.length;
       var kop = schrijf(30 + naam.length, function(v, b){
@@ -3057,7 +3071,7 @@ html:not([data-versie="1"]) .movers [data-act="down"]{order:3}
     {id:"1", naam:"Versie 1", uitleg:"Hoge kaarten, zijpaneel rechts"},
     {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"},
     {id:"3", naam:"Versie 3", uitleg:"Minimaal, alleen wat je nodig hebt"},
-    {id:"4", naam:"Versie 4", uitleg:"Kopie van versie 3, om verder op te bouwen"}
+    {id:"4", naam:"Versie 4", uitleg:"Snel voorbereiden: geen controlestap, geen nummers in de naam"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
   var STANDAARD_VERSIE = "3";        // waarmee een nieuwe browser begint
