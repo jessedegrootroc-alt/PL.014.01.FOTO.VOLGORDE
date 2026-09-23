@@ -21,7 +21,12 @@ de kop van het bestand, verander ze samen.
   en de status staan daaronder, links uitgelijnd. Alleen de kaart die aan de
   beurt is (de eerste zonder foto) toont die strook. Kies je een foto, dan
   klapt de kaart in tot een kleine weergave van die foto en gaat de volgende
-  open. Met *Andere foto kiezen* of *Foto kiezen* klap je een kaart weer uit. Een foto staat op maximaal één positie: zodra hij
+  open. Met *Andere foto kiezen* of *Foto kiezen* klap je een kaart weer uit.
+  Het voorbeeld van de detailpagina (de eerste foto groot, de volgende vier
+  ernaast) blijft daarbij bovenaan het scherm plakken, zodat je bij elke keuze
+  live ziet of de foto in de collage past. Klik op een vlak in dat voorbeeld
+  en die kaart gaat open, net onder het voorbeeld. In versie 4 zijn de strook
+  met vijf tegels en de voortgangsbalk weg, het voorbeeld zegt hetzelfde. Een foto staat op maximaal één positie: zodra hij
   ergens staat, bij de eerste 5 of in de rest van de reeks, verdwijnt hij uit
   de keuzerij van de andere posities. Haal je hem weg, dan komt hij terug.
   Kies je een foto, dan vult de tool
