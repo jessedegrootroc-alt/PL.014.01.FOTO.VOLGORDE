@@ -23,7 +23,7 @@ de kop van het bestand, verander ze samen.
   klapt de kaart in tot een kleine weergave van die foto en gaat de volgende
   open. Met *Andere foto kiezen* of *Foto kiezen* klap je een kaart weer uit.
   Het voorbeeld van de detailpagina (de eerste foto groot, de volgende vier
-  ernaast) blijft daarbij bovenaan het scherm plakken, zodat je bij elke keuze
+  ernaast, op volle breedte) blijft daarbij bovenaan het scherm plakken, zodat je bij elke keuze
   live ziet of de foto in de collage past. Klik op een vlak in dat voorbeeld
   en die kaart gaat open, net onder het voorbeeld. In versie 4 zijn de strook
   met vijf tegels en de voortgangsbalk weg, het voorbeeld zegt hetzelfde. Een foto staat op maximaal één positie: zodra hij
@@ -104,7 +104,7 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   waarna de tool adviseert wat de volgende foto het beste kan zijn. Het advies houdt
   rekening met wat al gebruikt is, of de omgeving al zichtbaar is, en of het gebouw
   aantrekkelijk genoeg is.
-- **Rest van de reeks** in versie 2: een slider met een plek per foto vanaf foto 6.
+- **Rest van de reeks** in versie 2: een raster van drie plekken per rij, een plek per foto vanaf foto 6; de rest loopt door op de volgende rij, er hoeft niet naar rechts gescrold te worden.
   Het aantal plekken volgt de teller van 8 tot 14. Per plek zegt de tool wat er
   hoort, hotelbeeld of omgeving, en bij een foto die daar niet bij past kleurt de
   plek oranje met de reden. Klikken op een foto onder de slider zet hem op de
