@@ -66,22 +66,24 @@ de kop van het bestand, verander ze samen.
   blijven**, en zonder dat collega's iets anders nodig hebben dan een browser.
   Bij 05 Techniek staat *Maak reviewbestand*. Dat maakt één HTML-bestand met de
   foto's erin (te zware foto's worden eerst geoptimaliseerd), in de volgorde
-  van de reeks, met type en beschrijving per foto. Je stuurt het via Teams
-  (*Open Teams* zet een berichtje klaar, *Kopieer bericht* ook). De collega
-  opent het bestand in de browser en ziet bovenaan hoe de reeks op de
-  detailpagina komt (de eerste foto groot, de volgende vier ernaast). Ze kan
-  de volgorde aanpassen met de pijlen, een foto vervangen, verwijderen of
-  toevoegen (nieuwe foto's worden in het bestand verkleind tot 2000 px), en
-  opmerkingen zetten bij losse foto's of bij Algemeen. *Download met
-  feedback* geeft hetzelfde bestand terug met de nieuwe reeks en de
-  opmerkingen erin. De opmerkingen blijven ook in haar browser bewaard als het
-  bestand tussendoor dicht gaat; een nieuwe volgorde of nieuwe foto's komen
-  alleen mee in het gedownloade bestand. Komt het bestand terug, sleep het dan
-  in de tool (uploadzone van stap 01 of 05): de reeks staat er weer in de
-  nieuwe volgorde, met posities, types (voor nieuwe foto's uit de
-  bestandsnaam) en beschrijvingen, en onder Feedback vragen staat wat er is
-  veranderd en welke opmerkingen erbij zijn gezet. Een reviewbestand van een
-  reeks van 12 foto's is grofweg 3 tot 5 MB.
+  van de reeks. Je stuurt het via Teams; de collega heeft alleen een browser
+  nodig. Het bestand is bewust kaal: één zin uitleg, het voorbeeld zoals de
+  gast het op de detailpagina ziet (foto 1 groot, 2 t/m 5 ernaast) met vier
+  aandachtspunten eronder (foto 1 is het droombeeld, 2 t/m 5 hotel, kamer en
+  includes, geen dubbele beelden, één sfeer en licht), en daaronder alle
+  foto's op volgorde. Per foto kan de collega schuiven (‹ ›), vervangen of
+  verwijderen, en met *+ Foto toevoegen* een foto achteraan zetten; dat zijn
+  de feedback voor die foto. Een tekstveld per foto zit achter een klein
+  linkje *Opmerking*, alleen voor wat de collega niet zelf kan oplossen.
+  Onderaan staat één oordeel, *Akkoord, kan zo live* of *Nog niet akkoord*,
+  met een optionele toelichting en de naam, en één hoofdknop *Download en
+  stuur terug*; zonder oordeel gaat de download niet. *Kopieer als tekst* is
+  er voor een snel antwoord in Teams, maar een nieuwe volgorde of nieuwe
+  foto's zitten alleen in het gedownloade bestand. Komt het bestand terug,
+  sleep het dan in de uploadzone: de reeks staat er in de nieuwe volgorde,
+  nieuwe en vervangen foto's krijgen een type uit de bestandsnaam, en onder
+  *Feedback vragen* staat het oordeel (groen of oranje), wat er is aangepast
+  en de opmerkingen per foto.
 
   Draait de tool in de claude.ai-artifact, dan staan daar bovenop *Bewaar bij
   claude.ai* en het blok *Bewaarde reeksen*: dezelfde flow, maar dan met de

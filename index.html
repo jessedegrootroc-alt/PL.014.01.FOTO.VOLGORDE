@@ -496,6 +496,8 @@ html[data-versie="4"] .overview{display:none}
 .fb-rij{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 #deel-feedback:not(:empty){margin-top:10px}
 #deel-feedback .fb-item{background:var(--surface)}
+.fb-item.fb-ok{border-color:var(--ok-line); background:var(--ok-bg); color:var(--ok); font-weight:600}
+.fb-item.fb-niet{border-color:var(--dev-line); background:var(--dev-bg); color:var(--dev); font-weight:600}
 .fpick{position:relative; min-width:0; padding:0; border:1px solid var(--line); border-radius:var(--r);
   background:var(--surface); cursor:pointer; line-height:0}
 .fpick img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block}
@@ -916,7 +918,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
             <div class="progress"><i id="zip-fill"></i></div><span id="zip-lbl">0%</span>
           </div>
           <div class="deel" id="deel" hidden>
-            <div class="deel-kop"><b>Feedback vragen</b><span>Maak een reviewbestand en stuur het via Teams. Je collega opent het in de browser, zet er opmerkingen bij en stuurt het terug. Sleep dat bestand hier in de tool en de reeks staat er weer, met de feedback erbij.</span></div>
+            <div class="deel-kop"><b>Feedback vragen</b><span>Stuur de reeks als bestand naar een collega. Die opent het in de browser, past aan wat beter kan, kiest akkoord of nog niet, en stuurt het terug. Sleep het hier weer in en je ziet het oordeel en de aanpassingen.</span></div>
             <div class="deel-knoppen">
               <button class="btn btn-primary" id="deel-bestand" type="button">Maak reviewbestand</button>
               <button class="btn" id="deel-teams" type="button" hidden>Open Teams</button>
@@ -3097,34 +3099,41 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     if(laatsteReeks && laatsteReeks.id){
       return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
     }
-    return "Fotoreeks " + h + " staat klaar voor feedback, zie het bijgevoegde bestand. Open het in je browser, zet je opmerkingen erbij en stuur het terug.";
+    return "Wil je de fotoreeks van " + h + " bekijken? Zie het bijgevoegde bestand. Open het in je browser, pas aan wat beter kan, kies akkoord of nog niet, en stuur het bestand terug.";
   }
 
   /* ---------- reviewbestand: een los HTML-bestand met de foto's erin, dat overal opent ----------
      Collega's hebben geen claude.ai nodig, alleen een browser. Ze zetten er hun opmerkingen bij,
      downloaden het bestand opnieuw en sturen het terug; de tool leest het weer in, met feedback. */
   var REVIEW_CSS = "body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1c1b19;background:#faf9f7}"
-    + ".wrap{max-width:1140px;margin:0 auto;padding:24px 16px 60px}h1{font-size:24px;margin:0 0 4px}.sub{color:#6b6660;margin:0 0 18px;font-size:14px}"
-    + ".uitleg{background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:12px 14px;font-size:14px;margin:0 0 18px}"
-    + ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}"
-    + "figure{margin:0;background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}"
-    + "figure img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;display:block;background:#eee}"
-    + "figcaption{font-size:13px;color:#6b6660}figcaption b{color:#1c1b19;font-size:14px}"
-    + "textarea{width:100%;box-sizing:border-box;min-height:64px;border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;resize:vertical;background:#fff}"
-    + "textarea:focus{outline:2px solid #fb862c;outline-offset:1px}.alg{margin-top:22px}.alg textarea{min-height:110px}"
-    + "label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:0 0 6px}"
-    + "input[type=text]{border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;width:min(360px,100%);background:#fff}"
-    + ".knoppen{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:sticky;bottom:0;background:#faf9f7;padding:12px 0}"
-    + "button{border:1px solid #d9d4cd;background:#fff;border-radius:8px;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}"
-    + "button.p{background:#fb862c;border-color:#fb862c;color:#fff}button.g{background:#00b67e;border-color:#00b67e;color:#fff}"
-    + ".melding{font-size:13px;color:#6b6660;margin:8px 0 0;min-height:1.2em}"
-    + ".lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:18px 0 8px}.lbl span{font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px}"
-    + ".rij{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.rij .lbl{margin-bottom:6px}.rij button{padding:6px 10px;font-size:13px}"
+    + ".wrap{max-width:1140px;margin:0 auto;padding:28px 16px 80px}h1{font-size:26px;margin:0 0 2px;letter-spacing:-.01em}.sub{color:#6b6660;margin:0 0 14px;font-size:14px}"
+    + ".intro{font-size:15px;margin:0 0 6px;max-width:70ch}"
+    + ".lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:22px 0 8px}.lbl span{font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px}"
+    + ".let{display:flex;flex-wrap:wrap;gap:4px 22px;margin:10px 0 0;padding:0;list-style:none;font-size:13.5px;color:#4a4642}"
+    + ".let li::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#fb862c;margin-right:8px;vertical-align:middle}"
     + ".mozaiek{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border-radius:12px;overflow:hidden}"
     + ".mz{position:relative;aspect-ratio:4/3;background:#e9e6e1}.mz.groot{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}"
     + ".mz img{width:100%;height:100%;object-fit:cover;display:block}.mz span{position:absolute;left:8px;top:8px;background:rgba(20,20,20,.75);color:#fff;font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}"
+    + ".rij{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}.rij .lbl{margin-bottom:0}.rij button{padding:6px 10px;font-size:13px}"
+    + ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px;margin-top:10px}"
+    + "figure{margin:0;background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}"
+    + "figure.anders{border-color:#fb862c}"
+    + "figure img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;display:block;background:#eee}"
     + ".kop{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}.acties{display:flex;gap:4px}.acties button{padding:3px 8px;font-size:13px;line-height:1.2}"
-    + "figcaption i{color:#c96a12;font-style:normal;font-weight:600}"
+    + "figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#6b6660;min-height:1.5em}figcaption i{color:#c96a12;font-style:normal;font-weight:600}"
+    + ".opm{border:0;background:none;color:#8a847c;font-size:12.5px;padding:0;text-decoration:underline;cursor:pointer;font-weight:500;white-space:nowrap}.opm:hover{color:#1c1b19}"
+    + "textarea{width:100%;box-sizing:border-box;min-height:64px;border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;resize:vertical;background:#fff}"
+    + "textarea:focus,input:focus{outline:2px solid #fb862c;outline-offset:1px}"
+    + ".oordeel{margin-top:32px;background:#fff;border:1px solid #e6e2dc;border-radius:10px;padding:16px 18px 18px}.oordeel .lbl{margin-top:0}"
+    + ".keuze{display:flex;gap:8px;flex-wrap:wrap}.keuze button{flex:1 1 200px;padding:12px 14px;font-size:14.5px}"
+    + ".keuze button[aria-pressed=true]{color:#fff}.keuze button[data-o=akkoord][aria-pressed=true]{background:#00b67e;border-color:#00b67e}.keuze button[data-o=niet][aria-pressed=true]{background:#c96a12;border-color:#c96a12}"
+    + ".velden{display:grid;gap:14px;margin-top:16px}.velden textarea{min-height:90px}"
+    + "label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#8a847c;margin:0 0 6px}label span{font-weight:500;text-transform:none;letter-spacing:0}"
+    + "input[type=text]{border:1px solid #d9d4cd;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;width:min(360px,100%);background:#fff;box-sizing:border-box}"
+    + ".knoppen{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;position:sticky;bottom:0;background:#faf9f7;padding:12px 0}"
+    + "button{border:1px solid #d9d4cd;background:#fff;border-radius:8px;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;color:#1c1b19}button:hover{border-color:#8a847c}"
+    + "button.g{background:#141414;border-color:#141414;color:#fff}button.g:hover{background:#000}"
+    + ".melding{font-size:13px;color:#6b6660;margin:6px 0 0;min-height:1.2em}.klein{font-size:12.5px;color:#8a847c;margin:4px 0 0}"
     + "@media(max-width:640px){.mozaiek{grid-template-columns:repeat(2,minmax(0,1fr))}.mz.groot{grid-column:span 2;grid-row:auto;aspect-ratio:4/3}}";
   // Dit draait in het reviewbestand, niet in de tool. Het wordt met toString() in het bestand gezet,
   // dus het mag nergens op de tool leunen: alleen wat hier binnen staat bestaat daar.
@@ -3133,17 +3142,18 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     P.fotos.forEach(function(f, i){ if(!f.id) f.id = "f" + i; });
     var F = P.fotos.slice().sort(function(a, b){ return (a.pos == null ? 99 : a.pos) - (b.pos == null ? 99 : b.pos); });
     var origineel = F.map(function(f){ return f.id; });
-    var fb = {door: "", algemeen: "", perFoto: {}};
+    var fb = {door: "", algemeen: "", oordeel: "", perFoto: {}};
+    var open = {};                                 // foto's waarbij het opmerkingenveld is opengeklapt
     var sleutel = "fotocheck-review-" + (P.id || "");
     function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]; }); }
     function el(id){ return document.getElementById(id); }
     function meld(t){ el("melding").textContent = t; }
 
-    // eerder getypte opmerkingen: uit dit bestand (teruggestuurd) of uit de eigen browser (concept)
+    // eerder getypte tekst: uit dit bestand (teruggestuurd) of uit de eigen browser (concept)
     (function laad(){
       var c = null; try{ c = JSON.parse(localStorage.getItem(sleutel) || "null"); }catch(e){}
       var bron = c || P.feedback || null; if(!bron) return;
-      fb.door = bron.door || ""; fb.algemeen = bron.algemeen || "";
+      fb.door = bron.door || ""; fb.algemeen = bron.algemeen || ""; fb.oordeel = bron.oordeel || "";
       if(Array.isArray(bron.perFoto)) bron.perFoto.forEach(function(t, i){ if(t && F[i]) fb.perFoto[F[i].id] = t; });
       else fb.perFoto = bron.perFoto || {};
     })();
@@ -3154,20 +3164,24 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         return '<div class="mz' + (i === 0 ? ' groot' : '') + '"><img src="' + f.data + '" alt=""><span>' + (i + 1) + '</span></div>';
       }).join("");
       el("grid").innerHTML = F.map(function(f, i){
-        return '<figure data-id="' + f.id + '">'
+        var t = fb.perFoto[f.id] || "", toon = open[f.id] || t.trim();
+        return '<figure data-id="' + f.id + '"' + ((f.nieuw || f.vervangen) ? ' class="anders"' : '') + '>'
           + '<div class="kop"><b>Foto ' + (i + 1) + (i === 0 ? ', hoofdbeeld' : '') + '</b><span class="acties">'
           + '<button type="button" data-act="links" title="Naar voren"' + (i === 0 ? ' disabled' : '') + '>&#8249;</button>'
           + '<button type="button" data-act="rechts" title="Naar achteren"' + (i === F.length - 1 ? ' disabled' : '') + '>&#8250;</button>'
           + '<button type="button" data-act="vervang" title="Vervangen door een andere foto">Vervang</button>'
           + '<button type="button" data-act="weg" title="Uit de reeks halen">&times;</button></span></div>'
           + '<img src="' + f.data + '" alt="">'
-          + '<figcaption>' + (f.catLabel ? esc(f.catLabel) + '<br>' : '') + esc(f.alt || '')
-          + (f.nieuw ? '<br><i>nieuw toegevoegd</i>' : (f.vervangen ? '<br><i>vervangen</i>' : '')) + '</figcaption>'
-          + '<textarea data-fb="' + f.id + '" placeholder="Opmerking bij foto ' + (i + 1) + ' (optioneel)">' + esc(fb.perFoto[f.id] || '') + '</textarea>'
+          + '<figcaption><span>' + (f.nieuw ? '<i>nieuw</i>' : (f.vervangen ? '<i>vervangen</i>' : esc(f.catLabel || ''))) + '</span>'
+          + (toon ? '' : '<button type="button" class="opm" data-opm="' + f.id + '">Opmerking</button>') + '</figcaption>'
+          + (toon ? '<textarea data-fb="' + f.id + '" placeholder="Wat moet er met deze foto anders?">' + esc(t) + '</textarea>' : '')
           + '</figure>';
       }).join("");
       el("naam").value = fb.door; el("alg").value = fb.algemeen;
       el("teller").textContent = F.length + (F.length === 1 ? " foto" : " foto’s");
+      Array.prototype.forEach.call(el("keuze").querySelectorAll("button"), function(b){
+        b.setAttribute("aria-pressed", b.getAttribute("data-o") === fb.oordeel ? "true" : "false");
+      });
     }
 
     // nieuwe foto's: verkleinen tot 2000 px breed, anders wordt het bestand veel te groot
@@ -3192,6 +3206,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       });
     }
     el("grid").addEventListener("click", async function(e){
+      var o = e.target.closest("button[data-opm]");
+      if(o){ open[o.getAttribute("data-opm")] = true; render(); var ta = document.querySelector('textarea[data-fb="' + o.getAttribute("data-opm") + '"]'); if(ta) ta.focus(); return; }
       var b = e.target.closest("button[data-act]"); if(!b) return;
       var id = b.closest("figure").getAttribute("data-id"), i = -1;
       F.forEach(function(f, k){ if(f.id === id) i = k; });
@@ -3213,7 +3229,11 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         var data = await verklein(files[k]);
         if(data){ F.push({id: "n" + Date.now() + "-" + k, naam: files[k].name, alt: "", cat: null, catLabel: "", data: data, nieuw: true}); n++; }
       }
-      render(); if(n) meld(n + (n === 1 ? " foto toegevoegd" : " foto’s toegevoegd") + ", achteraan in de reeks. Schuif hem met de pijlen op zijn plek.");
+      render(); if(n) meld(n + (n === 1 ? " foto toegevoegd" : " foto’s toegevoegd") + ", achteraan. Schuif hem met de pijlen op zijn plek.");
+    });
+    el("keuze").addEventListener("click", function(e){
+      var b = e.target.closest("button[data-o]"); if(!b) return;
+      fb.oordeel = b.getAttribute("data-o"); bewaarConcept(); render(); meld("");
     });
     document.addEventListener("input", function(e){
       var t = e.target; if(!t) return;
@@ -3242,27 +3262,33 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       if(w.verwijderd) d.push(w.verwijderd + " verwijderd");
       return d.join(", ");
     }
+    function oordeelTekst(w){
+      if(fb.oordeel === "akkoord") return wijzigingenTekst(w) ? "Akkoord met de aanpassingen in het bestand" : "Akkoord, kan zo live";
+      if(fb.oordeel === "niet") return "Nog niet akkoord";
+      return "";
+    }
     function tekst(){
-      var r = ["Feedback fotoreeks " + (P.hotel || "") + (fb.door ? " — " + fb.door : "")];
-      var w = wijzigingenTekst(wijzigingen()); if(w) r.push("Wijzigingen in het bestand: " + w);
-      if(fb.algemeen.trim()) r.push("Algemeen: " + fb.algemeen.trim());
+      var w = wijzigingen();
+      var r = ["Fotoreeks " + (P.hotel || "") + (fb.door ? " — " + fb.door : "")];
+      var o = oordeelTekst(w); if(o) r.push(o);
+      var wt = wijzigingenTekst(w); if(wt) r.push("Aangepast: " + wt);
+      if(fb.algemeen.trim()) r.push(fb.algemeen.trim());
       F.forEach(function(f, i){ var t = (fb.perFoto[f.id] || "").trim(); if(t) r.push("Foto " + (i + 1) + (f.catLabel ? " (" + f.catLabel + ")" : "") + ": " + t); });
-      if(r.length === 1) r.push("(nog geen opmerkingen)");
+      if(r.length === 1) r.push("(nog geen oordeel)");
       return r.join("\n");
     }
     el("kopieer").onclick = function(){
       var t = tekst();
       if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(t).then(function(){ meld("Feedback gekopieerd, plak hem in Teams."); }, function(){ meld("Kopiëren lukt niet, selecteer de tekst zelf."); });
+        navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Let op: alleen tekst, een nieuwe volgorde of nieuwe foto’s zitten alleen in het gedownloade bestand."); }, function(){ meld("Kopiëren lukt niet, selecteer de tekst zelf."); });
       } else meld("Kopiëren lukt niet in deze browser.");
     };
-    el("teams").onclick = function(){ window.open("https://teams.microsoft.com/l/chat/0/0?message=" + encodeURIComponent(tekst()), "_blank"); };
     el("download").onclick = function(){
-      var w = wijzigingen(), heeftTekst = fb.algemeen.trim() || Object.keys(fb.perFoto).some(function(k){ return (fb.perFoto[k] || "").trim(); });
-      if(!heeftTekst && !wijzigingenTekst(w)){ meld("Zet eerst een opmerking neer of pas iets aan."); return; }
+      if(!fb.oordeel){ meld("Kies eerst je oordeel: akkoord of nog niet akkoord."); el("keuze").scrollIntoView({block: "center", behavior: "smooth"}); return; }
+      var w = wijzigingen();
       var kopie = JSON.parse(JSON.stringify(P));
       kopie.fotos = F.map(function(f, i){ var g = JSON.parse(JSON.stringify(f)); g.pos = i; return g; });
-      kopie.feedback = {door: fb.door.trim(), algemeen: fb.algemeen.trim(), perFoto: fb.perFoto, datum: new Date().toISOString(), wijzigingen: w};
+      kopie.feedback = {door: fb.door.trim(), oordeel: fb.oordeel, algemeen: fb.algemeen.trim(), perFoto: fb.perFoto, datum: new Date().toISOString(), wijzigingen: w};
       var scr = el("fotocheck-reeks"), oud = scr.textContent;
       scr.textContent = JSON.stringify(kopie).replace(/</g, "\\u003c");
       // de beelden even zonder src, anders staan alle foto's twee keer in het bestand
@@ -3273,7 +3299,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], {type: "text/html"}));
       a.download = (P.bestand || "fotoreeks").replace(/\.html$/, "") + "-feedback.html";
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      meld("Bestand met je feedback" + (wijzigingenTekst(w) ? " en wijzigingen" : "") + " gedownload. Stuur het terug via Teams.");
+      meld("Gedownload. Stuur dit bestand terug via Teams.");
     };
     render();
   }
@@ -3283,17 +3309,20 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       + '<title>Fotoreeks ' + esc(pakket.hotel || "") + '</title><style>' + REVIEW_CSS + '</style></head><body>'
       + '<script type="application/json" id="fotocheck-reeks">' + json + '<\/script>'
       + '<div class="wrap"><h1>Fotoreeks ' + esc(pakket.hotel || "zonder hotelnaam") + '</h1>'
-      + '<p class="sub">' + pakket.fotos.length + ' foto\u2019s in de volgorde van de reeks \u00b7 gemaakt ' + esc(datumTekst(pakket.datum)) + '</p>'
-      + '<div class="uitleg">Zo komt de reeks op de detailpagina te staan: de eerste foto groot, de volgende vier ernaast. Zet de foto\u2019s in de goede volgorde met de pijlen, vervang of verwijder er een, of voeg er een toe. Zet je opmerkingen bij de foto\u2019s of onderaan bij Algemeen. Klik daarna op <b>Download met feedback</b> en stuur dat bestand terug via Teams. Je opmerkingen blijven in deze browser bewaard; een nieuwe volgorde of nieuwe foto\u2019s komen alleen mee in het gedownloade bestand.</div>'
-      + '<p class="lbl">Zo ziet het er op de website uit</p><div class="mozaiek" id="mozaiek"></div>'
-      + '<div class="rij"><p class="lbl">Alle foto\u2019s op volgorde <span id="teller"></span></p><button type="button" id="toevoegen">+ Foto toevoegen</button></div>'
+      + '<p class="sub">' + pakket.fotos.length + ' foto’s · gemaakt ' + esc(datumTekst(pakket.datum)) + '</p>'
+      + '<p class="intro">Zo komt de reeks op de detailpagina te staan. Pas aan wat beter kan, geef onderaan je oordeel en stuur het bestand terug via Teams.</p>'
+      + '<p class="lbl">Zo ziet de gast het</p><div class="mozaiek" id="mozaiek"></div>'
+      + '<ul class="let"><li>Foto 1 is het droombeeld waarvoor de gast boekt</li><li>Foto 2 t/m 5: hotel, kamer en de belangrijkste includes</li><li>Geen dubbele of bijna gelijke beelden</li><li>Eén sfeer, hetzelfde licht</li></ul>'
+      + '<div class="rij"><p class="lbl">Alle foto’s op volgorde <span id="teller"></span></p><button type="button" id="toevoegen">+ Foto toevoegen</button></div>'
       + '<div class="grid" id="grid"></div>'
-      + '<div class="alg"><label for="alg">Algemeen</label><textarea id="alg" placeholder="Over de reeks als geheel: volgorde, wat mist, wat eruit kan"></textarea></div>'
-      + '<div class="alg"><label for="naam">Je naam</label><input type="text" id="naam" placeholder="Zodat duidelijk is van wie de feedback is"></div>'
-      + '<div class="knoppen"><button type="button" class="g" id="download">Download met feedback</button>'
-      + '<button type="button" class="p" id="kopieer">Kopieer feedback</button>'
-      + '<button type="button" id="teams">Open Teams</button></div>'
-      + '<p class="melding" id="melding"></p></div>'
+      + '<div class="oordeel"><p class="lbl">Je oordeel</p>'
+      + '<div class="keuze" id="keuze"><button type="button" data-o="akkoord" aria-pressed="false">Akkoord, kan zo live</button><button type="button" data-o="niet" aria-pressed="false">Nog niet akkoord</button></div>'
+      + '<div class="velden"><div><label for="alg">Toelichting <span>(optioneel)</span></label><textarea id="alg" placeholder="Wat moet er anders, of wat mist er nog?"></textarea></div>'
+      + '<div><label for="naam">Je naam</label><input type="text" id="naam" placeholder="Zodat duidelijk is van wie dit komt"></div></div></div>'
+      + '<div class="knoppen"><button type="button" class="g" id="download">Download en stuur terug</button>'
+      + '<button type="button" id="kopieer">Kopieer als tekst</button></div>'
+      + '<p class="melding" id="melding"></p>'
+      + '<p class="klein">Je tekst blijft in deze browser bewaard tot je downloadt. De volgorde en nieuwe foto’s zitten alleen in het gedownloade bestand.</p></div>'
       + '<script>(' + reviewPaginaScript.toString() + ')();<\/script></body></html>';
   }
   function blobNaarDataUrl(blob){
@@ -3326,8 +3355,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       setTimeout(function(){ toonVoortgang(null); }, 1200);
       laatsteReeks = {id: null, hotel: hotelNaam};
       $("#deel-stand").innerHTML = "Reviewbestand gemaakt: <b>" + esc(basis + ".html") + "</b> (" + fotos.length + " foto\u2019s, " + (bytes/1048576).toFixed(1).replace(".", ",") + " MB). "
-        + "Stuur het via Teams. Komt het terug met feedback, sleep het dan in de tool.";
-      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
+        + "Stuur het via Teams. Komt het terug, sleep het dan hier in de tool.";
+      $("#deel-teams").hidden = true; $("#deel-kopieer").hidden = false;
     }catch(e){
       toonVoortgang(null); toast("Het reviewbestand maken lukt niet");
     }
@@ -3366,15 +3395,17 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         var w = fb.wijzigingen || {}, d = [];
         if(w.volgorde) d.push("volgorde aangepast"); if(w.vervangen) d.push(w.vervangen + " vervangen");
         if(w.toegevoegd) d.push(w.toegevoegd + " toegevoegd"); if(w.verwijderd) d.push(w.verwijderd + " verwijderd");
-        if(d.length) regels.push('<div class="fb-item">' + esc("Wijzigingen in het bestand: " + d.join(", ")) + '<small>de reeks hierboven is al aangepast</small></div>');
-        if(fb.algemeen) regels.push('<div class="fb-item">' + esc(fb.algemeen) + '<small>hele reeks</small></div>');
+        if(fb.oordeel === "akkoord") regels.push('<div class="fb-item fb-ok">' + (d.length ? "Akkoord met de aanpassingen in het bestand" : "Akkoord, kan zo live") + '</div>');
+        else if(fb.oordeel === "niet") regels.push('<div class="fb-item fb-niet">Nog niet akkoord</div>');
+        if(d.length) regels.push('<div class="fb-item">' + esc("Aangepast: " + d.join(", ")) + '<small>de reeks hierboven staat al zo</small></div>');
+        if(fb.algemeen) regels.push('<div class="fb-item">' + esc(fb.algemeen) + '<small>toelichting</small></div>');
         var per = fb.perFoto || {};
         meta.forEach(function(f, k){
           var t = Array.isArray(per) ? per[k] : per[f.id];
           if(t && String(t).trim()) regels.push('<div class="fb-item">' + esc(t) + '<small>foto ' + (k+1) + (f.catLabel ? ' \u00b7 ' + esc(f.catLabel) : '') + '</small></div>');
         });
       }
-      fbHost.innerHTML = fb ? '<p class="review-lbl">Feedback uit het bestand' + (fb.door ? ' van ' + esc(fb.door) : '') + (fb.datum ? ' \u00b7 ' + esc(datumTekst(fb.datum)) : '') + '</p>' + (regels.join("") || '<div class="fb-item">Geen opmerkingen.</div>') : "";
+      fbHost.innerHTML = fb ? '<p class="review-lbl">Oordeel' + (fb.door ? ' van ' + esc(fb.door) : '') + (fb.datum ? ' \u00b7 ' + esc(datumTekst(fb.datum)) : '') + '</p>' + (regels.join("") || '<div class="fb-item">Geen oordeel of opmerkingen in het bestand.</div>') : "";
     }
     toast(fb ? "Reeks en feedback ingelezen" : "Reeks ingelezen, " + files.length + " foto\u2019s");
   }
