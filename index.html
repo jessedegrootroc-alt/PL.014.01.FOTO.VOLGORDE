@@ -921,7 +921,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
             <div class="deel-kop"><b>Feedback vragen</b><span>Stuur de reeks als bestand naar een collega. Die opent het in de browser, past aan wat beter kan, kiest akkoord of nog niet, en stuurt het terug. Sleep het hier weer in en je ziet het oordeel en de aanpassingen.</span></div>
             <div class="deel-knoppen">
               <button class="btn btn-primary" id="deel-bestand" type="button">Maak reviewbestand</button>
-              <button class="btn" id="deel-teams" type="button" hidden>Open Teams</button>
+              <button class="btn" id="deel-teams" type="button" hidden>Stuur door via Teams</button>
               <button class="btn" id="deel-kopieer" type="button" hidden>Kopieer bericht</button>
               <button class="btn" id="deel-bewaar" type="button" hidden>Bewaar bij claude.ai</button>
             </div>
@@ -3021,6 +3021,23 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
   var ARTIFACT_URL = "https://claude.ai/artifact/DcVKpcN6sgfpAM2zUDN55C";
   var DB = null, ASSETS = null, USER = null, MIJN_ID = null;
   var laatsteReeks = null, reeksenGeladen = false, reviewId = null, reviewStop = null;
+  var laatsteBestand = null;   // het laatst gemaakte reviewbestand, voor Stuur door via Teams
+
+  /* Een webpagina kan geen bestand in een Teams-chat zetten. Dit probeert eerst het deelmenu van het
+     systeem met het bestand erin (Chrome en Safari, als Teams als deeldoel is geïnstalleerd) en opent
+     anders een Teams-chat met het bericht al ingevuld, zodat alleen het bestand er nog in hoeft. */
+  async function stuurViaTeams(blob, naam, bericht){
+    if(blob){
+      try{
+        var f = new File([blob], naam, {type: blob.type || "text/html"});
+        if(navigator.canShare && navigator.canShare({files: [f]})){ await navigator.share({files: [f], text: bericht}); return "gedeeld"; }
+      }catch(e){ if(e && e.name === "AbortError") return "geannuleerd"; }
+    }
+    var w = null;
+    try{ w = window.open("https://teams.microsoft.com/l/chat/0/0?message=" + encodeURIComponent(bericht), "_blank", "noopener"); }catch(e){}
+    if(!w){ kopieerTekst(bericht); return "klembord"; }
+    return "teams";
+  }
   if(window.claude && typeof window.claude.use === "function"){
     window.claude.use("db").then(function(d){ DB = d || null; renderDeel(); openUitHash(); }, function(){});
     window.claude.use("assets").then(function(a){ ASSETS = a || null; renderDeel(); }, function(){});
@@ -3099,7 +3116,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     if(laatsteReeks && laatsteReeks.id){
       return "Fotoreeks " + h + " staat klaar voor feedback. Open de Fotocheck, kies de reeks onder Bewaarde reeksen en zet je opmerkingen erbij: " + ARTIFACT_URL;
     }
-    return "Wil je de fotoreeks van " + h + " bekijken? Zie het bijgevoegde bestand. Open het in je browser, pas aan wat beter kan, kies akkoord of nog niet, en stuur het bestand terug.";
+    var naam = laatsteBestand ? laatsteBestand.naam : "het bijgevoegde bestand";
+    return "Wil je de fotoreeks van " + h + " bekijken? Open " + naam + " in je browser, pas aan wat beter kan, kies akkoord of nog niet, en stuur het bestand terug.";
   }
 
   /* ---------- reviewbestand: een los HTML-bestand met de foto's erin, dat overal opent ----------
@@ -3283,8 +3301,8 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
         navigator.clipboard.writeText(t).then(function(){ meld("Gekopieerd. Let op: alleen tekst, een nieuwe volgorde of nieuwe foto’s zitten alleen in het gedownloade bestand."); }, function(){ meld("Kopiëren lukt niet, selecteer de tekst zelf."); });
       } else meld("Kopiëren lukt niet in deze browser.");
     };
-    el("download").onclick = function(){
-      if(!fb.oordeel){ meld("Kies eerst je oordeel: akkoord of nog niet akkoord."); el("keuze").scrollIntoView({block: "center", behavior: "smooth"}); return; }
+    // het bestand zoals het teruggaat: dezelfde pagina, met de nieuwe volgorde en de feedback erin
+    function maakBestand(){
       var w = wijzigingen();
       var kopie = JSON.parse(JSON.stringify(P));
       kopie.fotos = F.map(function(f, i){ var g = JSON.parse(JSON.stringify(f)); g.pos = i; return g; });
@@ -3296,10 +3314,34 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       imgs.forEach(function(i){ i.removeAttribute("src"); });
       var html = "<!doctype html>\n" + document.documentElement.outerHTML;
       imgs.forEach(function(i, k){ i.setAttribute("src", srcs[k]); }); scr.textContent = oud;
-      var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], {type: "text/html"}));
-      a.download = (P.bestand || "fotoreeks").replace(/\.html$/, "") + "-feedback.html";
+      return {blob: new Blob([html], {type: "text/html"}), naam: (P.bestand || "fotoreeks").replace(/\.html$/, "") + "-feedback.html"};
+    }
+    function download(b){
+      var a = document.createElement("a"); a.href = URL.createObjectURL(b.blob); a.download = b.naam;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    function zonderOordeel(){
+      if(fb.oordeel) return false;
+      meld("Kies eerst je oordeel: akkoord of nog niet akkoord."); el("keuze").scrollIntoView({block: "center", behavior: "smooth"}); return true;
+    }
+    el("download").onclick = function(){
+      if(zonderOordeel()) return;
+      download(maakBestand());
       meld("Gedownload. Stuur dit bestand terug via Teams.");
+    };
+    // Een webpagina kan geen bestand in een Teams-chat zetten: eerst het deelmenu van het systeem
+    // proberen met het bestand erin, anders het bestand downloaden en Teams openen met de tekst.
+    el("teams").onclick = async function(){
+      if(zonderOordeel()) return;
+      var b = maakBestand();
+      try{
+        var f = new File([b.blob], b.naam, {type: "text/html"});
+        if(navigator.canShare && navigator.canShare({files: [f]})){ await navigator.share({files: [f], text: tekst()}); meld("Verstuurd via het deelmenu."); return; }
+      }catch(e){ if(e && e.name === "AbortError") return; }
+      download(b);
+      var w = null; try{ w = window.open("https://teams.microsoft.com/l/chat/0/0?message=" + encodeURIComponent(tekst()), "_blank"); }catch(e){}
+      meld(w ? "Teams is geopend met je feedback als tekst. Sleep het gedownloade bestand " + b.naam + " er nog bij, dan gaan volgorde en foto\u2019s mee."
+             : "Teams openen lukt hier niet. Het bestand is gedownload; stuur het zelf via Teams.");
     };
     render();
   }
@@ -3320,6 +3362,7 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       + '<div class="velden"><div><label for="alg">Toelichting <span>(optioneel)</span></label><textarea id="alg" placeholder="Wat moet er anders, of wat mist er nog?"></textarea></div>'
       + '<div><label for="naam">Je naam</label><input type="text" id="naam" placeholder="Zodat duidelijk is van wie dit komt"></div></div></div>'
       + '<div class="knoppen"><button type="button" class="g" id="download">Download en stuur terug</button>'
+      + '<button type="button" id="teams">Stuur terug via Teams</button>'
       + '<button type="button" id="kopieer">Kopieer als tekst</button></div>'
       + '<p class="melding" id="melding"></p>'
       + '<p class="klein">Je tekst blijft in deze browser bewaard tot je downloadt. De volgorde en nieuwe foto’s zitten alleen in het gedownloade bestand.</p></div>'
@@ -3350,13 +3393,15 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
       var pakket = {soort: "fotocheck-reeks", versie: 1, id: basis + "-" + stempel.slice(0,16).replace(/[^0-9]/g, ""), bestand: basis + ".html",
                     hotel: hotelNaam || "", datum: stempel, aantal: state.count, kenmerken: state.filters, eigen: state.eigen, fotos: fotos};
       var html = reviewSjabloon(pakket);
-      await bewaarBlob(new Blob([html], {type: "text/html"}), basis + ".html");
+      var reviewBlob = new Blob([html], {type: "text/html"});
+      laatsteBestand = {blob: reviewBlob, naam: basis + ".html"};
+      await bewaarBlob(reviewBlob, basis + ".html");
       toonVoortgang(reeks.length, reeks.length, "Klaar \u00b7 100%");
       setTimeout(function(){ toonVoortgang(null); }, 1200);
       laatsteReeks = {id: null, hotel: hotelNaam};
       $("#deel-stand").innerHTML = "Reviewbestand gemaakt: <b>" + esc(basis + ".html") + "</b> (" + fotos.length + " foto\u2019s, " + (bytes/1048576).toFixed(1).replace(".", ",") + " MB). "
         + "Stuur het via Teams. Komt het terug, sleep het dan hier in de tool.";
-      $("#deel-teams").hidden = true; $("#deel-kopieer").hidden = false;
+      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
     }catch(e){
       toonVoortgang(null); toast("Het reviewbestand maken lukt niet");
     }
@@ -3410,10 +3455,19 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
     toast(fb ? "Reeks en feedback ingelezen" : "Reeks ingelezen, " + files.length + " foto\u2019s");
   }
   $("#deel-bewaar").addEventListener("click", function(){ bewaarReeks(this); });
-  $("#deel-teams").addEventListener("click", function(){
-    var url = "https://teams.microsoft.com/share?href=" + encodeURIComponent(ARTIFACT_URL) + "&msgText=" + encodeURIComponent(deelBericht());
-    var w = null; try{ w = window.open(url, "_blank", "noopener"); }catch(e){}
-    if(!w){ kopieerTekst(deelBericht()); toast("Teams openen lukt hier niet, het bericht staat op je klembord"); }
+  $("#deel-teams").addEventListener("click", async function(){
+    if(laatsteReeks && laatsteReeks.id){          // reeks bij claude.ai: alleen een link, geen bestand
+      var url = "https://teams.microsoft.com/share?href=" + encodeURIComponent(ARTIFACT_URL) + "&msgText=" + encodeURIComponent(deelBericht());
+      var w = null; try{ w = window.open(url, "_blank", "noopener"); }catch(e){}
+      if(!w){ kopieerTekst(deelBericht()); toast("Teams openen lukt hier niet, het bericht staat op je klembord"); }
+      return;
+    }
+    if(!laatsteBestand){ toast("Maak eerst het reviewbestand"); return; }
+    var hoe = await stuurViaTeams(laatsteBestand.blob, laatsteBestand.naam, deelBericht());
+    var st = $("#deel-stand");
+    if(hoe === "gedeeld") st.innerHTML = "Verstuurd via het deelmenu.";
+    else if(hoe === "teams") st.innerHTML = "Teams is geopend met het bericht. Sleep het gedownloade bestand <b>" + esc(laatsteBestand.naam) + "</b> in het gesprek en verstuur.";
+    else if(hoe === "klembord") st.innerHTML = "Teams openen lukt hier niet. Het bericht staat op je klembord; plak het in Teams en voeg <b>" + esc(laatsteBestand.naam) + "</b> toe.";
   });
   $("#deel-kopieer").addEventListener("click", function(){ kopieerTekst(deelBericht()); });
 

@@ -79,9 +79,16 @@ de kop van het bestand, verander ze samen.
   linkje *Opmerking*, alleen voor wat de collega niet zelf kan oplossen.
   Onderaan staat één oordeel, *Akkoord, kan zo live* of *Nog niet akkoord*,
   met een optionele toelichting en de naam, en één hoofdknop *Download en
-  stuur terug*; zonder oordeel gaat de download niet. *Kopieer als tekst* is
-  er voor een snel antwoord in Teams, maar een nieuwe volgorde of nieuwe
-  foto's zitten alleen in het gedownloade bestand. Komt het bestand terug,
+  stuur terug*; zonder oordeel gaat de download niet. *Stuur terug via Teams*
+  probeert eerst het deelmenu van het systeem met het bestand erin (Chrome en
+  Safari, als Teams als deeldoel is geïnstalleerd); lukt dat niet, dan wordt
+  het bestand gedownload en gaat Teams open met de feedback als tekst, zodat
+  alleen het bestand er nog in gesleept hoeft te worden. Een webpagina kan
+  namelijk zelf geen bestand in een Teams-chat zetten. *Kopieer als tekst* is
+  er voor een snel antwoord, maar een nieuwe volgorde of nieuwe foto's zitten
+  alleen in het gedownloade bestand. In de tool werkt *Stuur door via Teams*
+  onder *Feedback vragen* op dezelfde manier met het zojuist gemaakte
+  reviewbestand. Komt het bestand terug,
   sleep het dan in de uploadzone: de reeks staat er in de nieuwe volgorde,
   nieuwe en vervangen foto's krijgen een type uit de bestandsnaam, en onder
   *Feedback vragen* staat het oordeel (groen of oranje), wat er is aangepast
