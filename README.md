@@ -117,10 +117,14 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   herkennen → SEO-bestandsnaam → converteren → controleren → downloaden. Stappen
   00 t/m 04 zijn er niet en alt-teksten ook niet. Boven de foto's staan velden
   voor hotelnaam, plaats, regio, land, naam arrangement en een extra zoekwoord,
-  en aanklikbare keuzes voor type accommodatie (één), belangrijkste kenmerken
-  en activiteiten in de omgeving (meer tegelijk, met een veldje *anders…* voor
-  een eigen woord); alles blijft in de browser bewaard en wordt alleen voor de
-  bestandsnaam gebruikt. Typ je een hotelnaam, dan zoekt de tool na een korte
+  en daaronder de soorten arrangement van de site als aanklikbare knoppen met
+  icoon (Nieuwe hotels, Zwembad, Wellnesshotels, Hotels in België, Hond mee,
+  Bijzondere overnachtingen, Aan zee, Exclusief bij ViaLuxury, In de natuur,
+  Kerstmarkten, Stedentrips, Hotels in Frankrijk, Fietsarrangement, Hotels met
+  wellness, Bubbelbad op kamer, 5 sterren, Met diner, Mini vakanties,
+  Kasteelhotels, SUPER DEAL); alles blijft in de browser bewaard en wordt alleen
+  voor de bestandsnaam gebruikt. Hotels in België of Frankrijk vult het land in
+  als dat leeg is. Typ je een hotelnaam, dan zoekt de tool na een korte
   pauze plaats, regio en land op via OpenStreetMap (gratis, zonder sleutel) en
   vult lege velden in; lukt dat niet, dan vraagt de artifact-versie het aan
   Claude. Wat je zelf al had ingevuld blijft staan, en onder het veld staat
@@ -132,9 +136,12 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   staat dat bij de foto en kies je het zelf. De naam volgt de prioriteit
   onderwerp → zoekintentie → locatie → hotelnaam, met hooguit een paar sterke
   termen: kamers krijgen hotelnaam, regio en onderwerp
-  (`hotel-winselerhof-limburg-luxe-hotelkamer`), voorzieningen krijgen de
-  hotelterm uit de kenmerken (`wellness-hotel-limburg-zwembad`,
-  `romantisch-hotel-limburg-restaurant`), omgeving en activiteiten krijgen
+  (`hotel-winselerhof-limburg-luxe-hotelkamer`, met Bubbelbad op kamer
+  `…-hotelkamer-met-jacuzzi`), voorzieningen krijgen de hotelterm uit de soort
+  arrangement (Kasteelhotels → `kasteelhotel-…`, Wellnesshotels →
+  `wellness-hotel-limburg-zwembad`, 5 sterren → `luxe-hotel-…`, Aan zee →
+  `hotel-aan-zee-…`; Met diner maakt van een restaurantfoto `…-diner`,
+  Kerstmarkten van een stadsfoto `…-kerstmarkt`), omgeving en activiteiten krijgen
   hotelnaam, onderwerp en regio (`hotel-winselerhof-wandelen-zuid-limburg`),
   het hotel zelf wordt `hotel-winselerhof-limburg` of
   `landgoedhotel-winselerhof-limburg`. Alles lowercase met koppeltekens,
