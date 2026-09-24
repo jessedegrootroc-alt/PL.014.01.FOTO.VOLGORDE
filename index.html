@@ -811,7 +811,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
       <h1>Fotocheck arrangement</h1>
       <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
-      <p class="sub v5-sub">Upload, vul de context in, en download de foto's met SEO-bestandsnaam en alt-tekst als WebP.</p>
+      <p class="sub v5-sub">Upload, vul de hotelinformatie in, en download de foto's met een SEO-bestandsnaam als WebP.</p>
     </div>
     <button class="btn btn-reset" id="btn-reset" type="button">Resetten</button>
   </div>
@@ -828,19 +828,18 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
         <div class="progress"><i id="v5-fill"></i></div><span id="v5-lbl">0%</span>
       </div>
 
-      <p class="v5-kop">Context voor bestandsnamen en alt-teksten</p>
+      <p class="v5-kop">Hotelinformatie voor de bestandsnamen</p>
       <div class="v5-velden" id="v5-ctx">
         <label>Hotelnaam<input id="v5-hotel" data-ctx="hotel" placeholder="Hotel Winselerhof" autocomplete="off"></label>
         <label>Plaats<input id="v5-plaats" data-ctx="plaats" placeholder="Landgraaf" autocomplete="off"></label>
-        <label>Regio<input id="v5-regio" data-ctx="regio" placeholder="Limburg" autocomplete="off"></label>
+        <label>Regio<input id="v5-regio" data-ctx="regio" placeholder="Zuid-Limburg" autocomplete="off"></label>
         <label>Land<input id="v5-land" data-ctx="land" placeholder="Nederland" autocomplete="off"></label>
         <label>Type accommodatie<input id="v5-acco" data-ctx="acco" list="v5-accolijst" placeholder="Landgoedhotel" autocomplete="off">
           <datalist id="v5-accolijst"><option value="Hotel"><option value="Boutiquehotel"><option value="Kasteelhotel"><option value="Landgoedhotel"><option value="Wellnesshotel"><option value="Strandhotel"><option value="Stadshotel"><option value="Resort"><option value="Bed and breakfast"><option value="Vakantiepark"></datalist></label>
         <label>Naam arrangement<input id="v5-arr" data-ctx="arr" placeholder="Wellnessweekend met diner" autocomplete="off"></label>
-        <label>Type afbeelding (standaard, per foto aanpasbaar)<select id="v5-type" data-ctx="type"></select></label>
-        <label>Belangrijkste USP’s van het arrangement<input id="v5-usp" data-ctx="usp" placeholder="wellness, sterrenrestaurant, kasteel" autocomplete="off"></label>
+        <label>Belangrijkste kenmerken van hotel of arrangement<input id="v5-usp" data-ctx="usp" placeholder="wellness, romantisch, sterrenrestaurant" autocomplete="off"></label>
         <label>Activiteiten in de omgeving<input id="v5-act" data-ctx="act" placeholder="wandelen, fietsen, Maastricht" autocomplete="off"></label>
-        <label>Extra zoekwoord (optioneel)<input id="v5-extra" data-ctx="extra" placeholder="romantisch weekendje weg" autocomplete="off"></label>
+        <label>Extra zoekwoord<input id="v5-extra" data-ctx="extra" placeholder="weekendje weg" autocomplete="off"></label>
       </div>
 
       <details class="v5-inst" id="v5-inst">
@@ -856,11 +855,11 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 
       <div class="opt-bar" id="v5-bar" hidden>
         <span class="stand" id="v5-stand"></span>
-        <button class="btn" id="v5-ai" type="button" hidden>Alt-teksten door Claude</button>
+        <button class="btn" id="v5-ai" type="button" hidden>Onderwerp herkennen door Claude</button>
         <button class="btn btn-primary" id="v5-alles" type="button">Download alles</button>
         <button class="btn btn-zip" id="v5-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-download"></use></svg> Download als zip</button>
       </div>
-      <div id="v5-lijst"><p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden krijgt elke foto meteen een SEO-bestandsnaam, een alt-tekst en een geoptimaliseerde versie.</p></div>
+      <div id="v5-lijst"><p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden herkent de tool het onderwerp, maakt een SEO-bestandsnaam en converteert de foto.</p></div>
     </div>
   </section>
 
@@ -3939,7 +3938,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"},
     {id:"3", naam:"Versie 3", uitleg:"Minimaal, alleen wat je nodig hebt"},
     {id:"4", naam:"Versie 4", uitleg:"Snel voorbereiden: geen controlestap, geen nummers in de naam"},
-    {id:"5", naam:"Versie 5", uitleg:"Alleen optimaliseren: SEO-namen, alt-teksten, WebP, downloaden"}
+    {id:"5", naam:"Versie 5", uitleg:"Alleen converteren, SEO-namen en downloaden"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
   var STANDAARD_VERSIE = "4";        // waarmee een nieuwe browser begint
@@ -4007,23 +4006,30 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     if(geldigeVersie(e.key)){ zetVersie(e.key); toonVersielijst(false); }
   });
 
-  /* ==================== versie 5: alleen optimaliseren, hernoemen en downloaden ====================
-     Upload → context invullen → SEO-naam en alt-tekst → converteren → controleren → downloaden.
-     Geen volgnummers: de naam komt uit wat er op de foto staat en de ingevulde context. */
+  /* ==================== versie 5: converteren, SEO-vriendelijk hernoemen en downloaden ====================
+     Upload → hotelinformatie → onderwerp herkennen → SEO-bestandsnaam → converteren → controleren → downloaden.
+     Geen alt-teksten, geen volgnummers: de naam komt uit wat er op de foto staat en de ingevulde informatie. */
   var V5 = [], v5Id = 0, V5_STORE = "vialuxury-fotocheck-v5";
   var V5_TYPES = [["hotel","Hotel"],["hotelkamer","Hotelkamer"],["suite","Suite"],["restaurant","Restaurant"],["ontbijt","Ontbijt"],
-                  ["diner","Diner"],["wellness","Wellness"],["zwembad","Zwembad"],["terras","Terras"],["omgeving","Omgeving"],
-                  ["natuur","Natuur"],["wandelen","Wandelen"],["fietsen","Fietsen"],["stad","Stad"],["strand","Strand"],["overig","Overig"]];
+                  ["diner","Diner"],["wellness","Wellness"],["zwembad","Zwembad"],["terras","Terras"],["natuur","Natuur"],["bergen","Bergen"],
+                  ["strand","Strand"],["wandelen","Wandelen"],["fietsen","Fietsen"],["stad","Stad"],["gebouw","Gebouw"],["omgeving","Omgeving"]];
   var V5_LABEL = {}; V5_TYPES.forEach(function(t){ V5_LABEL[t[0]] = t[1]; });
-  // van de trefwoorden in een bestandsnaam (catUitNaam) naar een type afbeelding
-  var V5_UIT_CAT = {gebouw:"hotel", kamer:"hotelkamer", suite:"suite", jacuzzi:"suite", interieur:"hotel", tuin:"terras", diner:"restaurant",
+  // van de trefwoorden in een bestandsnaam (catUitNaam) naar een onderwerp
+  var V5_UIT_CAT = {gebouw:"gebouw", kamer:"hotelkamer", suite:"suite", jacuzzi:"suite", interieur:"hotel", tuin:"terras", diner:"restaurant",
                     ontbijt:"ontbijt", wellness:"wellness", zwembad:"zwembad", fietsen:"fietsen", activiteit:"omgeving", omgeving:"omgeving",
-                    natuur:"natuur", zee:"strand", stad:"stad", bezienswaardigheid:"omgeving", museum:"stad", evenement:"overig"};
+                    natuur:"natuur", zee:"strand", stad:"stad", bezienswaardigheid:"omgeving", museum:"stad", evenement:"omgeving"};
   function v5TypeUitNaam(naam){
-    var cat = catUitNaam(naam), t = slug(naam);
-    if(cat === "diner" && /(^|-)(diner|dinner)(-|$)/.test(t)) return "diner";
-    if(/(^|-)(wandel|wandelen|hiking|hike)(-|$)/.test(t)) return "wandelen";
+    var t = slug(naam.replace(/\.[^.]+$/, ""));
+    if(/(^|-)(berg|bergen|alpen|mountain|mountains|gletsjer|skigebied)(-|$)/.test(t)) return "bergen";
+    if(/(^|-)(diner|dinner)(-|$)/.test(t)) return "diner";
+    if(/(^|-)(wandel|hik|trekking|trail)/.test(t)) return "wandelen";      // wandelen, wandelpad, wandelroute, hiking
+    var cat = catUitNaam(naam);
     return cat ? (V5_UIT_CAT[cat] || null) : null;
+  }
+  // woorden uit de oorspronkelijke bestandsnaam die echt iets zeggen, om een dubbele naam specifieker te maken
+  var V5_RUIS = /^(img|dsc|dscn|dsc_|foto|image|photo|pxl|screenshot|schermafbeelding|untitled|final|kopie|copy|edit|bewerkt|klein|groot|web|hr|lr|jpg|jpeg|png|webp|heic|hotel|v\d*|\d+)$/;
+  function v5NaamWoorden(it){
+    return slug(it.naam.replace(/\.[^.]+$/, "")).split("-").filter(function(w){ return w.length > 2 && !V5_RUIS.test(w) && !/^\d+$/.test(w); });
   }
 
   function v5Ctx(){
@@ -4051,121 +4057,104 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     }catch(e){}
   }
 
-  /* ---------- zoekterm en bestandsnaam ----------
-     Per type een kernterm uit veelgebruikte hotel- en reiszoekopdrachten, alleen als hij past bij de foto.
-     De naam wordt: hotelnaam + plek + kernterm (+ extra zoekwoord), lowercase, met koppeltekens, zonder nummers. */
+  /* ---------- keywordselectie en bestandsnaam ----------
+     Prioriteit: wat er op de foto staat → zoekintentie → locatie → hotelnaam. Per naam hooguit een paar sterke termen.
+     Bouwstenen: een hotelterm uit de kenmerken (wellness hotel, romantisch hotel, luxe hotel, kasteelhotel),
+     de hotelnaam, de plek (plaats of regio) en de term voor het onderwerp. */
   function v5Woorden(t){ return slug(t).split("-").filter(Boolean); }
-  function v5Heeft(lijst, w){ return lijst.indexOf(w) !== -1; }
-  function v5Kern(type, c){
-    var usp = v5Woorden(c.usp), act = v5Woorden(c.act), acco = slug(c.acco);
-    var regioTerm = ["hotel","wellness","natuur","wandelen","fietsen","omgeving"].indexOf(type) !== -1;   // regio-termen: "wandelen limburg"
-    var plek = regioTerm ? (c.regio || c.plaats) : (c.plaats || c.regio);
-    var kern;
-    switch(type){
-      case "hotel":
-        kern = acco && acco !== "hotel" ? acco : "hotel";
-        if(v5Heeft(usp, "romantisch")) kern = "romantisch-hotel";
-        else if(v5Heeft(usp, "luxe") || v5Heeft(usp, "luxueus")) kern = "luxe-hotel";
-        else if(v5Heeft(usp, "wellness") && kern === "hotel") kern = "hotel-met-wellness";
-        else if(v5Heeft(usp, "zwembad") && kern === "hotel") kern = "hotel-met-zwembad";
-        break;
-      case "hotelkamer": kern = v5Heeft(usp, "romantisch") ? "romantische-hotelkamer" : "luxe-hotelkamer"; break;
-      case "suite":      kern = "suite"; break;
-      case "restaurant": kern = "hotel-met-restaurant"; break;
-      case "ontbijt":    kern = "hotel-met-ontbijt"; break;
-      case "diner":      kern = "diner"; break;
-      case "wellness":   kern = "wellness-hotel"; break;
-      case "zwembad":    kern = "hotel-met-zwembad"; break;
-      case "terras":     kern = "terras"; break;
-      case "omgeving":
-        kern = v5Heeft(act, "wandelen") ? "wandelen" : (v5Heeft(act, "fietsen") ? "fietsen" : "weekendje-weg"); break;
-      case "natuur":     kern = "hotel-in-de-natuur"; break;
-      case "wandelen":   kern = "wandelen"; break;
-      case "fietsen":    kern = "fietsen"; break;
-      case "stad":       kern = "stedentrip"; plek = c.plaats || c.regio; break;
-      case "strand":     kern = "hotel-aan-zee"; break;
-      default:           kern = slug(c.arr) || "";
-    }
-    return {kern: kern, plek: slug(plek)};
+  function v5Heeft(lijst){ for(var i=1;i<arguments.length;i++){ if(lijst.indexOf(arguments[i]) !== -1) return true; } return false; }
+  function v5Hotelterm(c){
+    var k = v5Woorden(c.usp), acco = slug(c.acco);
+    if(v5Heeft(k, "romantisch", "romantische")) return "romantisch-hotel";
+    if(v5Heeft(k, "wellness", "spa", "sauna")) return "wellness-hotel";
+    if(v5Heeft(k, "kasteel") || acco === "kasteelhotel") return "kasteelhotel";
+    if(v5Heeft(k, "luxe", "luxueus", "5-sterren", "vijfsterren")) return "luxe-hotel";
+    if(acco && acco !== "hotel" && /hotel$/.test(acco)) return acco;      // landgoedhotel, boutiquehotel, strandhotel
+    return "hotel";
   }
+  // de zoekterm voor het onderwerp zelf, met de intentie erin waar dat natuurlijk is
+  function v5Onderwerpterm(type, c){
+    var k = v5Woorden(c.usp), act = v5Woorden(c.act);
+    switch(type){
+      case "hotelkamer": return v5Heeft(k, "romantisch", "romantische") ? "romantische-hotelkamer" : "luxe-hotelkamer";
+      case "suite":      return "suite";
+      case "restaurant": return "restaurant";
+      case "ontbijt":    return "ontbijt";
+      case "diner":      return "diner";
+      case "wellness":   return "wellness";
+      case "zwembad":    return "zwembad";
+      case "terras":     return "terras";
+      case "natuur":     return "natuur";
+      case "bergen":     return "bergen";
+      case "strand":     return "strand";
+      case "wandelen":   return "wandelen";
+      case "fietsen":    return "fietsen";
+      case "stad":       return "stad";
+      case "omgeving":   return v5Heeft(act, "wandelen") ? "wandelen" : (v5Heeft(act, "fietsen") ? "fietsen" : "omgeving");
+      default:           return "";          // hotel en gebouw: het hotel zelf is het onderwerp
+    }
+  }
+  var V5_ACTIVITEIT = {wandelen:1, fietsen:1, natuur:1, bergen:1, strand:1, stad:1, omgeving:1};   // omgevingstermen: hotelnaam, onderwerp, plek
+  // de regio is de sterkste locatieterm (hotel limburg, wandelen zuid-limburg); de plaats komt erbij als een naam specifieker moet
+  function v5Plek(type, c){ return c.regio || c.plaats; }
   function v5Ontdubbel(delen){
-    // geen woord twee keer achter elkaar, geen lege delen
     var uit = [];
     delen.join("-").split("-").forEach(function(w){ if(w && uit[uit.length - 1] !== w) uit.push(w); });
-    return uit.join("-");
+    // het woord hotel hoort er hooguit een keer in, tenzij het deel is van een term als hotelkamer
+    var gezien = false;
+    return uit.filter(function(w){ if(w !== "hotel") return true; if(gezien) return false; gezien = true; return true; }).join("-");
   }
-  function v5NaamVoor(type, c, variant){
-    var k = v5Kern(type, c), hotel = slug(c.hotel), extra = slug(c.extra), arr = slug(c.arr);
-    var kaal = hotel.replace(/^hotel-/, "");                     // "hotel-winselerhof" zonder het woord hotel
-    var kern = k.kern, delen;
-    // het woord hotel hoort maar een keer in de naam: zit het in de kernterm, dan valt het uit de hotelnaam
-    if(/^hotel(-|$)/.test(kern) || /hotel$/.test(kern)) hotel = kaal;
-    if(type === "hotel"){
-      if(kern === "hotel"){ kern = ""; hotel = "hotel-" + kaal; }   // "hotel-winselerhof-limburg"
-      else { delen = [kern, kaal, k.plek, extra]; }                 // "landgoedhotel-winselerhof-limburg"
+  function v5Basis(type, c){
+    var hotelterm = v5Hotelterm(c), naam = slug(c.hotel), kaal = naam.replace(/^hotel-/, ""), plek = slug(v5Plek(type, c));
+    var onderwerp = v5Onderwerpterm(type, c);
+    if(!onderwerp){                                                      // hotel of gebouw
+      if(hotelterm === "hotel") return [naam ? (naam.indexOf("hotel") === 0 ? naam : "hotel-" + naam) : "hotel", plek];       // hotel-winselerhof-limburg
+      return [hotelterm, kaal, plek];                                    // wellness-hotel-winselerhof-limburg
     }
-    if(!delen) switch(variant || 0){
-      case 1:  delen = [hotel, k.plek, kern, arr]; break;                       // met arrangement
-      case 2:  delen = [kern, hotel, slug(c.plaats || c.regio) === k.plek ? slug(c.regio || c.plaats) : slug(c.plaats || c.regio)]; break;
-      case 3:  delen = [hotel, k.plek, kern, extra || v5Woorden(c.usp)[0] || slug(c.land)]; break;
-      default: delen = [hotel, k.plek, kern, extra];
+    if(V5_ACTIVITEIT[type]) return [naam ? "hotel-" + kaal : hotelterm, onderwerp, plek];   // hotel-winselerhof-wandelen-zuid-limburg
+    var voorziening = {restaurant:1, zwembad:1, wellness:1, terras:1, ontbijt:1, diner:1};
+    if(hotelterm !== "hotel" && voorziening[type]) return [hotelterm, plek, onderwerp];   // wellness-hotel-limburg-zwembad, romantisch-hotel-limburg-restaurant
+    if(!naam){
+      var met = {zwembad:1, restaurant:1, wellness:1, terras:1, ontbijt:1};                 // zonder hotelnaam: "hotel met zwembad limburg"
+      return met[type] ? ["hotel-met-" + onderwerp, plek] : ["hotel", plek, onderwerp];
     }
-    else if(variant === 1) delen.push(arr);
-    else if(variant === 2) delen = [kaal, kern, k.plek];
-    else if(variant === 3) delen.push(v5Woorden(c.usp)[0] || slug(c.land));
-    var naam = v5Ontdubbel(delen);
-    if(!naam) naam = "foto-" + type;
-    while(naam.length > 64 && naam.indexOf("-") !== -1) naam = naam.slice(0, naam.lastIndexOf("-"));   // niet extreem lang
-    // geen naam die eindigt op een los woordje als "met" of "van"
+    return ["hotel-" + kaal, plek, onderwerp];                            // hotel-winselerhof-limburg-luxe-hotelkamer
+  }
+  function v5Kort(naam){
+    while(naam.length > 64 && naam.indexOf("-") !== -1) naam = naam.slice(0, naam.lastIndexOf("-"));
     while(/-(met|en|de|het|van|in|op|aan|voor|bij|of)$/.test(naam)) naam = naam.slice(0, naam.lastIndexOf("-"));
     return naam;
   }
-
-  /* ---------- alt-tekst: wat er te zien is, met hooguit een of twee zoektermen ---------- */
-  function v5Alt(type, c){
-    var H = c.hotel || "", plek = c.plaats && c.regio ? c.plaats + ", " + c.regio : (c.plaats || c.regio || c.land || "");
-    var inPlek = plek ? " in " + plek : "";
-    var van = H ? " van " + H : "";
-    var bij = H ? " bij " + H : "";
-    var romantisch = /romantisch/i.test(c.usp) ? "Romantische" : "Luxe";
-    var t;
-    switch(type){
-      case "hotel":      t = (c.acco ? hoofdletter(c.acco) : "Hotel") + (H ? " " + H.replace(/^hotel\s+/i, "") : "") + inPlek; break;
-      case "hotelkamer": t = romantisch + " hotelkamer" + van + inPlek; break;
-      case "suite":      t = "Suite" + van + inPlek; break;
-      case "restaurant": t = "Restaurant" + van + inPlek; break;
-      case "ontbijt":    t = "Ontbijt" + (H ? " bij " + H : "") + inPlek; break;
-      case "diner":      t = "Diner in het restaurant" + van + inPlek; break;
-      case "wellness":   t = "Wellness" + van + inPlek; break;
-      case "zwembad":    t = "Zwembad" + van + inPlek; break;
-      case "terras":     t = "Terras" + van + inPlek; break;
-      case "omgeving":   t = "Omgeving" + van + inPlek; break;
-      case "natuur":     t = "Natuur rond " + (H || "het hotel") + inPlek; break;
-      case "wandelen":   t = "Wandelen in de omgeving" + van + inPlek; break;
-      case "fietsen":    t = "Fietsen in de omgeving" + van + inPlek; break;
-      case "stad":       t = (c.plaats ? "Binnenstad van " + c.plaats : "Stad") + bij; break;
-      case "strand":     t = "Strand" + bij + inPlek; break;
-      default:           t = (H || "Het hotel") + inPlek + (c.arr ? ", " + c.arr : "");
-    }
-    if(!H && !plek && type !== "overig") t += "";   // zonder context blijft het bij het onderwerp
-    return t.replace(/\s+/g, " ").replace(/\s,/g, ",").trim().slice(0, 125);
+  function v5NaamVoor(it, c){
+    var delen = v5Basis(it.type, c);
+    if(c.extra) delen.push(slug(c.extra));
+    return v5Kort(v5Ontdubbel(delen)) || ("foto-" + it.type);
   }
-
+  // dubbele namen: inhoudelijk specifieker maken, geen -1 of -2
+  function v5Specifieker(it, c, basis, stap){
+    var extra = [];
+    v5NaamWoorden(it).forEach(function(w){ if(basis.indexOf(w) === -1) extra.push(w); });    // woorden uit de eigen bestandsnaam: balkon, tuinzicht
+    var kandidaten = extra.slice(0, 2).map(function(w){ return basis + "-" + w; });
+    var anderePlek = slug(c.plaats);
+    if(anderePlek && basis.indexOf(anderePlek) === -1) kandidaten.push(basis + "-" + anderePlek);
+    if(c.arr) kandidaten.push(basis + "-" + slug(c.arr));
+    v5Woorden(c.usp).concat(v5Woorden(c.act)).forEach(function(w){ if(w.length > 3 && basis.indexOf(w) === -1) kandidaten.push(basis + "-" + w); });
+    if(c.land && basis.indexOf(slug(c.land)) === -1) kandidaten.push(basis + "-" + slug(c.land));
+    kandidaten = kandidaten.map(v5Kort).filter(function(n){ return n !== basis; });
+    return kandidaten[stap] || null;
+  }
   function v5Namen(){
-    // eerst iedereen zijn standaardnaam, dan botsingen oplossen met een andere, even passende variant
     var c = v5Ctx();
-    V5.forEach(function(it){
-      if(!it.naamHand) it.seoNaam = v5NaamVoor(it.type, c, 0);
-      if(!it.altHand) it.alt = v5Alt(it.type, c);
-    });
+    V5.forEach(function(it){ if(!it.naamHand) it.seoNaam = v5NaamVoor(it, c); });
     var gezien = {};
     V5.forEach(function(it){
-      var n = it.seoNaam;
       if(!it.naamHand){
-        var v = 1;
-        while(gezien[n] && v <= 3){ n = v5NaamVoor(it.type, c, v); v++; }
-        var teller = 2;
-        while(gezien[n]){ n = it.seoNaam + "-" + teller; teller++; }   // laatste redmiddel, geen uploadvolgorde maar gewoon uniek
+        var basis = it.seoNaam, n = basis, stap = 0;
+        while(gezien[n]){
+          var kandidaat = v5Specifieker(it, c, basis, stap++);
+          if(!kandidaat){ n = basis + "-" + (stap + 1); break; }      // pas als er echt niets onderscheidends meer is
+          n = kandidaat;
+        }
         it.seoNaam = n;
       }
       it.dubbel = !!gezien[it.seoNaam];
@@ -4252,10 +4241,10 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     if(v5Bezig){ v5Opnieuw = true; return; }
     v5Bezig = true;
     var inst = v5Inst(), lijst = V5.filter(function(it){ return !it.fout; });
-    if(lijst.length) toonVoortgang(0, lijst.length, "Optimaliseren · 0 van " + lijst.length, "v5");
+    if(lijst.length) toonVoortgang(0, lijst.length, "Converteren · 0 van " + lijst.length, "v5");
     for(var i=0;i<lijst.length;i++){
       await v5Optimaliseer(lijst[i], inst);
-      toonVoortgang(i+1, lijst.length, "Optimaliseren · " + (i+1) + " van " + lijst.length + " · " + Math.round(((i+1)/lijst.length)*100) + "%", "v5");
+      toonVoortgang(i+1, lijst.length, "Converteren · " + (i+1) + " van " + lijst.length + " · " + Math.round(((i+1)/lijst.length)*100) + "%", "v5");
       v5Render();
     }
     if(lijst.length){ toonVoortgang(lijst.length, lijst.length, "Klaar · 100%", "v5"); setTimeout(function(){ toonVoortgang(null, 0, "", "v5"); }, 1200); }
@@ -4267,14 +4256,14 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
   async function v5VoegToe(lijst){
     var bestanden = Array.prototype.slice.call(lijst).filter(function(f){ return /^image\//.test(f.type) || ["heic","heif","avif","webp"].indexOf(extVan(f.name)) !== -1; });
     if(!bestanden.length) return;
-    var standaard = $("#v5-type").value;
+    var nieuw = [];
     toonVoortgang(0, bestanden.length, "Foto’s inlezen · 0 van " + bestanden.length, "v5");
     for(var i=0;i<bestanden.length;i++){
-      var f = bestanden[i], url = URL.createObjectURL(f);
+      var f = bestanden[i], url = URL.createObjectURL(f), herkend = v5TypeUitNaam(f.name);
       var it = {id: ++v5Id, bestand: f, naam: f.name, ext: extVan(f.name), grootte: f.size, url: url, bronUrl: url, alpha: false,
-                breedte: 0, hoogte: 0, type: standaard || v5TypeUitNaam(f.name) || "hotel", typeHand: !!standaard, naamHand: false, altHand: false,
-                seoNaam: "", alt: "", uit: null, fout: null, kanTonen: true};
-      V5.push(it);
+                breedte: 0, hoogte: 0, type: herkend || "hotel", herkend: !!herkend, typeHand: false, naamHand: false,
+                seoNaam: "", uit: null, fout: null, kanTonen: true};
+      V5.push(it); nieuw.push(it);
       try{
         var img = await laadAfbeelding(url);
         it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
@@ -4288,6 +4277,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     }
     v5Namen(); v5Render();
     v5OptimaliseerAlles();
+    if(SAMPLE) v5Herken(nieuw);          // in de artifact kijkt Claude naar de foto's zelf
   }
   function v5Verwijder(it){
     if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl);
@@ -4309,16 +4299,18 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     $("#v5-inst-kop").textContent = "Instellingen: " + inst.formaat.toUpperCase() + " · maximaal " + inst.maxKb + " KB · "
       + ((inst.maxW || inst.maxH) ? "maximaal " + [inst.maxW ? inst.maxW + " px breed" : "", inst.maxH ? inst.maxH + " px hoog" : ""].filter(Boolean).join(" en ") : "afmetingen behouden");
     if(!V5.length){
-      host.innerHTML = '<p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden krijgt elke foto meteen een SEO-bestandsnaam, een alt-tekst en een geoptimaliseerde versie.</p>';
+      host.innerHTML = '<p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden herkent de tool het onderwerp, maakt een SEO-bestandsnaam en converteert de foto.</p>';
       bar.hidden = true; return;
     }
     bar.hidden = false;
     $("#v5-ai").hidden = !SAMPLE;
     var klaar = V5.filter(function(it){ return it.uit; }).length, teGroot = V5.filter(function(it){ return it.uit && it.uit.pastNiet; }).length;
     var voor = V5.reduce(function(a, it){ return a + it.grootte; }, 0), na = V5.reduce(function(a, it){ return a + (it.uit ? it.uit.grootte : 0); }, 0);
+    var onbekend = V5.filter(function(it){ return !it.herkend && !it.typeHand; }).length;
     $("#v5-stand").textContent = V5.length + (V5.length === 1 ? " foto" : " foto’s")
-      + (klaar === V5.length ? " klaar · " + v5Kb(voor) + " → " + v5Kb(na) : " · " + klaar + " van " + V5.length + " geoptimaliseerd")
-      + (teGroot ? " · " + teGroot + " blijft boven het maximum" : "");
+      + (klaar === V5.length ? " klaar · " + v5Kb(voor) + " → " + v5Kb(na) : " · " + klaar + " van " + V5.length + " geconverteerd")
+      + (teGroot ? " · " + teGroot + " blijft boven het maximum" : "")
+      + (onbekend && !SAMPLE ? " · " + onbekend + (onbekend === 1 ? " onderwerp niet herkend, kies het zelf" : " onderwerpen niet herkend, kies ze zelf") : "");
     var opties = V5_TYPES.map(function(t){ return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join("");
 
     host.innerHTML = V5.map(function(it){
@@ -4329,14 +4321,14 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
         +   '<div class="breed"><label for="v5n-' + it.id + '">Nieuwe bestandsnaam</label>'
         +     '<div class="v5-naam"><input id="v5n-' + it.id + '" data-veld="naam" value="' + esc(it.seoNaam) + '" spellcheck="false"><span>.' + esc(ext) + '</span></div>'
         +     '<p class="v5-oud">Was: ' + esc(it.naam) + (it.dubbel ? ' · <span class="let">deze naam is al in gebruik</span>' : '') + '</p></div>'
-        +   '<div class="breed"><label for="v5a-' + it.id + '">Alt-tekst</label><textarea id="v5a-' + it.id + '" data-veld="alt">' + esc(it.alt) + '</textarea></div>'
-        +   '<div><label for="v5t-' + it.id + '">Type afbeelding</label><select id="v5t-' + it.id + '" data-veld="type">' + opties + '</select></div>'
+        +   '<div><label for="v5t-' + it.id + '">Onderwerp' + (it.typeHand ? '' : (it.herkend ? ' · herkend' : (it.claude ? ' · door Claude' : ' · niet herkend, controleer'))) + '</label>'
+        +     '<select id="v5t-' + it.id + '" data-veld="type">' + opties + '</select></div>'
         +   '<div class="v5-specs">'
         +     (it.fout ? '<span class="let">' + esc(it.fout) + '</span>'
             : (u ? '<span><span class="oud">' + esc(it.ext.toUpperCase()) + ' · ' + v5Kb(it.grootte) + '</span> → <b>' + esc(ext.toUpperCase()) + ' · ' + v5Kb(u.grootte) + '</b></span>'
                  + '<span>' + u.breedte + ' × ' + u.hoogte + ' px' + (u.breedte !== it.breedte ? ' (was ' + it.breedte + ' × ' + it.hoogte + ')' : '') + '</span>'
                  + (u.pastNiet ? '<span class="let">blijft boven ' + inst.maxKb + ' KB, ook op de laagste stand</span>' : '<span class="ok">' + ico("ok", "ic-sm") + ' binnen ' + inst.maxKb + ' KB</span>')
-               : '<span>' + esc(it.ext.toUpperCase()) + ' · ' + v5Kb(it.grootte) + ' · bezig met optimaliseren…</span>'))
+               : '<span>' + esc(it.ext.toUpperCase()) + ' · ' + v5Kb(it.grootte) + ' · bezig met converteren…</span>'))
         +     '<span class="acties">' + (u ? '<button type="button" class="btn" data-act="download">' + ico("download") + ' Download</button>' : '')
         +     '<button type="button" class="mini-link" data-act="weg">weg</button></span>'
         +   '</div>'
@@ -4348,8 +4340,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       el.querySelector('[data-veld="type"]').value = it.type;
       el.querySelector('[data-veld="naam"]').addEventListener("input", function(){ it.seoNaam = slug(this.value) || it.seoNaam; it.naamHand = true; });
       el.querySelector('[data-veld="naam"]').addEventListener("blur", function(){ this.value = it.seoNaam; v5Namen(); v5Render(); });
-      el.querySelector('[data-veld="alt"]').addEventListener("input", function(){ it.alt = this.value; it.altHand = true; });
-      el.querySelector('[data-veld="type"]').addEventListener("change", function(){ it.type = this.value; it.typeHand = true; it.naamHand = false; it.altHand = false; v5Namen(); v5Render(); });
+      el.querySelector('[data-veld="type"]').addEventListener("change", function(){ it.type = this.value; it.typeHand = true; it.naamHand = false; v5Namen(); v5Render(); });
       el.querySelector('[data-act="weg"]').addEventListener("click", function(){ v5Verwijder(it); });
       var dl = el.querySelector('[data-act="download"]');
       if(dl) dl.addEventListener("click", function(){ if(it.uit) bewaarBlob(it.uit.blob, v5Bestandsnaam(it)); });
@@ -4358,7 +4349,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 
   /* ---------- downloaden ---------- */
   async function v5DownloadAlles(knop){
-    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geoptimaliseerde foto’s"); return; }
+    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geconverteerde foto’s"); return; }
     var oud = knop.textContent; knop.disabled = true;
     for(var i=0;i<lijst.length;i++){
       knop.textContent = "Downloaden… " + (i+1) + " van " + lijst.length;
@@ -4368,7 +4359,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     knop.disabled = false; knop.textContent = oud;
   }
   async function v5DownloadZip(knop){
-    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geoptimaliseerde foto’s"); return; }
+    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geconverteerde foto’s"); return; }
     var oud = knop.innerHTML; knop.disabled = true; knop.textContent = "Zip maken…";
     try{
       var gebruikt = {}, bestanden = [];
@@ -4388,47 +4379,45 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     knop.disabled = false; knop.innerHTML = oud;
   }
 
-  /* ---------- alt-teksten door Claude, alleen in de artifact ---------- */
-  async function v5Claude(knop){
-    if(!SAMPLE) return;
-    var doelen = V5.filter(function(it){ return it.kanTonen !== false && (it.uit || it.bestand); });
+  /* ---------- onderwerp herkennen door Claude, alleen in de artifact ---------- */
+  var v5HerkenBezig = false;
+  async function v5Herken(items, knop){
+    if(!SAMPLE || v5HerkenBezig) return;
+    var doelen = (items || V5).filter(function(it){ return it.kanTonen !== false && (it.uit || it.bestand) && !it.typeHand; });
     if(!doelen.length) return;
-    var c = v5Ctx(), max = Math.max(1, Math.min((SAMPLE_IMG && SAMPLE_IMG.maxCount) || 4, 8)), oud = knop.textContent, gedaan = 0;
-    knop.disabled = true;
+    v5HerkenBezig = true;
+    var max = Math.max(1, Math.min((SAMPLE_IMG && SAMPLE_IMG.maxCount) || 4, 8)), gedaan = 0, oud = knop ? knop.textContent : "";
+    if(knop) knop.disabled = true;
     try{
       for(var i=0;i<doelen.length;i+=max){
         var groep = doelen.slice(i, i+max);
-        knop.textContent = "Claude kijkt… " + gedaan + " van " + doelen.length;
-        var prompt = [
-          "Je schrijft alt-teksten voor foto's op de detailpagina van een hotelarrangement op een Nederlandse reissite.",
-          "Context: hotel " + (c.hotel || "onbekend") + (c.acco ? " (" + c.acco + ")" : "") + ", plaats " + (c.plaats || "-") + ", regio " + (c.regio || "-") + ", land " + (c.land || "-") + ".",
-          c.arr ? "Arrangement: " + c.arr + "." : "", c.usp ? "USP's: " + c.usp + "." : "", c.act ? "Omgeving: " + c.act + "." : "",
-          "Per foto: beschrijf wat echt zichtbaar is, natuurlijk Nederlands, hoogstens 125 tekens, geen 'foto van' of 'afbeelding van',",
-          "hooguit een of twee zoektermen op een natuurlijke manier, hotelnaam of plaats alleen als dat nuttig is.",
-          "Kies ook het type uit: " + V5_TYPES.map(function(t){ return t[0]; }).join(", ") + ".",
-          "Antwoord alleen met een JSON-array in de volgorde van de foto's: [{\"type\":\"...\",\"alt\":\"...\"}]"
-        ].filter(Boolean).join("\n");
-        var uit = await SAMPLE.json(prompt, {images: groep.map(function(it){ return it.uit ? it.uit.blob : it.bestand; }), modelTier: "default"});
+        if(knop) knop.textContent = "Claude kijkt… " + gedaan + " van " + doelen.length;
+        var prompt = "Bepaal per foto wat het onderwerp is voor de fotogalerij van een hotelarrangement. Kies precies een van: "
+          + V5_TYPES.map(function(t){ return t[0]; }).join(", ")
+          + ". hotel = het hotel van buiten of de sfeer van het hotel, gebouw = een ander gebouw of monument, omgeving = de streek zonder duidelijk ander onderwerp."
+          + " Antwoord alleen met een JSON-array van strings in de volgorde van de foto's.";
+        var uit = await SAMPLE.json(prompt, {images: groep.map(function(it){ return it.uit ? it.uit.blob : it.bestand; }), modelTier: "quick"});
         if(!uit || typeof uit.length !== "number") throw {code: "invalid_json"};
         groep.forEach(function(it, k){
-          var r = uit[k] || {};
-          if(r.type && V5_LABEL[r.type] && !it.typeHand){ it.type = r.type; it.naamHand = false; }
-          if(typeof r.alt === "string" && r.alt.trim()){ it.alt = r.alt.trim().replace(/\s+/g, " ").slice(0, 125); it.altHand = true; }
+          var t = typeof uit[k] === "string" ? uit[k].trim().toLowerCase() : "";
+          if(V5_LABEL[t] && !it.typeHand){ it.type = t; it.claude = true; it.herkend = false; it.naamHand = false; }
         });
         gedaan += groep.length;
         v5Namen(); v5Render();
       }
-      toast(gedaan + (gedaan === 1 ? " alt-tekst geschreven" : " alt-teksten geschreven"));
+      if(knop) toast(gedaan + (gedaan === 1 ? " onderwerp herkend" : " onderwerpen herkend"));
     }catch(e){
-      toast(aiFoutTekst(e && e.code));
+      var code = e && e.code;
+      if(knop) toast(aiFoutTekst(code));
+      if(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed","images_unavailable"].indexOf(code) !== -1){ SAMPLE = null; v5Render(); }
     }
-    knop.disabled = false; knop.textContent = oud;
+    v5HerkenBezig = false;
+    if(knop){ knop.disabled = false; knop.textContent = oud; }
   }
 
   /* ---------- koppelingen ---------- */
   (function v5Start(){
     var drop = $("#v5-drop"), inp = $("#v5-files"); if(!drop) return;
-    $("#v5-type").innerHTML = '<option value="">Automatisch uit de bestandsnaam</option>' + V5_TYPES.map(function(t){ return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join("");
     v5LaadVelden();
     drop.addEventListener("click", function(){ inp.click(); });
     drop.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); inp.click(); } });
@@ -4437,12 +4426,9 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     drop.addEventListener("dragleave", function(){ drop.classList.remove("over"); });
     drop.addEventListener("drop", function(e){ e.preventDefault(); drop.classList.remove("over"); if(e.dataTransfer && e.dataTransfer.files.length) v5VoegToe(e.dataTransfer.files); });
     var ctxTimer = null, instTimer = null;
-    $("#v5-ctx").addEventListener("input", function(e){
+    $("#v5-ctx").addEventListener("input", function(){
       clearTimeout(ctxTimer);
-      ctxTimer = setTimeout(function(){
-        if(e.target && e.target.id === "v5-type"){ var t = $("#v5-type").value; V5.forEach(function(it){ if(!it.typeHand){ it.type = t || v5TypeUitNaam(it.naam) || "hotel"; it.naamHand = false; it.altHand = false; } }); }
-        v5Namen(); v5Render(); v5BewaarVelden();
-      }, 250);
+      ctxTimer = setTimeout(function(){ v5Namen(); v5Render(); v5BewaarVelden(); }, 250);
     });
     $("#v5-inst").addEventListener("input", function(){
       clearTimeout(instTimer);
@@ -4450,7 +4436,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     });
     $("#v5-alles").addEventListener("click", function(){ v5DownloadAlles(this); });
     $("#v5-zip").addEventListener("click", function(){ v5DownloadZip(this); });
-    $("#v5-ai").addEventListener("click", function(){ v5Claude(this); });
+    $("#v5-ai").addEventListener("click", function(){ v5Herken(null, this); });
     v5Render();
   })();
 

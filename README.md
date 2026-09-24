@@ -112,34 +112,41 @@ achter `html:not([data-versie="1"])` en in het script achter `metFotos()`. Een
 versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
 `html[data-versie="5"]`.
 
-- **Versie 5** is een losse weergave waarin alleen het optimaliseren overblijft:
-  upload → context invullen → SEO-naam en alt-tekst → converteren → controleren
-  → downloaden. Stappen 00 t/m 04 zijn er niet. Boven de foto's staan velden
+- **Versie 5** is een losse weergave waarin alleen het converteren, SEO-vriendelijk
+  hernoemen en downloaden overblijft: upload → hotelinformatie → onderwerp
+  herkennen → SEO-bestandsnaam → converteren → controleren → downloaden. Stappen
+  00 t/m 04 zijn er niet en alt-teksten ook niet. Boven de foto's staan velden
   voor hotelnaam, plaats, regio, land, type accommodatie, naam arrangement,
-  type afbeelding (standaard voor alle foto's, per foto aanpasbaar), USP's,
-  activiteiten in de omgeving en een extra zoekwoord; die blijven in de browser
-  bewaard. Per foto kiest de tool een kernterm uit veelgebruikte hotel- en
-  reiszoekopdrachten die past bij het type (hotelkamer → *luxe hotelkamer*,
-  wellness → *wellness hotel*, natuur → *hotel in de natuur*, omgeving met
-  wandelen als activiteit → *wandelen*, USP romantisch → *romantisch hotel*) en
-  bouwt de naam als hotelnaam + plek + kernterm, bijvoorbeeld
-  `hotel-winselerhof-landgraaf-luxe-hotelkamer.webp`; het woord hotel komt maar
-  een keer voor, regio-termen (wandelen, wellness, natuur) krijgen de regio,
-  de rest de plaats. Het type komt uit de bestandsnaam (`kamer-balkon.jpg` →
-  hotelkamer), of via Claude in de artifact. Er komen nooit volgnummers in de
-  naam; twee foto's met dezelfde naam krijgen elk een andere passende variant
-  (met arrangement, met de andere plek, met een USP) en pas daarna `-2`. De
-  alt-tekst beschrijft het onderwerp met hotel en plek, zonder "foto van"
-  (*Luxe hotelkamer van Hotel Winselerhof in Landgraaf, Limburg*), maximaal
-  125 tekens. Naam en alt-tekst zijn per foto aan te passen; wat je zelf typt
-  blijft staan als de context verandert. Converteren gaat standaard naar WebP
-  met maximaal 300 KB en behoud van afmetingen; onder *Instellingen* staan
-  formaat (WebP, JPG, PNG), maximale grootte, maximale breedte en hoogte en de
-  startkwaliteit. De tool zoekt de hoogste kwaliteit die past en verkleint pas
-  als de laagste stand nog te groot is. Per foto zie je preview, oude en nieuwe
-  naam, alt-tekst, bestandstype, oude en nieuwe grootte en afmetingen, met een
-  downloadknop; *Download alles* haalt ze los binnen, *Download als zip* in één
-  bestand, beide met exact de gegenereerde namen.
+  belangrijkste kenmerken, activiteiten in de omgeving en een extra zoekwoord;
+  die blijven in de browser bewaard en worden alleen voor de bestandsnaam
+  gebruikt. Het onderwerp per foto (hotel, hotelkamer, suite, restaurant,
+  ontbijt, diner, wellness, zwembad, terras, natuur, bergen, strand, wandelen,
+  fietsen, stad, gebouw, omgeving) komt uit de bestandsnaam (`kamer-balkon.jpg`
+  → hotelkamer, `wandelpad.jpg` → wandelen); in de artifact kijkt Claude na het
+  uploaden naar de foto's zelf en vult het onderwerp in. Niet herkend, dan
+  staat dat bij de foto en kies je het zelf. De naam volgt de prioriteit
+  onderwerp → zoekintentie → locatie → hotelnaam, met hooguit een paar sterke
+  termen: kamers krijgen hotelnaam, regio en onderwerp
+  (`hotel-winselerhof-limburg-luxe-hotelkamer`), voorzieningen krijgen de
+  hotelterm uit de kenmerken (`wellness-hotel-limburg-zwembad`,
+  `romantisch-hotel-limburg-restaurant`), omgeving en activiteiten krijgen
+  hotelnaam, onderwerp en regio (`hotel-winselerhof-wandelen-zuid-limburg`),
+  het hotel zelf wordt `hotel-winselerhof-limburg` of
+  `landgoedhotel-winselerhof-limburg`. Alles lowercase met koppeltekens,
+  hooguit 64 tekens, het woord hotel maar een keer, nooit een volgnummer.
+  Dreigen twee foto's dezelfde naam te krijgen, dan wordt de tweede
+  inhoudelijk specifieker: eerst met een woord uit de eigen bestandsnaam
+  (`…-luxe-hotelkamer-balkon`), dan met de plaats, het arrangement, een kenmerk
+  of het land; pas als er niets onderscheidends meer is komt er een cijfer.
+  Elke naam is per foto aan te passen. Converteren gaat standaard naar WebP met
+  maximaal 300 KB en behoud van afmetingen; onder *Instellingen* staan formaat
+  (WebP, JPG, PNG), maximale grootte, breedte en hoogte en de startkwaliteit.
+  De tool zoekt de hoogste kwaliteit die past en verkleint pas als de laagste
+  stand nog te groot is; een gewijzigde instelling rekent alles direct opnieuw
+  door. Per foto zie je preview, oude en nieuwe naam, onderwerp, bestandstype,
+  oude en nieuwe grootte en afmetingen, met een downloadknop; *Download alles*
+  haalt ze los binnen, *Download als zip* in één bestand, beide met exact de
+  gegenereerde namen.
 
 ## Wat de tool doet
 
