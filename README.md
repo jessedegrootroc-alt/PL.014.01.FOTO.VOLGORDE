@@ -9,9 +9,9 @@ browser is genoeg.
 ## Vijf weergaven
 
 Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
-Versie 5 is de standaard, de keuze van een gebruiker blijft daarna in zijn eigen
-browser bewaard. De standaard staat in `STANDAARD_VERSIE` en in het scriptje in
-de kop van het bestand, verander ze samen.
+De tool opent altijd in versie 5; wisselen geldt alleen voor de open pagina en
+wordt niet bewaard, na herladen staat versie 5 er weer. De standaard staat in
+`STANDAARD_VERSIE` en in het scriptje in de kop van het bestand, verander ze samen.
 
 - **Versie 1** is de opbouw met hoge kaarten en een zijpaneel rechts.
 - **Versie 2** zet de eerste 5 foto's om in compacte rijen, maakt de stand van
