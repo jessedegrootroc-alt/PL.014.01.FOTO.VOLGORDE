@@ -201,6 +201,10 @@ of staat de foto verderop in de reeks, dan leest de tool het onderwerp uit de
 oorspronkelijke bestandsnaam: woorden als restaurant, sauna, suite, binnenplaats
 of fietsen wijzen het onderwerp aan, waarbij het laatste woord in de naam wint.
 Kies je Andere include en typ je zelf een omschrijving, dan is dat het onderwerp.
+Kies je zelf een type in het veld *Wat voor soort beeld is dit?*, dan staat de
+positie meteen op Klopt, ook als het afwijkt van het advies: een eigen keuze is
+een bewuste keuze. De waarschuwing met de reden blijft alleen bestaan voor een
+type dat de tool zelf uit de foto haalt; met Klopt zet je die weg.
 
 In de artifact-versie staat er een knop bij: **Beschrijvingen door Claude**. Die
 stuurt de foto's zelf mee, zodat het onderwerp klopt met wat er echt op staat.

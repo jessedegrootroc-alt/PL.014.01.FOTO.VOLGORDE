@@ -1774,14 +1774,9 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     state.pos[i].cat = cat;
     state.pos[i].autoCat = false;          // zelf gekozen gaat voor wat de tool herkende
     if(cat !== "anders") state.pos[i].anders = "";
-    if(cat === "anders"){
-      state.pos[i].status = "ok";           // een eigen onderwerp is een bewuste keuze, dus klopt
-    } else if(cat){
-      // een nieuwe keuze krijgt een verse status: volgt of alternatief is klopt, alleen echt afwijkend is afwijking.
-      // Zo blijft er geen oude afwijking hangen van het type dat hier eerder stond.
-      var v = volgtAdvies(i);
-      state.pos[i].status = (v === "afwijkend") ? "dev" : "ok";
-    }
+    // Zelf een type kiezen is een bewuste keuze: dat klopt meteen, ook als het afwijkt van het advies.
+    // De waarschuwing blijft alleen voor een type dat de tool zelf uit de foto haalt (pasTypeToe).
+    if(cat) state.pos[i].status = "ok";
     if(!cat && vorig) state.pos[i].status = null;
     renderAlles(); save();
     var el = document.getElementById(viaSelect ? ("cat-"+i) : ("cat-"+i));
