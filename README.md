@@ -9,7 +9,7 @@ browser is genoeg.
 ## Vijf weergaven
 
 Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
-Versie 4 is de standaard, de keuze van een gebruiker blijft daarna in zijn eigen
+Versie 5 is de standaard, de keuze van een gebruiker blijft daarna in zijn eigen
 browser bewaard. De standaard staat in `STANDAARD_VERSIE` en in het scriptje in
 de kop van het bestand, verander ze samen.
 
