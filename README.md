@@ -156,8 +156,8 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   zoekt de hoogste kwaliteit die past en verkleint pas als de laagste stand
   nog te groot is. Per foto zie je preview, oude en nieuwe naam, onderwerp,
   bestandstype, oude en nieuwe grootte en afmetingen; na het optimaliseren
-  verschijnen de downloadknoppen: per foto, *Download alles* los, of
-  *Download als zip*, alle met exact de gegenereerde namen.
+  verschijnen de downloadknoppen: per foto, of alles in één keer met
+  *Download als zip*, met exact de gegenereerde namen.
 
 ## Wat de tool doet
 

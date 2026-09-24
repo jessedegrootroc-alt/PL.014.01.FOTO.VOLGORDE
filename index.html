@@ -850,7 +850,6 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
         <span class="stand" id="v5-stand"></span>
         <button class="btn" id="v5-ai" type="button" hidden>Onderwerp herkennen door Claude</button>
         <button class="btn" id="v5-opt" type="button">Optimaliseren</button>
-        <button class="btn btn-primary" id="v5-alles" type="button">Download alles</button>
         <button class="btn btn-zip" id="v5-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-download"></use></svg> Download als zip</button>
       </div>
       <div id="v5-lijst"><p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden herkent de tool het onderwerp en maakt een SEO-bestandsnaam; met Optimaliseren worden ze JPG tot 300 KB.</p></div>
@@ -4362,7 +4361,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     $("#v5-ai").hidden = !SAMPLE;
     var klaar = V5.filter(function(it){ return it.uit; }).length, teGroot = V5.filter(function(it){ return it.uit && it.uit.pastNiet; }).length;
     var opt = $("#v5-opt"); if(opt && !v5Bezig) opt.textContent = klaar === V5.length ? "Opnieuw optimaliseren" : (klaar ? "Optimaliseren (" + (V5.length - klaar) + " nieuw)" : "Optimaliseren");
-    $("#v5-alles").hidden = !klaar; $("#v5-zip").hidden = !klaar;
+    $("#v5-zip").hidden = !klaar;
     var voor = V5.reduce(function(a, it){ return a + it.grootte; }, 0), na = V5.reduce(function(a, it){ return a + (it.uit ? it.uit.grootte : 0); }, 0);
     var onbekend = V5.filter(function(it){ return !it.herkend && !it.typeHand; }).length;
     $("#v5-stand").textContent = V5.length + (V5.length === 1 ? " foto" : " foto’s")
@@ -4406,16 +4405,6 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
   }
 
   /* ---------- downloaden ---------- */
-  async function v5DownloadAlles(knop){
-    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geconverteerde foto’s"); return; }
-    var oud = knop.textContent; knop.disabled = true;
-    for(var i=0;i<lijst.length;i++){
-      knop.textContent = "Downloaden… " + (i+1) + " van " + lijst.length;
-      await bewaarBlob(lijst[i].uit.blob, v5Bestandsnaam(lijst[i]));
-      await wacht(350);   // de browser wil even tijd tussen losse downloads
-    }
-    knop.disabled = false; knop.textContent = oud;
-  }
   async function v5DownloadZip(knop){
     var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geconverteerde foto’s"); return; }
     var oud = knop.innerHTML; knop.disabled = true; knop.textContent = "Zip maken…";
@@ -4491,7 +4480,6 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       if(e.target && e.target.id === "v5-hotel"){ clearTimeout(v5ZoekTimer); v5ZoekTimer = setTimeout(v5ZoekHotel, 900); }
     });
     $("#v5-opt").addEventListener("click", function(){ if(V5.length) v5OptimaliseerAlles(); });
-    $("#v5-alles").addEventListener("click", function(){ v5DownloadAlles(this); });
     $("#v5-zip").addEventListener("click", function(){ v5DownloadZip(this); });
     $("#v5-ai").addEventListener("click", function(){ v5Herken(null, this); });
     v5Render();
