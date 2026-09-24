@@ -116,10 +116,15 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   hernoemen en downloaden overblijft: upload → hotelinformatie → onderwerp
   herkennen → SEO-bestandsnaam → converteren → controleren → downloaden. Stappen
   00 t/m 04 zijn er niet en alt-teksten ook niet. Boven de foto's staan velden
-  voor hotelnaam, plaats, regio, land, type accommodatie, naam arrangement,
-  belangrijkste kenmerken, activiteiten in de omgeving en een extra zoekwoord;
-  die blijven in de browser bewaard en worden alleen voor de bestandsnaam
-  gebruikt. Het onderwerp per foto (hotel, hotelkamer, suite, restaurant,
+  voor hotelnaam, plaats, regio, land, naam arrangement en een extra zoekwoord,
+  en aanklikbare keuzes voor type accommodatie (één), belangrijkste kenmerken
+  en activiteiten in de omgeving (meer tegelijk, met een veldje *anders…* voor
+  een eigen woord); alles blijft in de browser bewaard en wordt alleen voor de
+  bestandsnaam gebruikt. Typ je een hotelnaam, dan zoekt de tool na een korte
+  pauze plaats, regio en land op via OpenStreetMap (gratis, zonder sleutel) en
+  vult lege velden in; lukt dat niet, dan vraagt de artifact-versie het aan
+  Claude. Wat je zelf al had ingevuld blijft staan, en onder het veld staat
+  waar de gegevens vandaan komen. Het onderwerp per foto (hotel, hotelkamer, suite, restaurant,
   ontbijt, diner, wellness, zwembad, terras, natuur, bergen, strand, wandelen,
   fietsen, stad, gebouw, omgeving) komt uit de bestandsnaam (`kamer-balkon.jpg`
   → hotelkamer, `wandelpad.jpg` → wandelen); in de artifact kijkt Claude na het
@@ -138,15 +143,14 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   inhoudelijk specifieker: eerst met een woord uit de eigen bestandsnaam
   (`…-luxe-hotelkamer-balkon`), dan met de plaats, het arrangement, een kenmerk
   of het land; pas als er niets onderscheidends meer is komt er een cijfer.
-  Elke naam is per foto aan te passen. Converteren gaat standaard naar WebP met
-  maximaal 300 KB en behoud van afmetingen; onder *Instellingen* staan formaat
-  (WebP, JPG, PNG), maximale grootte, breedte en hoogte en de startkwaliteit.
-  De tool zoekt de hoogste kwaliteit die past en verkleint pas als de laagste
-  stand nog te groot is; een gewijzigde instelling rekent alles direct opnieuw
-  door. Per foto zie je preview, oude en nieuwe naam, onderwerp, bestandstype,
-  oude en nieuwe grootte en afmetingen, met een downloadknop; *Download alles*
-  haalt ze los binnen, *Download als zip* in één bestand, beide met exact de
-  gegenereerde namen.
+  Elke naam is per foto aan te passen. Converteren is vast: altijd JPG,
+  maximaal 300 KB, afmetingen blijven waar dat kan; er zijn geen instellingen.
+  De groene knop *Optimaliseren* zet alles om, met een voortgangsbalk; de tool
+  zoekt de hoogste kwaliteit die past en verkleint pas als de laagste stand
+  nog te groot is. Per foto zie je preview, oude en nieuwe naam, onderwerp,
+  bestandstype, oude en nieuwe grootte en afmetingen; na het optimaliseren
+  verschijnen de downloadknoppen: per foto, *Download alles* los, of
+  *Download als zip*, alle met exact de gegenereerde namen.
 
 ## Wat de tool doet
 
