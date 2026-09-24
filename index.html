@@ -1099,6 +1099,7 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
   var STORE = "vialuxury-fotocheck-v12";
   function leegPos(){ return {cat:null, anders:"", status:null, fotoId:null, autoCat:false}; }
   var state = {
+    v:2,                       // opslagversie; vanaf 2 is een zelf gekozen type nooit meer een afwijking
     pos:[leegPos(),leegPos(),leegPos(),leegPos(),leegPos()],
     filters:[], eigen:[],
     gebouwNiet:false, hoofd:0, count:10, checks:{}
@@ -1122,9 +1123,12 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
       if(d.checks) state.checks = d.checks;
       if(Array.isArray(d.filters)) state.filters = d.filters;
       if(Array.isArray(d.eigen)) state.eigen = d.eigen;
+      var oud = !d.v || d.v < 2;   // bewaard voordat een eigen keuze meteen Klopt werd: die afwijkingen opruimen
       if(Array.isArray(d.pos)) d.pos.forEach(function(p,i){
         if(i>4 || !p) return;
-        state.pos[i] = {cat:p.cat||null, anders:p.anders||"", status:p.status||null};
+        var status = p.status || null;
+        if(oud && p.cat && status === "dev") status = "ok";
+        state.pos[i] = {cat:p.cat||null, anders:p.anders||"", status:status, fotoId:null, autoCat:false};
       });
     }catch(e){}
   }
