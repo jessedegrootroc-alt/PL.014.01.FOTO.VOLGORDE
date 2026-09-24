@@ -932,7 +932,6 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
             <div class="deel-knoppen">
               <button class="btn btn-primary" id="deel-bestand" type="button">Maak reviewbestand</button>
               <button class="btn" id="deel-teams" type="button" hidden>Stuur door via Teams</button>
-              <button class="btn" id="deel-kopieer" type="button" hidden>Kopieer bericht</button>
               <button class="btn" id="deel-bewaar" type="button" hidden>Bewaar bij claude.ai</button>
             </div>
             <p class="deel-stand" id="deel-stand"></p>
@@ -3108,7 +3107,7 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
       setTimeout(function(){ toonVoortgang(null); }, 1200);
       $("#deel-stand").innerHTML = "Bewaard als <b>" + esc(hotelNaam || "reeks zonder hotelnaam") + "</b> met " + fotos.length
         + " foto\u2019s. Stuur het bericht via Teams; je collega opent de tool, kiest de reeks onder Bewaarde reeksen en zet daar de feedback bij.";
-      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
+      $("#deel-teams").hidden = false;
       renderReeksen();
     }catch(e){
       toonVoortgang(null);
@@ -3406,7 +3405,7 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
       laatsteReeks = {id: null, hotel: hotelNaam};
       $("#deel-stand").innerHTML = "Reviewbestand gemaakt: <b>" + esc(basis + ".html") + "</b> (" + fotos.length + " foto\u2019s, " + (bytes/1048576).toFixed(1).replace(".", ",") + " MB). "
         + "Stuur het via Teams. Komt het terug, sleep het dan hier in de tool.";
-      $("#deel-teams").hidden = false; $("#deel-kopieer").hidden = false;
+      $("#deel-teams").hidden = false;
     }catch(e){
       toonVoortgang(null); toast("Het reviewbestand maken lukt niet");
     }
@@ -3474,7 +3473,6 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     else if(hoe === "teams") st.innerHTML = "Teams is geopend met het bericht. Sleep het gedownloade bestand <b>" + esc(laatsteBestand.naam) + "</b> in het gesprek en verstuur.";
     else if(hoe === "klembord") st.innerHTML = "Teams openen lukt hier niet. Het bericht staat op je klembord; plak het in Teams en voeg <b>" + esc(laatsteBestand.naam) + "</b> toe.";
   });
-  $("#deel-kopieer").addEventListener("click", function(){ kopieerTekst(deelBericht()); });
 
   async function renderReeksen(){
     var host = $("#reeksen-lijst"); if(!host || !deelActief()) return;
