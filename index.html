@@ -708,6 +708,15 @@ html[data-versie="4"] .sv, html[data-versie="4"] .strip{display:none}
 @media (max-width:760px){
   html:not([data-versie="1"]) #mz-wrap{position:static; box-shadow:none}
 }
+/* ingeklapte kaart: foto links, type en toelichting rechts ernaast, anders blijft rechts alles leeg */
+html:not([data-versie="1"]) .card:not(.open){grid-template-columns:auto minmax(0,1fr) minmax(0,440px); column-gap:var(--s4)}
+html:not([data-versie="1"]) .card:not(.open) .c-num{grid-row:1}
+html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; max-width:none; padding-top:2px}
+@media (max-width:900px){
+  html:not([data-versie="1"]) .card:not(.open){grid-template-columns:auto minmax(0,1fr)}
+  html:not([data-versie="1"]) .card:not(.open) .c-num{grid-row:1 / span 2}
+  html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:2; grid-row:2; max-width:380px}
+}
 </style>
 <script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"4");}catch(e){document.documentElement.setAttribute("data-versie","4");}</script>
 

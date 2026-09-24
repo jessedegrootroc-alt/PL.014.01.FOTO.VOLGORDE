@@ -22,6 +22,9 @@ de kop van het bestand, verander ze samen.
   beurt is (de eerste zonder foto) toont die strook. Kies je een foto, dan
   klapt de kaart in tot een kleine weergave van die foto en gaat de volgende
   open. Met *Andere foto kiezen* of *Foto kiezen* klap je een kaart weer uit.
+  Een ingeklapte kaart gebruikt de breedte: links het nummer, dan titel en
+  foto, en rechts ernaast het type en de toelichting; op een smal scherm
+  staat dat weer onder elkaar.
   Het voorbeeld van de detailpagina (de eerste foto groot, de volgende vier
   ernaast, op volle breedte) blijft daarbij bovenaan het scherm plakken, zodat je bij elke keuze
   live ziet of de foto in de collage past. Klik op een vlak in dat voorbeeld
