@@ -718,6 +718,52 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
   html:not([data-versie="1"]) .card:not(.open) .c-num{grid-row:1 / span 2}
   html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:2; grid-row:2; max-width:380px}
 }
+
+/* ---------- versie 5: alleen optimaliseren, hernoemen en downloaden ---------- */
+#v5{display:none}
+html[data-versie="5"] main.wrap > *:not(#v5):not(.paginakop){display:none}
+html[data-versie="5"] #v5{display:block}
+html[data-versie="5"] .paginakop .sub{display:none}
+.v5-sub{display:none}
+html[data-versie="5"] .paginakop .v5-sub{display:block}
+.v5-kop{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3); margin:var(--s4) 0 8px}
+.v5-velden{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px 14px}
+.v5-velden label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700}
+.v5-velden input,.v5-velden select{display:block; width:100%; margin-top:4px; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:7px 9px; font:inherit; font-size:13.5px; color:var(--ink)}
+.v5-velden .breed{grid-column:1 / -1}
+.v5-inst{margin-top:var(--s3); border:1px solid var(--line-soft); border-radius:var(--r); padding:8px 12px; background:var(--surface-2)}
+.v5-inst summary{cursor:pointer; font-size:13px; font-weight:600; color:var(--ink-2)}
+.v5-inst[open] summary{margin-bottom:10px}
+.v5-inst .v5-velden{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+#v5-bar{margin-top:var(--s4)}
+.v5-item{display:grid; grid-template-columns:var(--fotomaat) minmax(0,1fr); gap:var(--s3); padding:12px; border:1px solid var(--line);
+  border-radius:var(--r); background:var(--surface); margin-bottom:10px; align-items:start}
+.v5-item.fout{border-color:var(--dev-line); background:var(--dev-bg)}
+.v5-item img{width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:5px; display:block; background:var(--na-bg)}
+.v5-item .geenbeeld{width:100%; aspect-ratio:16/9}
+.v5-f{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px 14px; min-width:0}
+.v5-f label{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700}
+.v5-f input,.v5-f textarea,.v5-f select{display:block; width:100%; margin-top:3px; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:6px 9px; font:inherit; font-size:13px; color:var(--ink)}
+.v5-f textarea{min-height:56px; resize:vertical}
+.v5-f .breed{grid-column:1 / -1}
+.v5-naam{display:flex; align-items:center; gap:6px; margin-top:3px}
+.v5-naam input{margin-top:0; flex:1; min-width:0}
+.v5-naam span{font-size:12.5px; color:var(--ink-3); white-space:nowrap}
+.v5-specs{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:12.5px; color:var(--ink-2)}
+.v5-specs b{color:var(--ink); font-weight:600}
+.v5-specs .oud{text-decoration:line-through; color:var(--ink-3)}
+.v5-specs .ok{color:var(--ok); font-weight:600}
+.v5-specs .let{color:var(--dev); font-weight:600}
+.v5-specs .acties{margin-left:auto; display:flex; gap:10px; align-items:center}
+.v5-specs .acties .btn{width:auto; padding:6px 12px; font-size:12.5px}
+.v5-oud{font-size:12px; color:var(--ink-3); word-break:break-all; margin-top:6px}
+.v5-leeg{font-size:13.5px; color:var(--ink-3); padding:8px 0}
+@media (max-width:760px){
+  .v5-item{grid-template-columns:minmax(0,1fr)}
+  .v5-f{grid-template-columns:minmax(0,1fr)}
+}
 </style>
 <script>try{var vv=localStorage.getItem("vialuxury-fotocheck-versie");document.documentElement.setAttribute("data-versie",/^[1-9]$/.test(vv)?vv:"4");}catch(e){document.documentElement.setAttribute("data-versie","4");}</script>
 
@@ -765,9 +811,58 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
       <div class="brandline"><span class="dot"></span> ViaLuxury backoffice</div>
       <h1>Fotocheck arrangement</h1>
       <p class="sub">Stel de eerste 5 foto's samen, de tool denkt na elke keuze mee. Dit zijn richtlijnen, afwijken mag.</p>
+      <p class="sub v5-sub">Upload, vul de context in, en download de foto's met SEO-bestandsnaam en alt-tekst als WebP.</p>
     </div>
     <button class="btn btn-reset" id="btn-reset" type="button">Resetten</button>
   </div>
+
+
+  <section class="block" id="v5" aria-labelledby="h-v5" style="margin-bottom:var(--s4)">
+    <div class="block-h"><h2 id="h-v5">Foto’s optimaliseren voor de website</h2></div>
+    <div class="block-b">
+      <div class="drop" id="v5-drop" role="button" tabindex="0" aria-label="Foto’s toevoegen">
+        <p><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-upload"></use></svg><br><b>Sleep de foto’s hierheen</b> of klik om ze te kiezen. Ze blijven in je browser.</p>
+        <input type="file" id="v5-files" multiple accept="image/*,.heic,.avif,.webp">
+      </div>
+      <div class="zip-prog" id="v5-prog" hidden aria-live="polite">
+        <div class="progress"><i id="v5-fill"></i></div><span id="v5-lbl">0%</span>
+      </div>
+
+      <p class="v5-kop">Context voor bestandsnamen en alt-teksten</p>
+      <div class="v5-velden" id="v5-ctx">
+        <label>Hotelnaam<input id="v5-hotel" data-ctx="hotel" placeholder="Hotel Winselerhof" autocomplete="off"></label>
+        <label>Plaats<input id="v5-plaats" data-ctx="plaats" placeholder="Landgraaf" autocomplete="off"></label>
+        <label>Regio<input id="v5-regio" data-ctx="regio" placeholder="Limburg" autocomplete="off"></label>
+        <label>Land<input id="v5-land" data-ctx="land" placeholder="Nederland" autocomplete="off"></label>
+        <label>Type accommodatie<input id="v5-acco" data-ctx="acco" list="v5-accolijst" placeholder="Landgoedhotel" autocomplete="off">
+          <datalist id="v5-accolijst"><option value="Hotel"><option value="Boutiquehotel"><option value="Kasteelhotel"><option value="Landgoedhotel"><option value="Wellnesshotel"><option value="Strandhotel"><option value="Stadshotel"><option value="Resort"><option value="Bed and breakfast"><option value="Vakantiepark"></datalist></label>
+        <label>Naam arrangement<input id="v5-arr" data-ctx="arr" placeholder="Wellnessweekend met diner" autocomplete="off"></label>
+        <label>Type afbeelding (standaard, per foto aanpasbaar)<select id="v5-type" data-ctx="type"></select></label>
+        <label>Belangrijkste USP’s van het arrangement<input id="v5-usp" data-ctx="usp" placeholder="wellness, sterrenrestaurant, kasteel" autocomplete="off"></label>
+        <label>Activiteiten in de omgeving<input id="v5-act" data-ctx="act" placeholder="wandelen, fietsen, Maastricht" autocomplete="off"></label>
+        <label>Extra zoekwoord (optioneel)<input id="v5-extra" data-ctx="extra" placeholder="romantisch weekendje weg" autocomplete="off"></label>
+      </div>
+
+      <details class="v5-inst" id="v5-inst">
+        <summary id="v5-inst-kop">Instellingen: WebP · maximaal 300 KB · afmetingen behouden</summary>
+        <div class="v5-velden">
+          <label>Formaat<select id="v5-formaat" data-inst="formaat"><option value="webp">WebP</option><option value="jpg">JPG</option><option value="png">PNG</option></select></label>
+          <label>Max. bestandsgrootte (KB)<input type="number" id="v5-maxkb" data-inst="maxKb" value="300" min="20" step="10"></label>
+          <label>Max. breedte (px)<input type="number" id="v5-maxw" data-inst="maxW" placeholder="behouden" min="200" step="10"></label>
+          <label>Max. hoogte (px)<input type="number" id="v5-maxh" data-inst="maxH" placeholder="behouden" min="200" step="10"></label>
+          <label>Kwaliteit (startpunt, %)<input type="number" id="v5-kwal" data-inst="kwal" value="90" min="40" max="100"></label>
+        </div>
+      </details>
+
+      <div class="opt-bar" id="v5-bar" hidden>
+        <span class="stand" id="v5-stand"></span>
+        <button class="btn" id="v5-ai" type="button" hidden>Alt-teksten door Claude</button>
+        <button class="btn btn-primary" id="v5-alles" type="button">Download alles</button>
+        <button class="btn btn-zip" id="v5-zip" type="button"><svg class="ic" aria-hidden="true"><use href="#ic-download"></use></svg> Download als zip</button>
+      </div>
+      <div id="v5-lijst"><p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden krijgt elke foto meteen een SEO-bestandsnaam, een alt-tekst en een geoptimaliseerde versie.</p></div>
+    </div>
+  </section>
 
   <section class="block" id="blok-reeksen" hidden aria-labelledby="h-reeksen" style="margin-bottom:var(--s4)">
     <div class="block-h"><h2 id="h-reeksen">Bewaarde reeksen</h2></div>
@@ -2885,7 +2980,7 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     window.claude.use("sample").then(function(sp){
       if(!sp || typeof sp.limits !== "function") return null;
       return sp.limits().then(function(lim){
-        if(lim && lim.images){ SAMPLE = sp; SAMPLE_IMG = lim.images; renderOpt(); }
+        if(lim && lim.images){ SAMPLE = sp; SAMPLE_IMG = lim.images; renderOpt(); v5Render(); }
       }, function(){});
     }, function(){});
   }
@@ -3777,6 +3872,7 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     var hnVeld = $("#hotelnaam"); if(hnVeld) hnVeld.value = "";
     try{ localStorage.removeItem(STORE); }catch(e){}
     renderRows(); renderCount(); renderFilters(); renderOpt(); renderBib(); renderAlles();
+    v5Reset();
     toast("Alles is gereset, klaar voor het volgende arrangement");
     window.scrollTo({top:0, behavior:"smooth"});
   });
@@ -3842,7 +3938,8 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     {id:"1", naam:"Versie 1", uitleg:"Hoge kaarten, zijpaneel rechts"},
     {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"},
     {id:"3", naam:"Versie 3", uitleg:"Minimaal, alleen wat je nodig hebt"},
-    {id:"4", naam:"Versie 4", uitleg:"Snel voorbereiden: geen controlestap, geen nummers in de naam"}
+    {id:"4", naam:"Versie 4", uitleg:"Snel voorbereiden: geen controlestap, geen nummers in de naam"},
+    {id:"5", naam:"Versie 5", uitleg:"Alleen optimaliseren: SEO-namen, alt-teksten, WebP, downloaden"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
   var STANDAARD_VERSIE = "4";        // waarmee een nieuwe browser begint
@@ -3909,6 +4006,453 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
     if(tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || (t && t.isContentEditable)) return;
     if(geldigeVersie(e.key)){ zetVersie(e.key); toonVersielijst(false); }
   });
+
+  /* ==================== versie 5: alleen optimaliseren, hernoemen en downloaden ====================
+     Upload → context invullen → SEO-naam en alt-tekst → converteren → controleren → downloaden.
+     Geen volgnummers: de naam komt uit wat er op de foto staat en de ingevulde context. */
+  var V5 = [], v5Id = 0, V5_STORE = "vialuxury-fotocheck-v5";
+  var V5_TYPES = [["hotel","Hotel"],["hotelkamer","Hotelkamer"],["suite","Suite"],["restaurant","Restaurant"],["ontbijt","Ontbijt"],
+                  ["diner","Diner"],["wellness","Wellness"],["zwembad","Zwembad"],["terras","Terras"],["omgeving","Omgeving"],
+                  ["natuur","Natuur"],["wandelen","Wandelen"],["fietsen","Fietsen"],["stad","Stad"],["strand","Strand"],["overig","Overig"]];
+  var V5_LABEL = {}; V5_TYPES.forEach(function(t){ V5_LABEL[t[0]] = t[1]; });
+  // van de trefwoorden in een bestandsnaam (catUitNaam) naar een type afbeelding
+  var V5_UIT_CAT = {gebouw:"hotel", kamer:"hotelkamer", suite:"suite", jacuzzi:"suite", interieur:"hotel", tuin:"terras", diner:"restaurant",
+                    ontbijt:"ontbijt", wellness:"wellness", zwembad:"zwembad", fietsen:"fietsen", activiteit:"omgeving", omgeving:"omgeving",
+                    natuur:"natuur", zee:"strand", stad:"stad", bezienswaardigheid:"omgeving", museum:"stad", evenement:"overig"};
+  function v5TypeUitNaam(naam){
+    var cat = catUitNaam(naam), t = slug(naam);
+    if(cat === "diner" && /(^|-)(diner|dinner)(-|$)/.test(t)) return "diner";
+    if(/(^|-)(wandel|wandelen|hiking|hike)(-|$)/.test(t)) return "wandelen";
+    return cat ? (V5_UIT_CAT[cat] || null) : null;
+  }
+
+  function v5Ctx(){
+    var c = {};
+    each(document.querySelectorAll("#v5-ctx [data-ctx]"), function(el){ c[el.getAttribute("data-ctx")] = (el.value || "").trim(); });
+    return c;
+  }
+  function v5Inst(){
+    var g = function(id){ return parseInt(($("#" + id).value || "").trim(), 10) || 0; };
+    return {formaat: $("#v5-formaat").value || "webp", maxKb: g("v5-maxkb") || 300, maxW: g("v5-maxw"), maxH: g("v5-maxh"),
+            kwal: Math.min(100, Math.max(40, g("v5-kwal") || 90))};
+  }
+  function v5BewaarVelden(){
+    try{
+      var d = {ctx: v5Ctx(), inst: {}};
+      each(document.querySelectorAll("#v5-inst [data-inst]"), function(el){ d.inst[el.id] = el.value; });
+      localStorage.setItem(V5_STORE, JSON.stringify(d));
+    }catch(e){}
+  }
+  function v5LaadVelden(){
+    try{
+      var d = JSON.parse(localStorage.getItem(V5_STORE) || "null"); if(!d) return;
+      each(document.querySelectorAll("#v5-ctx [data-ctx]"), function(el){ var k = el.getAttribute("data-ctx"); if(d.ctx && d.ctx[k] != null) el.value = d.ctx[k]; });
+      each(document.querySelectorAll("#v5-inst [data-inst]"), function(el){ if(d.inst && d.inst[el.id] != null) el.value = d.inst[el.id]; });
+    }catch(e){}
+  }
+
+  /* ---------- zoekterm en bestandsnaam ----------
+     Per type een kernterm uit veelgebruikte hotel- en reiszoekopdrachten, alleen als hij past bij de foto.
+     De naam wordt: hotelnaam + plek + kernterm (+ extra zoekwoord), lowercase, met koppeltekens, zonder nummers. */
+  function v5Woorden(t){ return slug(t).split("-").filter(Boolean); }
+  function v5Heeft(lijst, w){ return lijst.indexOf(w) !== -1; }
+  function v5Kern(type, c){
+    var usp = v5Woorden(c.usp), act = v5Woorden(c.act), acco = slug(c.acco);
+    var regioTerm = ["hotel","wellness","natuur","wandelen","fietsen","omgeving"].indexOf(type) !== -1;   // regio-termen: "wandelen limburg"
+    var plek = regioTerm ? (c.regio || c.plaats) : (c.plaats || c.regio);
+    var kern;
+    switch(type){
+      case "hotel":
+        kern = acco && acco !== "hotel" ? acco : "hotel";
+        if(v5Heeft(usp, "romantisch")) kern = "romantisch-hotel";
+        else if(v5Heeft(usp, "luxe") || v5Heeft(usp, "luxueus")) kern = "luxe-hotel";
+        else if(v5Heeft(usp, "wellness") && kern === "hotel") kern = "hotel-met-wellness";
+        else if(v5Heeft(usp, "zwembad") && kern === "hotel") kern = "hotel-met-zwembad";
+        break;
+      case "hotelkamer": kern = v5Heeft(usp, "romantisch") ? "romantische-hotelkamer" : "luxe-hotelkamer"; break;
+      case "suite":      kern = "suite"; break;
+      case "restaurant": kern = "hotel-met-restaurant"; break;
+      case "ontbijt":    kern = "hotel-met-ontbijt"; break;
+      case "diner":      kern = "diner"; break;
+      case "wellness":   kern = "wellness-hotel"; break;
+      case "zwembad":    kern = "hotel-met-zwembad"; break;
+      case "terras":     kern = "terras"; break;
+      case "omgeving":
+        kern = v5Heeft(act, "wandelen") ? "wandelen" : (v5Heeft(act, "fietsen") ? "fietsen" : "weekendje-weg"); break;
+      case "natuur":     kern = "hotel-in-de-natuur"; break;
+      case "wandelen":   kern = "wandelen"; break;
+      case "fietsen":    kern = "fietsen"; break;
+      case "stad":       kern = "stedentrip"; plek = c.plaats || c.regio; break;
+      case "strand":     kern = "hotel-aan-zee"; break;
+      default:           kern = slug(c.arr) || "";
+    }
+    return {kern: kern, plek: slug(plek)};
+  }
+  function v5Ontdubbel(delen){
+    // geen woord twee keer achter elkaar, geen lege delen
+    var uit = [];
+    delen.join("-").split("-").forEach(function(w){ if(w && uit[uit.length - 1] !== w) uit.push(w); });
+    return uit.join("-");
+  }
+  function v5NaamVoor(type, c, variant){
+    var k = v5Kern(type, c), hotel = slug(c.hotel), extra = slug(c.extra), arr = slug(c.arr);
+    var kaal = hotel.replace(/^hotel-/, "");                     // "hotel-winselerhof" zonder het woord hotel
+    var kern = k.kern, delen;
+    // het woord hotel hoort maar een keer in de naam: zit het in de kernterm, dan valt het uit de hotelnaam
+    if(/^hotel(-|$)/.test(kern) || /hotel$/.test(kern)) hotel = kaal;
+    if(type === "hotel"){
+      if(kern === "hotel"){ kern = ""; hotel = "hotel-" + kaal; }   // "hotel-winselerhof-limburg"
+      else { delen = [kern, kaal, k.plek, extra]; }                 // "landgoedhotel-winselerhof-limburg"
+    }
+    if(!delen) switch(variant || 0){
+      case 1:  delen = [hotel, k.plek, kern, arr]; break;                       // met arrangement
+      case 2:  delen = [kern, hotel, slug(c.plaats || c.regio) === k.plek ? slug(c.regio || c.plaats) : slug(c.plaats || c.regio)]; break;
+      case 3:  delen = [hotel, k.plek, kern, extra || v5Woorden(c.usp)[0] || slug(c.land)]; break;
+      default: delen = [hotel, k.plek, kern, extra];
+    }
+    else if(variant === 1) delen.push(arr);
+    else if(variant === 2) delen = [kaal, kern, k.plek];
+    else if(variant === 3) delen.push(v5Woorden(c.usp)[0] || slug(c.land));
+    var naam = v5Ontdubbel(delen);
+    if(!naam) naam = "foto-" + type;
+    while(naam.length > 64 && naam.indexOf("-") !== -1) naam = naam.slice(0, naam.lastIndexOf("-"));   // niet extreem lang
+    // geen naam die eindigt op een los woordje als "met" of "van"
+    while(/-(met|en|de|het|van|in|op|aan|voor|bij|of)$/.test(naam)) naam = naam.slice(0, naam.lastIndexOf("-"));
+    return naam;
+  }
+
+  /* ---------- alt-tekst: wat er te zien is, met hooguit een of twee zoektermen ---------- */
+  function v5Alt(type, c){
+    var H = c.hotel || "", plek = c.plaats && c.regio ? c.plaats + ", " + c.regio : (c.plaats || c.regio || c.land || "");
+    var inPlek = plek ? " in " + plek : "";
+    var van = H ? " van " + H : "";
+    var bij = H ? " bij " + H : "";
+    var romantisch = /romantisch/i.test(c.usp) ? "Romantische" : "Luxe";
+    var t;
+    switch(type){
+      case "hotel":      t = (c.acco ? hoofdletter(c.acco) : "Hotel") + (H ? " " + H.replace(/^hotel\s+/i, "") : "") + inPlek; break;
+      case "hotelkamer": t = romantisch + " hotelkamer" + van + inPlek; break;
+      case "suite":      t = "Suite" + van + inPlek; break;
+      case "restaurant": t = "Restaurant" + van + inPlek; break;
+      case "ontbijt":    t = "Ontbijt" + (H ? " bij " + H : "") + inPlek; break;
+      case "diner":      t = "Diner in het restaurant" + van + inPlek; break;
+      case "wellness":   t = "Wellness" + van + inPlek; break;
+      case "zwembad":    t = "Zwembad" + van + inPlek; break;
+      case "terras":     t = "Terras" + van + inPlek; break;
+      case "omgeving":   t = "Omgeving" + van + inPlek; break;
+      case "natuur":     t = "Natuur rond " + (H || "het hotel") + inPlek; break;
+      case "wandelen":   t = "Wandelen in de omgeving" + van + inPlek; break;
+      case "fietsen":    t = "Fietsen in de omgeving" + van + inPlek; break;
+      case "stad":       t = (c.plaats ? "Binnenstad van " + c.plaats : "Stad") + bij; break;
+      case "strand":     t = "Strand" + bij + inPlek; break;
+      default:           t = (H || "Het hotel") + inPlek + (c.arr ? ", " + c.arr : "");
+    }
+    if(!H && !plek && type !== "overig") t += "";   // zonder context blijft het bij het onderwerp
+    return t.replace(/\s+/g, " ").replace(/\s,/g, ",").trim().slice(0, 125);
+  }
+
+  function v5Namen(){
+    // eerst iedereen zijn standaardnaam, dan botsingen oplossen met een andere, even passende variant
+    var c = v5Ctx();
+    V5.forEach(function(it){
+      if(!it.naamHand) it.seoNaam = v5NaamVoor(it.type, c, 0);
+      if(!it.altHand) it.alt = v5Alt(it.type, c);
+    });
+    var gezien = {};
+    V5.forEach(function(it){
+      var n = it.seoNaam;
+      if(!it.naamHand){
+        var v = 1;
+        while(gezien[n] && v <= 3){ n = v5NaamVoor(it.type, c, v); v++; }
+        var teller = 2;
+        while(gezien[n]){ n = it.seoNaam + "-" + teller; teller++; }   // laatste redmiddel, geen uploadvolgorde maar gewoon uniek
+        it.seoNaam = n;
+      }
+      it.dubbel = !!gezien[it.seoNaam];
+      gezien[it.seoNaam] = true;
+    });
+  }
+
+  /* ---------- converteren en optimaliseren ---------- */
+  function v5Mime(f){ return f === "png" ? "image/png" : (f === "jpg" ? "image/jpeg" : "image/webp"); }
+  var v5WebpKan = null;
+  function v5KanWebp(){
+    if(v5WebpKan !== null) return v5WebpKan;
+    try{ var c = document.createElement("canvas"); c.width = 2; c.height = 2; v5WebpKan = c.toDataURL("image/webp").indexOf("data:image/webp") === 0; }
+    catch(e){ v5WebpKan = false; }
+    return v5WebpKan;
+  }
+  function v5Teken(img, w, h, vullen){
+    var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h));
+    var x = c.getContext("2d"); x.imageSmoothingQuality = "high";
+    if(vullen){ x.fillStyle = "#ffffff"; x.fillRect(0, 0, c.width, c.height); }   // jpg kent geen transparantie
+    x.drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
+  async function v5Optimaliseer(it, inst){
+    if(it.fout) return;
+    it.bezig = true;
+    try{
+      var img = await laadAfbeelding(it.url);
+      var formaat = inst.formaat;
+      if(formaat === "webp" && !v5KanWebp()) formaat = "jpg";      // deze browser kan geen WebP schrijven
+      var mime = v5Mime(formaat), maxB = inst.maxKb * 1024;
+      // afmetingen behouden, alleen kleiner als een maximum dat vraagt of het bestand anders te groot blijft
+      var schaal = 1;
+      if(inst.maxW && img.naturalWidth > inst.maxW) schaal = Math.min(schaal, inst.maxW / img.naturalWidth);
+      if(inst.maxH && img.naturalHeight > inst.maxH) schaal = Math.min(schaal, inst.maxH / img.naturalHeight);
+      var beste = null, laatste = null;
+      for(var ronde = 0; ronde < 5 && !beste; ronde++){
+        var canvas = v5Teken(img, img.naturalWidth * schaal, img.naturalHeight * schaal, formaat === "jpg");
+        var teGroot;
+        if(formaat === "png"){
+          var b = await naarBlob(canvas, mime);
+          laatste = {blob: b, w: canvas.width, h: canvas.height};
+          if(b && b.size <= maxB) beste = laatste; else teGroot = b ? b.size : maxB * 2;
+        } else {
+          // eerst het startpunt: past dat, dan is dit de hoogste kwaliteit die kan
+          var hoog = inst.kwal / 100, laag = 0.55;
+          var bh = await naarBlob(canvas, mime, hoog);
+          laatste = {blob: bh, w: canvas.width, h: canvas.height, q: hoog};
+          if(bh && bh.size <= maxB){ beste = laatste; break; }
+          // past de laagste stand ook niet, dan moet het beeld kleiner; anders zoeken we de hoogste kwaliteit die past
+          var bl = await naarBlob(canvas, mime, laag);
+          if(!bl) break;
+          laatste = {blob: bl, w: canvas.width, h: canvas.height, q: laag};
+          if(bl.size > maxB){ teGroot = bl.size; }
+          else {
+            beste = laatste;
+            for(var stap = 0; stap < 3; stap++){
+              var mid = (laag + hoog) / 2, bm = await naarBlob(canvas, mime, mid);
+              if(!bm) break;
+              if(bm.size <= maxB){ beste = {blob: bm, w: canvas.width, h: canvas.height, q: mid}; laag = mid; } else hoog = mid;
+            }
+          }
+        }
+        if(!beste){
+          // bestandsgrootte schaalt ongeveer met het aantal pixels: in een keer naar de juiste maat, met een kleine marge
+          var factor = Math.sqrt(maxB / teGroot) * 0.95;
+          factor = Math.max(0.35, Math.min(0.92, factor));
+          if(canvas.width * factor < 640) break;      // niet kleiner dan zinvol is voor de website
+          schaal *= factor;
+        }
+      }
+      var uit = beste || laatste;
+      if(!uit || !uit.blob) throw new Error("geen resultaat");
+      if(it.uit && it.uit.url) URL.revokeObjectURL(it.uit.url);
+      it.uit = {blob: uit.blob, url: URL.createObjectURL(uit.blob), ext: formaat, grootte: uit.blob.size, breedte: uit.w, hoogte: uit.h,
+                pastNiet: uit.blob.size > maxB, kwaliteit: uit.q ? Math.round(uit.q * 100) : null};
+    }catch(e){
+      it.uit = null; it.fout = "Deze foto kan niet worden omgezet";
+    }
+    it.bezig = false;
+  }
+  var v5Bezig = false, v5Opnieuw = false;
+  async function v5OptimaliseerAlles(){
+    if(v5Bezig){ v5Opnieuw = true; return; }
+    v5Bezig = true;
+    var inst = v5Inst(), lijst = V5.filter(function(it){ return !it.fout; });
+    if(lijst.length) toonVoortgang(0, lijst.length, "Optimaliseren · 0 van " + lijst.length, "v5");
+    for(var i=0;i<lijst.length;i++){
+      await v5Optimaliseer(lijst[i], inst);
+      toonVoortgang(i+1, lijst.length, "Optimaliseren · " + (i+1) + " van " + lijst.length + " · " + Math.round(((i+1)/lijst.length)*100) + "%", "v5");
+      v5Render();
+    }
+    if(lijst.length){ toonVoortgang(lijst.length, lijst.length, "Klaar · 100%", "v5"); setTimeout(function(){ toonVoortgang(null, 0, "", "v5"); }, 1200); }
+    v5Bezig = false;
+    if(v5Opnieuw){ v5Opnieuw = false; v5OptimaliseerAlles(); }
+  }
+
+  /* ---------- toevoegen ---------- */
+  async function v5VoegToe(lijst){
+    var bestanden = Array.prototype.slice.call(lijst).filter(function(f){ return /^image\//.test(f.type) || ["heic","heif","avif","webp"].indexOf(extVan(f.name)) !== -1; });
+    if(!bestanden.length) return;
+    var standaard = $("#v5-type").value;
+    toonVoortgang(0, bestanden.length, "Foto’s inlezen · 0 van " + bestanden.length, "v5");
+    for(var i=0;i<bestanden.length;i++){
+      var f = bestanden[i], url = URL.createObjectURL(f);
+      var it = {id: ++v5Id, bestand: f, naam: f.name, ext: extVan(f.name), grootte: f.size, url: url, bronUrl: url, alpha: false,
+                breedte: 0, hoogte: 0, type: standaard || v5TypeUitNaam(f.name) || "hotel", typeHand: !!standaard, naamHand: false, altHand: false,
+                seoNaam: "", alt: "", uit: null, fout: null, kanTonen: true};
+      V5.push(it);
+      try{
+        var img = await laadAfbeelding(url);
+        it.breedte = img.naturalWidth; it.hoogte = img.naturalHeight;
+        it.alpha = (["png","webp","avif"].indexOf(it.ext) !== -1) && heeftTransparantie(img);
+      }catch(e){
+        // heic en andere formaten die de browser niet toont: eerst omzetten naar jpg, net als in de andere versies
+        var gelukt = await zetOmNaarJpg(it);
+        if(!gelukt){ it.fout = "Kan niet worden gelezen" + (isHeic(it.ext) ? " (HEIC omzetten lukt niet)" : ""); it.kanTonen = false; }
+      }
+      toonVoortgang(i+1, bestanden.length, "Foto’s inlezen · " + (i+1) + " van " + bestanden.length, "v5");
+    }
+    v5Namen(); v5Render();
+    v5OptimaliseerAlles();
+  }
+  function v5Verwijder(it){
+    if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl);
+    if(it.uit && it.uit.url) URL.revokeObjectURL(it.uit.url);
+    V5 = V5.filter(function(x){ return x !== it; });
+    v5Namen(); v5Render();
+  }
+  function v5Reset(){
+    V5.slice().forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); if(it.uit && it.uit.url) URL.revokeObjectURL(it.uit.url); });
+    V5 = []; v5Render();
+  }
+
+  /* ---------- weergave ---------- */
+  function v5Bestandsnaam(it){ return it.seoNaam + "." + ((it.uit && it.uit.ext) || v5Inst().formaat); }
+  function v5Kb(n){ return n >= 1048576 ? (n/1048576).toFixed(1).replace(".", ",") + " MB" : kb(n) + " KB"; }
+  function v5Render(){
+    var host = $("#v5-lijst"), bar = $("#v5-bar"); if(!host) return;
+    var inst = v5Inst();
+    $("#v5-inst-kop").textContent = "Instellingen: " + inst.formaat.toUpperCase() + " · maximaal " + inst.maxKb + " KB · "
+      + ((inst.maxW || inst.maxH) ? "maximaal " + [inst.maxW ? inst.maxW + " px breed" : "", inst.maxH ? inst.maxH + " px hoog" : ""].filter(Boolean).join(" en ") : "afmetingen behouden");
+    if(!V5.length){
+      host.innerHTML = '<p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden krijgt elke foto meteen een SEO-bestandsnaam, een alt-tekst en een geoptimaliseerde versie.</p>';
+      bar.hidden = true; return;
+    }
+    bar.hidden = false;
+    $("#v5-ai").hidden = !SAMPLE;
+    var klaar = V5.filter(function(it){ return it.uit; }).length, teGroot = V5.filter(function(it){ return it.uit && it.uit.pastNiet; }).length;
+    var voor = V5.reduce(function(a, it){ return a + it.grootte; }, 0), na = V5.reduce(function(a, it){ return a + (it.uit ? it.uit.grootte : 0); }, 0);
+    $("#v5-stand").textContent = V5.length + (V5.length === 1 ? " foto" : " foto’s")
+      + (klaar === V5.length ? " klaar · " + v5Kb(voor) + " → " + v5Kb(na) : " · " + klaar + " van " + V5.length + " geoptimaliseerd")
+      + (teGroot ? " · " + teGroot + " blijft boven het maximum" : "");
+    var opties = V5_TYPES.map(function(t){ return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join("");
+
+    host.innerHTML = V5.map(function(it){
+      var u = it.uit, ext = (u && u.ext) || inst.formaat;
+      return '<div class="v5-item' + (it.fout ? ' fout' : '') + '" data-id="' + it.id + '">'
+        + (it.kanTonen === false ? '<div class="geenbeeld">' + esc(it.ext.toUpperCase()) + '</div>' : '<img src="' + (u ? u.url : it.url) + '" alt="">')
+        + '<div class="v5-f">'
+        +   '<div class="breed"><label for="v5n-' + it.id + '">Nieuwe bestandsnaam</label>'
+        +     '<div class="v5-naam"><input id="v5n-' + it.id + '" data-veld="naam" value="' + esc(it.seoNaam) + '" spellcheck="false"><span>.' + esc(ext) + '</span></div>'
+        +     '<p class="v5-oud">Was: ' + esc(it.naam) + (it.dubbel ? ' · <span class="let">deze naam is al in gebruik</span>' : '') + '</p></div>'
+        +   '<div class="breed"><label for="v5a-' + it.id + '">Alt-tekst</label><textarea id="v5a-' + it.id + '" data-veld="alt">' + esc(it.alt) + '</textarea></div>'
+        +   '<div><label for="v5t-' + it.id + '">Type afbeelding</label><select id="v5t-' + it.id + '" data-veld="type">' + opties + '</select></div>'
+        +   '<div class="v5-specs">'
+        +     (it.fout ? '<span class="let">' + esc(it.fout) + '</span>'
+            : (u ? '<span><span class="oud">' + esc(it.ext.toUpperCase()) + ' · ' + v5Kb(it.grootte) + '</span> → <b>' + esc(ext.toUpperCase()) + ' · ' + v5Kb(u.grootte) + '</b></span>'
+                 + '<span>' + u.breedte + ' × ' + u.hoogte + ' px' + (u.breedte !== it.breedte ? ' (was ' + it.breedte + ' × ' + it.hoogte + ')' : '') + '</span>'
+                 + (u.pastNiet ? '<span class="let">blijft boven ' + inst.maxKb + ' KB, ook op de laagste stand</span>' : '<span class="ok">' + ico("ok", "ic-sm") + ' binnen ' + inst.maxKb + ' KB</span>')
+               : '<span>' + esc(it.ext.toUpperCase()) + ' · ' + v5Kb(it.grootte) + ' · bezig met optimaliseren…</span>'))
+        +     '<span class="acties">' + (u ? '<button type="button" class="btn" data-act="download">' + ico("download") + ' Download</button>' : '')
+        +     '<button type="button" class="mini-link" data-act="weg">weg</button></span>'
+        +   '</div>'
+        + '</div></div>';
+    }).join("");
+
+    each(host.querySelectorAll(".v5-item"), function(el){
+      var it = V5.filter(function(x){ return x.id === parseInt(el.getAttribute("data-id"), 10); })[0]; if(!it) return;
+      el.querySelector('[data-veld="type"]').value = it.type;
+      el.querySelector('[data-veld="naam"]').addEventListener("input", function(){ it.seoNaam = slug(this.value) || it.seoNaam; it.naamHand = true; });
+      el.querySelector('[data-veld="naam"]').addEventListener("blur", function(){ this.value = it.seoNaam; v5Namen(); v5Render(); });
+      el.querySelector('[data-veld="alt"]').addEventListener("input", function(){ it.alt = this.value; it.altHand = true; });
+      el.querySelector('[data-veld="type"]').addEventListener("change", function(){ it.type = this.value; it.typeHand = true; it.naamHand = false; it.altHand = false; v5Namen(); v5Render(); });
+      el.querySelector('[data-act="weg"]').addEventListener("click", function(){ v5Verwijder(it); });
+      var dl = el.querySelector('[data-act="download"]');
+      if(dl) dl.addEventListener("click", function(){ if(it.uit) bewaarBlob(it.uit.blob, v5Bestandsnaam(it)); });
+    });
+  }
+
+  /* ---------- downloaden ---------- */
+  async function v5DownloadAlles(knop){
+    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geoptimaliseerde foto’s"); return; }
+    var oud = knop.textContent; knop.disabled = true;
+    for(var i=0;i<lijst.length;i++){
+      knop.textContent = "Downloaden… " + (i+1) + " van " + lijst.length;
+      await bewaarBlob(lijst[i].uit.blob, v5Bestandsnaam(lijst[i]));
+      await wacht(350);   // de browser wil even tijd tussen losse downloads
+    }
+    knop.disabled = false; knop.textContent = oud;
+  }
+  async function v5DownloadZip(knop){
+    var lijst = V5.filter(function(it){ return it.uit; }); if(!lijst.length){ toast("Nog geen geoptimaliseerde foto’s"); return; }
+    var oud = knop.innerHTML; knop.disabled = true; knop.textContent = "Zip maken…";
+    try{
+      var gebruikt = {}, bestanden = [];
+      toonVoortgang(0, lijst.length, "", "v5");
+      for(var i=0;i<lijst.length;i++){
+        var it = lijst[i], naam = v5Bestandsnaam(it), basis = naam.replace(/\.[^.]+$/, ""), ext = extVan(naam);
+        // exact de SEO-naam; alleen als twee foto's met de hand dezelfde naam kregen, krijgt de tweede een achtervoegsel
+        if(gebruikt[naam]){ gebruikt[naam]++; naam = basis + "-" + gebruikt[naam] + "." + ext; } else gebruikt[naam] = 1;
+        bestanden.push({naam: naam, data: new Uint8Array(await it.uit.blob.arrayBuffer())});
+        toonVoortgang(i+1, lijst.length, "", "v5");
+      }
+      var c = v5Ctx();
+      await bewaarBlob(await maakZip(bestanden), "fotos-" + (slug(c.hotel) || "website") + ".zip");
+      toonVoortgang(lijst.length, lijst.length, "Klaar · 100%", "v5");
+    }catch(e){ toast("Zip maken lukt niet"); }
+    setTimeout(function(){ toonVoortgang(null, 0, "", "v5"); }, 1200);
+    knop.disabled = false; knop.innerHTML = oud;
+  }
+
+  /* ---------- alt-teksten door Claude, alleen in de artifact ---------- */
+  async function v5Claude(knop){
+    if(!SAMPLE) return;
+    var doelen = V5.filter(function(it){ return it.kanTonen !== false && (it.uit || it.bestand); });
+    if(!doelen.length) return;
+    var c = v5Ctx(), max = Math.max(1, Math.min((SAMPLE_IMG && SAMPLE_IMG.maxCount) || 4, 8)), oud = knop.textContent, gedaan = 0;
+    knop.disabled = true;
+    try{
+      for(var i=0;i<doelen.length;i+=max){
+        var groep = doelen.slice(i, i+max);
+        knop.textContent = "Claude kijkt… " + gedaan + " van " + doelen.length;
+        var prompt = [
+          "Je schrijft alt-teksten voor foto's op de detailpagina van een hotelarrangement op een Nederlandse reissite.",
+          "Context: hotel " + (c.hotel || "onbekend") + (c.acco ? " (" + c.acco + ")" : "") + ", plaats " + (c.plaats || "-") + ", regio " + (c.regio || "-") + ", land " + (c.land || "-") + ".",
+          c.arr ? "Arrangement: " + c.arr + "." : "", c.usp ? "USP's: " + c.usp + "." : "", c.act ? "Omgeving: " + c.act + "." : "",
+          "Per foto: beschrijf wat echt zichtbaar is, natuurlijk Nederlands, hoogstens 125 tekens, geen 'foto van' of 'afbeelding van',",
+          "hooguit een of twee zoektermen op een natuurlijke manier, hotelnaam of plaats alleen als dat nuttig is.",
+          "Kies ook het type uit: " + V5_TYPES.map(function(t){ return t[0]; }).join(", ") + ".",
+          "Antwoord alleen met een JSON-array in de volgorde van de foto's: [{\"type\":\"...\",\"alt\":\"...\"}]"
+        ].filter(Boolean).join("\n");
+        var uit = await SAMPLE.json(prompt, {images: groep.map(function(it){ return it.uit ? it.uit.blob : it.bestand; }), modelTier: "default"});
+        if(!uit || typeof uit.length !== "number") throw {code: "invalid_json"};
+        groep.forEach(function(it, k){
+          var r = uit[k] || {};
+          if(r.type && V5_LABEL[r.type] && !it.typeHand){ it.type = r.type; it.naamHand = false; }
+          if(typeof r.alt === "string" && r.alt.trim()){ it.alt = r.alt.trim().replace(/\s+/g, " ").slice(0, 125); it.altHand = true; }
+        });
+        gedaan += groep.length;
+        v5Namen(); v5Render();
+      }
+      toast(gedaan + (gedaan === 1 ? " alt-tekst geschreven" : " alt-teksten geschreven"));
+    }catch(e){
+      toast(aiFoutTekst(e && e.code));
+    }
+    knop.disabled = false; knop.textContent = oud;
+  }
+
+  /* ---------- koppelingen ---------- */
+  (function v5Start(){
+    var drop = $("#v5-drop"), inp = $("#v5-files"); if(!drop) return;
+    $("#v5-type").innerHTML = '<option value="">Automatisch uit de bestandsnaam</option>' + V5_TYPES.map(function(t){ return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join("");
+    v5LaadVelden();
+    drop.addEventListener("click", function(){ inp.click(); });
+    drop.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); inp.click(); } });
+    inp.addEventListener("change", function(){ if(!inp.files.length) return; var k = Array.prototype.slice.call(inp.files); inp.value = ""; v5VoegToe(k); });
+    drop.addEventListener("dragover", function(e){ e.preventDefault(); drop.classList.add("over"); });
+    drop.addEventListener("dragleave", function(){ drop.classList.remove("over"); });
+    drop.addEventListener("drop", function(e){ e.preventDefault(); drop.classList.remove("over"); if(e.dataTransfer && e.dataTransfer.files.length) v5VoegToe(e.dataTransfer.files); });
+    var ctxTimer = null, instTimer = null;
+    $("#v5-ctx").addEventListener("input", function(e){
+      clearTimeout(ctxTimer);
+      ctxTimer = setTimeout(function(){
+        if(e.target && e.target.id === "v5-type"){ var t = $("#v5-type").value; V5.forEach(function(it){ if(!it.typeHand){ it.type = t || v5TypeUitNaam(it.naam) || "hotel"; it.naamHand = false; it.altHand = false; } }); }
+        v5Namen(); v5Render(); v5BewaarVelden();
+      }, 250);
+    });
+    $("#v5-inst").addEventListener("input", function(){
+      clearTimeout(instTimer);
+      instTimer = setTimeout(function(){ v5BewaarVelden(); v5Render(); if(V5.length) v5OptimaliseerAlles(); }, 500);
+    });
+    $("#v5-alles").addEventListener("click", function(){ v5DownloadAlles(this); });
+    $("#v5-zip").addEventListener("click", function(){ v5DownloadZip(this); });
+    $("#v5-ai").addEventListener("click", function(){ v5Claude(this); });
+    v5Render();
+  })();
 
   /* ---------- start ---------- */
   zetVersie(bewaardeVersie(), false);
