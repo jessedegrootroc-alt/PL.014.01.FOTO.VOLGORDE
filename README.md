@@ -115,20 +115,19 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
 - **Versie 5** is een losse weergave waarin alleen het converteren, SEO-vriendelijk
   hernoemen en downloaden overblijft: upload → hotelinformatie → onderwerp
   herkennen → SEO-bestandsnaam → converteren → controleren → downloaden. Stappen
-  00 t/m 04 zijn er niet en alt-teksten ook niet. Boven de foto's staan velden
-  voor hotelnaam, plaats, regio, land, naam arrangement en een extra zoekwoord,
-  en daaronder de soorten arrangement van de site als aanklikbare knoppen met
-  icoon (Nieuwe hotels, Zwembad, Wellnesshotels, Hotels in België, Hond mee,
-  Bijzondere overnachtingen, Aan zee, Exclusief bij ViaLuxury, In de natuur,
-  Kerstmarkten, Stedentrips, Hotels in Frankrijk, Fietsarrangement, Hotels met
-  wellness, Bubbelbad op kamer, 5 sterren, Met diner, Mini vakanties,
-  Kasteelhotels, SUPER DEAL); alles blijft in de browser bewaard en wordt alleen
-  voor de bestandsnaam gebruikt. Hotels in België of Frankrijk vult het land in
-  als dat leeg is. Typ je een hotelnaam, dan zoekt de tool na een korte
-  pauze plaats, regio en land op via OpenStreetMap (gratis, zonder sleutel) en
-  vult lege velden in; lukt dat niet, dan vraagt de artifact-versie het aan
-  Claude. Wat je zelf al had ingevuld blijft staan, en onder het veld staat
-  waar de gegevens vandaan komen. Het onderwerp per foto (hotel, hotelkamer, suite, restaurant,
+  00 t/m 04 zijn er niet en alt-teksten ook niet. Boven de foto's staat één
+  veld, de hotelnaam, en daaronder de soorten arrangement van de site als
+  aanklikbare knoppen met icoon (Nieuwe hotels, Zwembad, Wellnesshotels, Hotels
+  in België, Hond mee, Bijzondere overnachtingen, Aan zee, Exclusief bij
+  ViaLuxury, In de natuur, Kerstmarkten, Stedentrips, Hotels in Frankrijk,
+  Fietsarrangement, Hotels met wellness, Bubbelbad op kamer, 5 sterren, Met
+  diner, Mini vakanties, Kasteelhotels, SUPER DEAL); alles blijft in de browser
+  bewaard en wordt alleen voor de bestandsnaam gebruikt. Typ je een hotelnaam,
+  dan zoekt de tool na een korte pauze plaats, regio en land op via
+  OpenStreetMap (gratis, zonder sleutel); lukt dat niet, dan vraagt de
+  artifact-versie het aan Claude. Die locatie staat niet in een veld maar als
+  regel onder de hotelnaam en gaat mee in de bestandsnaam; Hotels in België of
+  Frankrijk vult het land in als het niet gevonden is. Het onderwerp per foto (hotel, hotelkamer, suite, restaurant,
   ontbijt, diner, wellness, zwembad, terras, natuur, bergen, strand, wandelen,
   fietsen, stad, gebouw, omgeving) komt uit de bestandsnaam (`kamer-balkon.jpg`
   → hotelkamer, `wandelpad.jpg` → wandelen); in de artifact kijkt Claude na het
@@ -148,8 +147,8 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   hooguit 64 tekens, het woord hotel maar een keer, nooit een volgnummer.
   Dreigen twee foto's dezelfde naam te krijgen, dan wordt de tweede
   inhoudelijk specifieker: eerst met een woord uit de eigen bestandsnaam
-  (`…-luxe-hotelkamer-balkon`), dan met de plaats, het arrangement, een kenmerk
-  of het land; pas als er niets onderscheidends meer is komt er een cijfer.
+  (`…-luxe-hotelkamer-balkon`), dan met de plaats, een soort arrangement of
+  het land; pas als er niets onderscheidends meer is komt er een cijfer.
   Elke naam is per foto aan te passen. Converteren is vast: altijd JPG,
   maximaal 300 KB, afmetingen blijven waar dat kan; er zijn geen instellingen.
   De groene knop *Optimaliseren* zet alles om, met een voortgangsbalk; de tool

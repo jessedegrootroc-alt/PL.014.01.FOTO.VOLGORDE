@@ -728,6 +728,7 @@ html[data-versie="5"] .paginakop .sub{display:none}
 html[data-versie="5"] .paginakop .v5-sub{display:block}
 .v5-kop{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3); margin:var(--s4) 0 8px}
 .v5-velden{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px 14px}
+.v5-velden label.breed input{max-width:420px}
 .v5-velden label,.v5-velden-lbl{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-3); font-weight:700}
 .v5-velden input,.v5-velden select{display:block; width:100%; margin-top:4px; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:7px 9px; font:inherit; font-size:13.5px; color:var(--ink)}
@@ -834,12 +835,8 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 
       <p class="v5-kop">Hotelinformatie voor de bestandsnamen</p>
       <div class="v5-velden" id="v5-ctx">
-        <label>Hotelnaam<input id="v5-hotel" data-ctx="hotel" placeholder="Hotel Winselerhof" autocomplete="off"><span class="v5-zoek" id="v5-zoek"></span></label>
-        <label>Plaats<input id="v5-plaats" data-ctx="plaats" placeholder="wordt opgezocht" autocomplete="off"></label>
-        <label>Regio<input id="v5-regio" data-ctx="regio" placeholder="wordt opgezocht" autocomplete="off"></label>
-        <label>Land<input id="v5-land" data-ctx="land" placeholder="wordt opgezocht" autocomplete="off"></label>
-        <label>Naam arrangement<input id="v5-arr" data-ctx="arr" placeholder="Wellnessweekend met diner" autocomplete="off"></label>
-        <label>Extra zoekwoord<input id="v5-extra" data-ctx="extra" placeholder="weekendje weg" autocomplete="off"></label>
+        <label class="breed">Hotelnaam<input id="v5-hotel" data-ctx="hotel" placeholder="Hotel Winselerhof" autocomplete="off"><span class="v5-zoek" id="v5-zoek"></span></label>
+        <input type="hidden" id="v5-plaats" data-ctx="plaats"><input type="hidden" id="v5-regio" data-ctx="regio"><input type="hidden" id="v5-land" data-ctx="land">
         <div class="breed"><span class="v5-velden-lbl">Soort arrangement (klik aan wat van toepassing is)</span>
           <input type="hidden" id="v5-soort" data-ctx="soort">
           <div class="fchips v5-soorten" id="v5-soorten"></div></div>
@@ -4040,6 +4037,8 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     try{
       var d = JSON.parse(localStorage.getItem(V5_STORE) || "null"); if(!d) return;
       each(document.querySelectorAll("#v5-ctx [data-ctx]"), function(el){ var k = el.getAttribute("data-ctx"); if(d.ctx && d.ctx[k] != null) el.value = d.ctx[k]; });
+      var delen = [$("#v5-plaats").value, $("#v5-regio").value, $("#v5-land").value].filter(Boolean);
+      if(delen.length){ $("#v5-zoek").textContent = "Locatie: " + delen.join(", ") + ". Die komt in de bestandsnaam."; v5LaatstGezocht = $("#v5-hotel").value.trim(); }
     }catch(e){}
   }
 
@@ -4071,13 +4070,10 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
      Alleen lege velden worden gevuld, wat je zelf typte blijft staan. */
   var v5ZoekTimer = null, v5LaatstGezocht = "";
   function v5VulLocatie(loc, bron){
-    var gevuld = [];
-    [["plaats", loc.plaats], ["regio", loc.regio], ["land", loc.land]].forEach(function(pr){
-      var el = $("#v5-" + pr[0]);
-      if(pr[1] && !el.value.trim()){ el.value = pr[1]; gevuld.push(pr[0]); }
-    });
-    $("#v5-zoek").textContent = gevuld.length ? "Ingevuld via " + bron + ": " + gevuld.join(", ") + ". Klopt het niet, pas het dan aan." : "";
-    if(gevuld.length){ v5Namen(); v5Render(); v5BewaarVelden(); }
+    $("#v5-plaats").value = loc.plaats || ""; $("#v5-regio").value = loc.regio || ""; $("#v5-land").value = loc.land || "";
+    var delen = [loc.plaats, loc.regio, loc.land].filter(Boolean);
+    $("#v5-zoek").textContent = delen.length ? "Locatie via " + bron + ": " + delen.join(", ") + ". Die komt in de bestandsnaam." : "";
+    v5Namen(); v5Render(); v5BewaarVelden();
   }
   async function v5ZoekOsm(naam){
     var url = "https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&accept-language=nl&q=" + encodeURIComponent(naam);
@@ -4098,14 +4094,13 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
   async function v5ZoekHotel(){
     var naam = $("#v5-hotel").value.trim();
     if(naam.length < 4 || naam === v5LaatstGezocht) return;
-    if($("#v5-plaats").value.trim() && $("#v5-regio").value.trim() && $("#v5-land").value.trim()) return;   // alles staat er al
     v5LaatstGezocht = naam;
     $("#v5-zoek").textContent = "Plaats, regio en land opzoeken…";
     var loc = null, bron = "OpenStreetMap";
     try{ loc = await v5ZoekOsm(naam); }catch(e){ loc = null; }
     if((!loc || (!loc.plaats && !loc.regio)) && SAMPLE){ try{ loc = await v5ZoekClaude(naam); bron = "Claude"; }catch(e){ loc = null; } }
     if(loc && (loc.plaats || loc.regio || loc.land)) v5VulLocatie(loc, bron);
-    else $("#v5-zoek").textContent = "Niet gevonden, vul plaats, regio en land zelf in.";
+    else { v5VulLocatie({}, bron); $("#v5-zoek").textContent = "Locatie niet gevonden, de naam krijgt alleen de hotelnaam en het onderwerp."; }
   }
 
   /* ---------- keywordselectie en bestandsnaam ----------
@@ -4179,9 +4174,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     return naam;
   }
   function v5NaamVoor(it, c){
-    var delen = v5Basis(it.type, c);
-    if(c.extra) delen.push(slug(c.extra));
-    return v5Kort(v5Ontdubbel(delen)) || ("foto-" + it.type);
+    return v5Kort(v5Ontdubbel(v5Basis(it.type, c))) || ("foto-" + it.type);
   }
   // dubbele namen: inhoudelijk specifieker maken, geen -1 of -2
   function v5Specifieker(it, c, basis, stap){
@@ -4190,7 +4183,6 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     var kandidaten = extra.slice(0, 2).map(function(w){ return basis + "-" + w; });
     var anderePlek = slug(c.plaats);
     if(anderePlek && basis.indexOf(anderePlek) === -1) kandidaten.push(basis + "-" + anderePlek);
-    if(c.arr) kandidaten.push(basis + "-" + slug(c.arr));
     var soortWoord = {zwembad:"zwembad", jacuzzi:"jacuzzi", diner:"diner", zee:"aan-zee", natuur:"natuur", stedentrip:"stedentrip", kerstmarkt:"kerstmarkt", fiets:"fietsen", hond:"hond", mini:"weekendje-weg"};
     (c.soorten || []).forEach(function(id){ var w = soortWoord[id]; if(w && basis.indexOf(w) === -1) kandidaten.push(basis + "-" + w); });
     if(c.land && basis.indexOf(slug(c.land)) === -1) kandidaten.push(basis + "-" + slug(c.land));
