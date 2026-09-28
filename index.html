@@ -740,10 +740,13 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 .v5-soort-zoek{display:block; width:100%; max-width:420px; margin-top:6px; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:7px 9px; font:inherit; font-size:13.5px; color:var(--ink)}
 .v5-soort-leeg{font-size:12.5px; color:var(--ink-3); padding:4px 0}
-.fchip-wrap{display:inline-flex; align-items:stretch}
-.fchip-wrap .fchip.eigen{border-top-right-radius:0; border-bottom-right-radius:0; border-right:0}
-.fchip-weg{border:1px solid var(--line); border-left:0; background:var(--surface); color:var(--ink-3); border-radius:0 var(--r) var(--r) 0; padding:0 8px; cursor:pointer; font-size:14px; line-height:1}
-.fchip-weg:hover{color:var(--dev); border-color:var(--ink-3)}
+/* eigen soort: knop en kruisje in een rand, even hoog */
+.fchip-wrap{display:inline-flex; align-items:stretch; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); overflow:hidden}
+.fchip-wrap:has(.fchip[data-state="aan"]){border-color:var(--ink)}
+.fchip-wrap .fchip.eigen{border:0; border-radius:0}
+.fchip-weg{display:inline-flex; align-items:center; border:0; border-left:1px solid var(--line); background:var(--surface); color:var(--ink-3); padding:0 9px; cursor:pointer; font-size:15px; line-height:1}
+.fchip-wrap:has(.fchip[data-state="aan"]) .fchip-weg{border-left-color:var(--ink)}
+.fchip-weg:hover{color:var(--dev); background:var(--dev-bg)}
 .fchip.nieuw{border-style:dashed; color:var(--ink-3)}
 .fchip.nieuw:hover{color:var(--ink)}
 .v5-zoek{font-size:12px; color:var(--ink-3); margin-top:4px; min-height:1.2em}
@@ -4097,9 +4100,12 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     var bestaat = q && v5AlleSoorten().some(function(id){ return slug(v5SoortLabel(id)) === slug(q); });
     host.innerHTML = lijst.map(function(id){
       var st = aan.indexOf(id) !== -1, eigen = v5IsEigen(id);
-      return '<span class="fchip-wrap"><button type="button" class="fchip' + (eigen ? ' eigen' : '') + '" data-id="' + id + '" data-state="' + (st ? "aan" : "uit") + '" aria-pressed="' + st + '">'
-        + (eigen ? '' : ico(id)) + esc(v5SoortLabel(id)) + '</button>'
-        + (eigen ? '<button type="button" class="fchip-weg" data-weg="' + id + '" title="Eigen soort verwijderen" aria-label="' + esc(v5SoortLabel(id)) + ' verwijderen">&times;</button>' : '') + '</span>';
+      var knop = '<button type="button" class="fchip' + (eigen ? ' eigen' : '') + '" data-id="' + id + '" data-state="' + (st ? "aan" : "uit") + '" aria-pressed="' + st + '">'
+        + (eigen ? '' : ico(id)) + esc(v5SoortLabel(id)) + '</button>';
+      if(!eigen) return knop;
+      // eigen soort: knop en kruisje samen in een rand
+      return '<span class="fchip-wrap">' + knop
+        + '<button type="button" class="fchip-weg" data-weg="' + id + '" title="Eigen soort verwijderen" aria-label="' + esc(v5SoortLabel(id)) + ' verwijderen">&times;</button></span>';
     }).join("")
       + (q && !bestaat ? '<button type="button" class="fchip nieuw" data-nieuw="' + esc(q) + '">+ \u201c' + esc(q) + '\u201d toevoegen als eigen soort</button>' : '')
       + (!q ? '<button type="button" class="fchip nieuw" data-focus>+ Eigen soort</button>' : '');
