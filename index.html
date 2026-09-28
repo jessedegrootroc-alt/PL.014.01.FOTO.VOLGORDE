@@ -736,7 +736,10 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 #v5-bar{margin-top:var(--s4)}
 #v5-opt{background:#00B67E; border-color:#00B67E; color:#fff}
 #v5-opt:hover{background:#00A371; border-color:#00A371; color:#fff}
-.v5-soorten{margin-top:6px}
+.v5-soorten{margin-top:8px}
+.v5-soort-zoek{display:block; width:100%; max-width:420px; margin-top:6px; border:1px solid var(--line); background:var(--surface);
+  border-radius:var(--r); padding:7px 9px; font:inherit; font-size:13.5px; color:var(--ink)}
+.v5-soort-leeg{font-size:12.5px; color:var(--ink-3); padding:4px 0}
 .v5-zoek{font-size:12px; color:var(--ink-3); margin-top:4px; min-height:1.2em}
 .v5-vast{font-size:13px; color:var(--ink-2); margin-top:var(--s3)}
 .v5-vast b{color:var(--ink); font-weight:600}
@@ -839,6 +842,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
         <input type="hidden" id="v5-plaats" data-ctx="plaats"><input type="hidden" id="v5-regio" data-ctx="regio"><input type="hidden" id="v5-land" data-ctx="land">
         <div class="breed"><span class="v5-velden-lbl">Soort arrangement (klik aan wat van toepassing is)</span>
           <input type="hidden" id="v5-soort" data-ctx="soort">
+          <input type="search" id="v5-soort-zoek" class="v5-soort-zoek" placeholder="Zoek een soort, bijvoorbeeld wellness of kasteel" autocomplete="off" aria-label="Zoek in soorten arrangement">
           <div class="fchips v5-soorten" id="v5-soorten"></div></div>
       </div>
       <p class="v5-vast">Alle foto’s worden <b>JPG</b>, <b>maximaal 300 KB</b>, afmetingen blijven waar dat kan.</p>
@@ -4047,13 +4051,18 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
   var V5_SOORTEN = ["nieuw","zwembad","wellnesshotel","belgie","hond","bijzonder","zee","exclusief","natuur","kerstmarkt",
                     "stedentrip","frankrijk","fiets","hotelwellness","jacuzzi","5sterren","diner","mini","kasteel","superdeal"];
   function v5Soorten(){ return ($("#v5-soort").value || "").split(",").map(function(t){ return t.trim(); }).filter(function(t){ return FILTERS[t]; }); }
+  // zoekbalk: laat alleen de soorten zien die passen, plus wat al aan staat; Enter zet de eerste treffer aan
+  function v5SoortTreffers(){
+    var q = slug(($("#v5-soort-zoek") || {}).value || ""), aan = v5Soorten();
+    return V5_SOORTEN.filter(function(id){ return !q || aan.indexOf(id) !== -1 || slug(FILTERS[id].label).indexOf(q) !== -1 || id.indexOf(q) !== -1; });
+  }
   function v5SoortenTeken(){
     var host = $("#v5-soorten"); if(!host) return;
-    var aan = v5Soorten();
-    host.innerHTML = V5_SOORTEN.map(function(id){
+    var aan = v5Soorten(), lijst = v5SoortTreffers();
+    host.innerHTML = lijst.map(function(id){
       var st = aan.indexOf(id) !== -1;
       return '<button type="button" class="fchip" data-id="' + id + '" data-state="' + (st ? "aan" : "uit") + '" aria-pressed="' + st + '">' + ico(id) + esc(FILTERS[id].label) + '</button>';
-    }).join("");
+    }).join("") || '<p class="v5-soort-leeg">Geen soort gevonden.</p>';
     each(host.querySelectorAll(".fchip"), function(b){
       b.addEventListener("click", function(){
         var id = b.getAttribute("data-id"), nu = v5Soorten(), i = nu.indexOf(id);
@@ -4464,6 +4473,18 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     drop.addEventListener("dragleave", function(){ drop.classList.remove("over"); });
     drop.addEventListener("drop", function(e){ e.preventDefault(); drop.classList.remove("over"); if(e.dataTransfer && e.dataTransfer.files.length) v5VoegToe(e.dataTransfer.files); });
     v5SoortenTeken();
+    var zoek = $("#v5-soort-zoek");
+    zoek.addEventListener("input", v5SoortenTeken);
+    zoek.addEventListener("keydown", function(e){
+      if(e.key === "Escape"){ zoek.value = ""; v5SoortenTeken(); return; }
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      var aan = v5Soorten(), eerste = v5SoortTreffers().filter(function(id){ return aan.indexOf(id) === -1; })[0];
+      if(!eerste) return;
+      var el = $("#v5-soort"); el.value = aan.concat([eerste]).join(",");
+      el.dispatchEvent(new Event("input", {bubbles: true}));
+      zoek.value = ""; v5SoortenTeken();
+    });
     var ctxTimer = null;
     $("#v5-ctx").addEventListener("input", function(e){
       clearTimeout(ctxTimer);

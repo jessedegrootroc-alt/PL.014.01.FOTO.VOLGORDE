@@ -121,7 +121,9 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   in België, Hond mee, Bijzondere overnachtingen, Aan zee, Exclusief bij
   ViaLuxury, In de natuur, Kerstmarkten, Stedentrips, Hotels in Frankrijk,
   Fietsarrangement, Hotels met wellness, Bubbelbad op kamer, 5 sterren, Met
-  diner, Mini vakanties, Kasteelhotels, SUPER DEAL); alles blijft in de browser
+  diner, Mini vakanties, Kasteelhotels, SUPER DEAL) met een zoekbalk erboven die
+  de knoppen filtert terwijl je typt (Enter zet de eerste treffer aan, Escape
+  maakt de zoekbalk leeg); alles blijft in de browser
   bewaard en wordt alleen voor de bestandsnaam gebruikt. Typ je een hotelnaam,
   dan zoekt de tool na een korte pauze plaats, regio en land op via
   OpenStreetMap (gratis, zonder sleutel); lukt dat niet, dan vraagt de
