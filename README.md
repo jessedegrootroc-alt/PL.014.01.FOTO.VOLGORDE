@@ -123,7 +123,13 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   Fietsarrangement, Hotels met wellness, Bubbelbad op kamer, 5 sterren, Met
   diner, Mini vakanties, Kasteelhotels, SUPER DEAL) met een zoekbalk erboven die
   de knoppen filtert terwijl je typt (Enter zet de eerste treffer aan, Escape
-  maakt de zoekbalk leeg); alles blijft in de browser
+  maakt de zoekbalk leeg). Staat een soort er niet bij, dan typ je hem en kies
+  je *toevoegen als eigen soort* (of Enter zonder treffer): die knop komt achter
+  de vaste lijst te staan, met een × om hem weer weg te halen, en blijft in de
+  browser bewaard, ook na *Resetten*. Een eigen soort komt als extra term in de
+  naam van hotel-, gebouw- en omgevingsfoto's (`hotel-winselerhof-limburg-golfarrangement`)
+  en maakt dubbele namen specifieker. *Resetten* maakt de hotelnaam, de
+  opgezochte locatie en de gekozen soorten leeg en haalt de foto's weg; alles blijft in de browser
   bewaard en wordt alleen voor de bestandsnaam gebruikt. Typ je een hotelnaam,
   dan zoekt de tool na een korte pauze plaats, regio en land op via
   OpenStreetMap (gratis, zonder sleutel); lukt dat niet, dan vraagt de

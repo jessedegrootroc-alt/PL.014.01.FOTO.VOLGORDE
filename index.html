@@ -740,6 +740,12 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
 .v5-soort-zoek{display:block; width:100%; max-width:420px; margin-top:6px; border:1px solid var(--line); background:var(--surface);
   border-radius:var(--r); padding:7px 9px; font:inherit; font-size:13.5px; color:var(--ink)}
 .v5-soort-leeg{font-size:12.5px; color:var(--ink-3); padding:4px 0}
+.fchip-wrap{display:inline-flex; align-items:stretch}
+.fchip-wrap .fchip.eigen{border-top-right-radius:0; border-bottom-right-radius:0; border-right:0}
+.fchip-weg{border:1px solid var(--line); border-left:0; background:var(--surface); color:var(--ink-3); border-radius:0 var(--r) var(--r) 0; padding:0 8px; cursor:pointer; font-size:14px; line-height:1}
+.fchip-weg:hover{color:var(--dev); border-color:var(--ink-3)}
+.fchip.nieuw{border-style:dashed; color:var(--ink-3)}
+.fchip.nieuw:hover{color:var(--ink)}
 .v5-zoek{font-size:12px; color:var(--ink-3); margin-top:4px; min-height:1.2em}
 .v5-vast{font-size:13px; color:var(--ink-2); margin-top:var(--s3)}
 .v5-vast b{color:var(--ink); font-weight:600}
@@ -4050,19 +4056,56 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
      De keuze staat als ids met komma's in een verborgen veld, zodat opslaan en bijwerken via dezelfde weg gaan als typen. */
   var V5_SOORTEN = ["nieuw","zwembad","wellnesshotel","belgie","hond","bijzonder","zee","exclusief","natuur","kerstmarkt",
                     "stedentrip","frankrijk","fiets","hotelwellness","jacuzzi","5sterren","diner","mini","kasteel","superdeal"];
-  function v5Soorten(){ return ($("#v5-soort").value || "").split(",").map(function(t){ return t.trim(); }).filter(function(t){ return FILTERS[t]; }); }
+  // zelf toegevoegde soorten: eigen opslag, los van de reset
+  var V5_EIGEN_STORE = "vialuxury-fotocheck-v5-eigen";
+  function v5Eigen(){ try{ var l = JSON.parse(localStorage.getItem(V5_EIGEN_STORE) || "[]"); return Array.isArray(l) ? l.filter(Boolean) : []; }catch(e){ return []; } }
+  function v5EigenBewaar(l){ try{ localStorage.setItem(V5_EIGEN_STORE, JSON.stringify(l)); }catch(e){} }
+  function v5EigenId(label){ return "eigen:" + slug(label); }
+  function v5IsEigen(id){ return id.indexOf("eigen:") === 0; }
+  function v5SoortLabel(id){
+    if(FILTERS[id]) return FILTERS[id].label;
+    var l = v5Eigen().filter(function(t){ return v5EigenId(t) === id; })[0];
+    return l || id.replace(/^eigen:/, "").replace(/-/g, " ");
+  }
+  function v5AlleSoorten(){ return V5_SOORTEN.concat(v5Eigen().map(v5EigenId)); }
+  function v5Soorten(){
+    var alle = v5AlleSoorten();
+    return ($("#v5-soort").value || "").split(",").map(function(t){ return t.trim(); }).filter(function(t){ return alle.indexOf(t) !== -1; });
+  }
+  function v5EigenToevoegen(label){
+    label = (label || "").replace(/,/g, " ").trim(); if(!label) return;
+    var l = v5Eigen(), id = v5EigenId(label);
+    if(!l.some(function(t){ return v5EigenId(t) === id; })){ l.push(label); v5EigenBewaar(l); }
+    var aan = v5Soorten(); if(aan.indexOf(id) === -1) aan.push(id);
+    var el = $("#v5-soort"); el.value = aan.join(","); el.dispatchEvent(new Event("input", {bubbles: true}));
+    var z = $("#v5-soort-zoek"); if(z) z.value = "";
+    v5SoortenTeken();
+  }
+  function v5EigenWeg(id){
+    v5EigenBewaar(v5Eigen().filter(function(t){ return v5EigenId(t) !== id; }));
+    var el = $("#v5-soort"); el.value = v5Soorten().filter(function(t){ return t !== id; }).join(","); el.dispatchEvent(new Event("input", {bubbles: true}));
+    v5SoortenTeken();
+  }
   // zoekbalk: laat alleen de soorten zien die passen, plus wat al aan staat; Enter zet de eerste treffer aan
   function v5SoortTreffers(){
     var q = slug(($("#v5-soort-zoek") || {}).value || ""), aan = v5Soorten();
-    return V5_SOORTEN.filter(function(id){ return !q || aan.indexOf(id) !== -1 || slug(FILTERS[id].label).indexOf(q) !== -1 || id.indexOf(q) !== -1; });
+    return v5AlleSoorten().filter(function(id){ return !q || aan.indexOf(id) !== -1 || slug(v5SoortLabel(id)).indexOf(q) !== -1 || id.indexOf(q) !== -1; });
   }
   function v5SoortenTeken(){
     var host = $("#v5-soorten"); if(!host) return;
-    var aan = v5Soorten(), lijst = v5SoortTreffers();
+    var aan = v5Soorten(), lijst = v5SoortTreffers(), q = (($("#v5-soort-zoek") || {}).value || "").trim();
+    var bestaat = q && v5AlleSoorten().some(function(id){ return slug(v5SoortLabel(id)) === slug(q); });
     host.innerHTML = lijst.map(function(id){
-      var st = aan.indexOf(id) !== -1;
-      return '<button type="button" class="fchip" data-id="' + id + '" data-state="' + (st ? "aan" : "uit") + '" aria-pressed="' + st + '">' + ico(id) + esc(FILTERS[id].label) + '</button>';
-    }).join("") || '<p class="v5-soort-leeg">Geen soort gevonden.</p>';
+      var st = aan.indexOf(id) !== -1, eigen = v5IsEigen(id);
+      return '<span class="fchip-wrap"><button type="button" class="fchip' + (eigen ? ' eigen' : '') + '" data-id="' + id + '" data-state="' + (st ? "aan" : "uit") + '" aria-pressed="' + st + '">'
+        + (eigen ? '' : ico(id)) + esc(v5SoortLabel(id)) + '</button>'
+        + (eigen ? '<button type="button" class="fchip-weg" data-weg="' + id + '" title="Eigen soort verwijderen" aria-label="' + esc(v5SoortLabel(id)) + ' verwijderen">&times;</button>' : '') + '</span>';
+    }).join("")
+      + (q && !bestaat ? '<button type="button" class="fchip nieuw" data-nieuw="' + esc(q) + '">+ \u201c' + esc(q) + '\u201d toevoegen als eigen soort</button>' : '')
+      + (!q ? '<button type="button" class="fchip nieuw" data-focus>+ Eigen soort</button>' : '');
+    each(host.querySelectorAll("[data-nieuw]"), function(b){ b.addEventListener("click", function(){ v5EigenToevoegen(b.getAttribute("data-nieuw")); }); });
+    each(host.querySelectorAll("[data-focus]"), function(b){ b.addEventListener("click", function(){ var z = $("#v5-soort-zoek"); z.placeholder = "Typ een eigen soort en druk op Enter"; z.focus(); }); });
+    each(host.querySelectorAll("[data-weg]"), function(b){ b.addEventListener("click", function(){ if(window.confirm("Eigen soort \u201c" + v5SoortLabel(b.getAttribute("data-weg")) + "\u201d verwijderen?")) v5EigenWeg(b.getAttribute("data-weg")); }); });
     each(host.querySelectorAll(".fchip"), function(b){
       b.addEventListener("click", function(){
         var id = b.getAttribute("data-id"), nu = v5Soorten(), i = nu.indexOf(id);
@@ -4182,8 +4225,11 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     while(/-(met|en|de|het|van|in|op|aan|voor|bij|of)$/.test(naam)) naam = naam.slice(0, naam.lastIndexOf("-"));
     return naam;
   }
+  function v5EigenWoorden(c){ return (c.soorten || []).filter(v5IsEigen).map(function(id){ return id.replace(/^eigen:/, ""); }); }
   function v5NaamVoor(it, c){
-    return v5Kort(v5Ontdubbel(v5Basis(it.type, c))) || ("foto-" + it.type);
+    var delen = v5Basis(it.type, c), eigen = v5EigenWoorden(c);
+    if(eigen.length && ["hotel","gebouw","omgeving"].indexOf(it.type) !== -1) delen.push(eigen[0]);   // bijvoorbeeld golfarrangement
+    return v5Kort(v5Ontdubbel(delen)) || ("foto-" + it.type);
   }
   // dubbele namen: inhoudelijk specifieker maken, geen -1 of -2
   function v5Specifieker(it, c, basis, stap){
@@ -4193,7 +4239,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     var anderePlek = slug(c.plaats);
     if(anderePlek && basis.indexOf(anderePlek) === -1) kandidaten.push(basis + "-" + anderePlek);
     var soortWoord = {zwembad:"zwembad", jacuzzi:"jacuzzi", diner:"diner", zee:"aan-zee", natuur:"natuur", stedentrip:"stedentrip", kerstmarkt:"kerstmarkt", fiets:"fietsen", hond:"hond", mini:"weekendje-weg"};
-    (c.soorten || []).forEach(function(id){ var w = soortWoord[id]; if(w && basis.indexOf(w) === -1) kandidaten.push(basis + "-" + w); });
+    (c.soorten || []).forEach(function(id){ var w = soortWoord[id] || (v5IsEigen(id) ? id.replace(/^eigen:/, "") : null); if(w && basis.indexOf(w) === -1) kandidaten.push(basis + "-" + w); });
     if(c.land && basis.indexOf(slug(c.land)) === -1) kandidaten.push(basis + "-" + slug(c.land));
     kandidaten = kandidaten.map(v5Kort).filter(function(n){ return n !== basis; });
     return kandidaten[stap] || null;
@@ -4344,7 +4390,14 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
   }
   function v5Reset(){
     V5.slice().forEach(function(it){ if(it.url !== it.bronUrl) URL.revokeObjectURL(it.url); URL.revokeObjectURL(it.bronUrl); if(it.uit && it.uit.url) URL.revokeObjectURL(it.uit.url); });
-    V5 = []; v5Render();
+    V5 = [];
+    // hotelnaam, locatie en de gekozen soorten leeg; de zelf toegevoegde soorten blijven bewaard
+    each(document.querySelectorAll("#v5-ctx [data-ctx]"), function(el){ el.value = ""; });
+    var z = $("#v5-zoek"); if(z) z.textContent = "";
+    var sz = $("#v5-soort-zoek"); if(sz) sz.value = "";
+    v5LaatstGezocht = "";
+    try{ localStorage.removeItem(V5_STORE); }catch(e){}
+    v5SoortenTeken(); v5Render();
   }
 
   /* ---------- weergave ---------- */
@@ -4479,9 +4532,10 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       if(e.key === "Escape"){ zoek.value = ""; v5SoortenTeken(); return; }
       if(e.key !== "Enter") return;
       e.preventDefault();
-      var aan = v5Soorten(), eerste = v5SoortTreffers().filter(function(id){ return aan.indexOf(id) === -1; })[0];
-      if(!eerste) return;
-      var el = $("#v5-soort"); el.value = aan.concat([eerste]).join(",");
+      var aan = v5Soorten(), q = zoek.value.trim();
+      var treffers = v5SoortTreffers().filter(function(id){ return aan.indexOf(id) === -1 && slug(v5SoortLabel(id)).indexOf(slug(q)) !== -1; });
+      if(!treffers.length){ if(q) v5EigenToevoegen(q); return; }     // niets gevonden: dan is het een eigen soort
+      var el = $("#v5-soort"); el.value = aan.concat([treffers[0]]).join(",");
       el.dispatchEvent(new Event("input", {bubbles: true}));
       zoek.value = ""; v5SoortenTeken();
     });
