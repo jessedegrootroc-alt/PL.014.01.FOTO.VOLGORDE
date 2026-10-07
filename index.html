@@ -876,7 +876,6 @@ html[data-versie="6"] .v5-vast{display:none}
           <button type="button" data-formaat="webp" aria-pressed="false">WebP</button>
           <button type="button" data-formaat="png" aria-pressed="false">PNG, transparant</button>
         </div>
-        <label>Maximaal <input type="number" id="v6-maxkb" value="300" min="20" step="10"> KB</label>
         <label id="v6-achtergrond-lbl"><input type="checkbox" id="v6-achtergrond"> Effen achtergrond transparant maken</label>
         <p class="v6-uitleg" id="v6-uitleg"></p>
       </div>
@@ -4071,21 +4070,21 @@ html[data-versie="6"] .v5-vast{display:none}
   }
   // versie 5: altijd JPG tot 300 KB, afmetingen blijven waar dat kan. Versie 6: formaat en maximum kies je zelf.
   var V6_STORE = "vialuxury-fotocheck-v6";
-  var v6 = {formaat: "jpg", maxKb: 300, achtergrond: false};
+  var v6 = {formaat: "jpg", achtergrond: false};
   function isV6(){ return document.documentElement.getAttribute("data-versie") === "6"; }
   function v5Inst(){
     if(!isV6()) return {formaat: "jpg", maxKb: 300, maxW: 0, maxH: 0, kwal: 90, achtergrond: false};
-    return {formaat: v6.formaat, maxKb: v6.maxKb, maxW: 0, maxH: 0, kwal: 90, achtergrond: v6.achtergrond && v6.formaat !== "jpg"};
+    return {formaat: v6.formaat, maxKb: 300, maxW: 0, maxH: 0, kwal: 90, achtergrond: v6.achtergrond && v6.formaat !== "jpg"};
   }
-  function v6Laad(){ try{ var d = JSON.parse(localStorage.getItem(V6_STORE) || "null"); if(d){ v6.formaat = d.formaat || "jpg"; v6.maxKb = d.maxKb || 300; v6.achtergrond = !!d.achtergrond; } }catch(e){} }
+  function v6Laad(){ try{ var d = JSON.parse(localStorage.getItem(V6_STORE) || "null"); if(d){ v6.formaat = d.formaat || "jpg"; v6.achtergrond = !!d.achtergrond; } }catch(e){} }
   function v6Bewaar(){ try{ localStorage.setItem(V6_STORE, JSON.stringify(v6)); }catch(e){} }
   function v6Teken(){
     var host = $("#v6-formaat"); if(!host) return;
     each(host.querySelectorAll("[data-formaat]"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-formaat") === v6.formaat)); });
-    $("#v6-maxkb").value = v6.maxKb; $("#v6-achtergrond").checked = v6.achtergrond;
+    $("#v6-achtergrond").checked = v6.achtergrond;
     $("#v6-achtergrond-lbl").hidden = v6.formaat === "jpg";
     $("#v6-uitleg").textContent = v6.formaat === "png"
-      ? "PNG houdt transparantie en scherpe randen (logo\u2019s, plattegronden). Een foto wordt als PNG veel groter; past hij niet binnen het maximum, dan wordt hij verkleind."
+      ? "PNG houdt transparantie en scherpe randen (logo\u2019s, plattegronden). Een foto wordt als PNG veel groter; boven 300 KB wordt hij verkleind."
       : (v6.formaat === "webp" ? "WebP is kleiner dan JPG bij dezelfde kwaliteit en houdt transparantie. Alle moderne browsers tonen het."
                                 : "JPG is het veiligst voor foto\u2019s en werkt overal. Transparantie wordt wit.");
   }
@@ -4626,7 +4625,6 @@ html[data-versie="6"] .v5-vast{display:none}
     each(document.querySelectorAll("#v6-formaat [data-formaat]"), function(b){
       b.addEventListener("click", function(){ if(v6.formaat === b.getAttribute("data-formaat")) return; v6.formaat = b.getAttribute("data-formaat"); v6Wijzig(); });
     });
-    $("#v6-maxkb").addEventListener("change", function(){ v6.maxKb = Math.max(20, parseInt(this.value, 10) || 300); v6Wijzig(); });
     $("#v6-achtergrond").addEventListener("change", function(){ v6.achtergrond = this.checked; v6Wijzig(); });
     $("#v5-zip").addEventListener("click", function(){ v5DownloadZip(this); });
     $("#v5-ai").addEventListener("click", function(){ v5Herken(null, this); });

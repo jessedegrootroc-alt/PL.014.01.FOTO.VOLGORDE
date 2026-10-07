@@ -167,8 +167,8 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   *Download als zip*, met exact de gegenereerde namen.
 
 - **Versie 6** is versie 5 met één verschil: na het uploaden kies je het
-  formaat. Boven de knoppenbalk staat een keuze JPG, WebP of PNG transparant,
-  met het maximum in KB (standaard 300) en bij PNG en WebP een vinkje *Effen
+  formaat. Boven de knoppenbalk staat een keuze JPG, WebP of PNG transparant
+  (het maximum blijft 300 KB, net als in versie 5) en bij PNG en WebP een vinkje *Effen
   achtergrond transparant maken*: dat haalt vanaf de randen alles weg dat op de
   randkleur lijkt, zodat een logo of plattegrond op wit een doorzichtige
   achtergrond krijgt; het binnenwerk blijft staan. JPG maakt transparantie wit,
