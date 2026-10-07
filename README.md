@@ -6,7 +6,7 @@ stellen en te controleren voordat die live gaat.
 Alles zit in één bestand, `index.html`. Geen build, geen dependencies. Openen in de
 browser is genoeg.
 
-## Vijf weergaven
+## Zes weergaven
 
 Linksonder staat een schakelaar tussen de versies, ook met de cijfertoetsen.
 De tool opent altijd in versie 5; wisselen geldt alleen voor de open pagina en
@@ -165,6 +165,18 @@ versie toevoegen is een regel in `VERSIES` plus een blok CSS achter
   bestandstype, oude en nieuwe grootte en afmetingen; na het optimaliseren
   verschijnen de downloadknoppen: per foto, of alles in één keer met
   *Download als zip*, met exact de gegenereerde namen.
+
+- **Versie 6** is versie 5 met één verschil: na het uploaden kies je het
+  formaat. Boven de knoppenbalk staat een keuze JPG, WebP of PNG transparant,
+  met het maximum in KB (standaard 300) en bij PNG en WebP een vinkje *Effen
+  achtergrond transparant maken*: dat haalt vanaf de randen alles weg dat op de
+  randkleur lijkt, zodat een logo of plattegrond op wit een doorzichtige
+  achtergrond krijgt; het binnenwerk blijft staan. JPG maakt transparantie wit,
+  WebP en PNG houden hem. Een gewone foto heeft zelf geen transparantie, dus
+  PNG is daar alleen groter; past hij niet binnen het maximum, dan wordt hij
+  verkleind. De keuze blijft in de browser bewaard; verander je hem, dan
+  vervallen de resultaten en druk je opnieuw op *Optimaliseren*. Versie 5
+  blijft vast op JPG tot 300 KB.
 
 ## Wat de tool doet
 

@@ -721,11 +721,25 @@ html:not([data-versie="1"]) .card:not(.open) .c-side{grid-column:3; grid-row:1; 
 
 /* ---------- versie 5: alleen optimaliseren, hernoemen en downloaden ---------- */
 #v5{display:none}
-html[data-versie="5"] main.wrap > *:not(#v5):not(.paginakop){display:none}
-html[data-versie="5"] #v5{display:block}
-html[data-versie="5"] .paginakop .sub{display:none}
+html:is([data-versie="5"],[data-versie="6"]) main.wrap > *:not(#v5):not(.paginakop){display:none}
+html:is([data-versie="5"],[data-versie="6"]) #v5{display:block}
+html:is([data-versie="5"],[data-versie="6"]) .paginakop .sub{display:none}
 .v5-sub{display:none}
-html[data-versie="5"] .paginakop .v5-sub{display:block}
+html:is([data-versie="5"],[data-versie="6"]) .paginakop .v5-sub{display:block}
+/* versie 6: formaatkeuze na het uploaden; in versie 5 blijft alles vast op JPG */
+.v6-formaat{display:none}
+html[data-versie="6"] .v6-formaat{display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; margin-top:var(--s4); padding:12px 14px; border:1px solid var(--line-soft); border-radius:var(--r); background:var(--surface-2)}
+html[data-versie="6"] .v5-vast{display:none}
+.v6-formaat .v6-lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3); flex-basis:100%}
+.v6-formaat .seg{display:inline-flex; gap:0}
+.v6-formaat .seg button{border:1px solid var(--line); background:var(--surface); padding:7px 12px; font:inherit; font-size:13px; cursor:pointer; color:var(--ink-2)}
+.v6-formaat .seg button:first-child{border-radius:var(--r) 0 0 var(--r)}
+.v6-formaat .seg button:last-child{border-radius:0 var(--r) var(--r) 0}
+.v6-formaat .seg button + button{margin-left:-1px}
+.v6-formaat .seg button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff; font-weight:600; position:relative; z-index:1}
+.v6-formaat label{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-2)}
+.v6-formaat input[type=number]{width:80px; border:1px solid var(--line); border-radius:var(--r); padding:5px 8px; font:inherit; font-size:13px; background:var(--surface)}
+.v6-formaat .v6-uitleg{flex-basis:100%; font-size:12.5px; color:var(--ink-3); margin:0}
 .v5-kop{font-size:10.5px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--ink-3); margin:var(--s4) 0 8px}
 .v5-velden{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px 14px}
 .v5-velden label.breed input{max-width:420px}
@@ -855,6 +869,17 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
           <div class="fchips v5-soorten" id="v5-soorten"></div></div>
       </div>
       <p class="v5-vast">Alle foto’s worden <b>JPG</b>, <b>maximaal 300 KB</b>, afmetingen blijven waar dat kan.</p>
+      <div class="v6-formaat" id="v6-formaat">
+        <span class="v6-lbl">Formaat van de geoptimaliseerde foto’s</span>
+        <div class="seg" role="group" aria-label="Formaat">
+          <button type="button" data-formaat="jpg" aria-pressed="true">JPG</button>
+          <button type="button" data-formaat="webp" aria-pressed="false">WebP</button>
+          <button type="button" data-formaat="png" aria-pressed="false">PNG, transparant</button>
+        </div>
+        <label>Maximaal <input type="number" id="v6-maxkb" value="300" min="20" step="10"> KB</label>
+        <label id="v6-achtergrond-lbl"><input type="checkbox" id="v6-achtergrond"> Effen achtergrond transparant maken</label>
+        <p class="v6-uitleg" id="v6-uitleg"></p>
+      </div>
 
       <div class="opt-bar" id="v5-bar" hidden>
         <span class="stand" id="v5-stand"></span>
@@ -3943,7 +3968,8 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     {id:"2", naam:"Versie 2", uitleg:"Compacte rijen, stand van zaken als balk"},
     {id:"3", naam:"Versie 3", uitleg:"Minimaal, alleen wat je nodig hebt"},
     {id:"4", naam:"Versie 4", uitleg:"Snel voorbereiden: geen controlestap, geen nummers in de naam"},
-    {id:"5", naam:"Versie 5", uitleg:"Alleen converteren, SEO-namen en downloaden"}
+    {id:"5", naam:"Versie 5", uitleg:"Alleen converteren, SEO-namen en downloaden"},
+    {id:"6", naam:"Versie 6", uitleg:"Als versie 5, met keuze JPG, PNG transparant of WebP"}
   ];
   var VERSIE_STORE = "vialuxury-fotocheck-versie";
   var STANDAARD_VERSIE = "5";        // waarmee een nieuwe browser begint
@@ -3965,7 +3991,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     document.documentElement.setAttribute("data-versie", id);
     renderVersie(id);
     renderStapnummers();
-    if(gestart){ herindexeer(); renderBib(); renderOpt(); renderAlles(); }
+    if(gestart){ herindexeer(); renderBib(); renderOpt(); renderAlles(); if(typeof v6Wijzig === "function" && V5.length) v6Wijzig(); }
   }
   function renderStapnummers(){
     each(document.querySelectorAll(".step"), function(el){
@@ -4043,8 +4069,51 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     if(!c.land){ if(c.soorten.indexOf("belgie") !== -1) c.land = "Belgi\u00eb"; else if(c.soorten.indexOf("frankrijk") !== -1) c.land = "Frankrijk"; }
     return c;
   }
-  // vaste instelling: altijd JPG tot 300 KB, afmetingen blijven waar dat kan
-  function v5Inst(){ return {formaat: "jpg", maxKb: 300, maxW: 0, maxH: 0, kwal: 90}; }
+  // versie 5: altijd JPG tot 300 KB, afmetingen blijven waar dat kan. Versie 6: formaat en maximum kies je zelf.
+  var V6_STORE = "vialuxury-fotocheck-v6";
+  var v6 = {formaat: "jpg", maxKb: 300, achtergrond: false};
+  function isV6(){ return document.documentElement.getAttribute("data-versie") === "6"; }
+  function v5Inst(){
+    if(!isV6()) return {formaat: "jpg", maxKb: 300, maxW: 0, maxH: 0, kwal: 90, achtergrond: false};
+    return {formaat: v6.formaat, maxKb: v6.maxKb, maxW: 0, maxH: 0, kwal: 90, achtergrond: v6.achtergrond && v6.formaat !== "jpg"};
+  }
+  function v6Laad(){ try{ var d = JSON.parse(localStorage.getItem(V6_STORE) || "null"); if(d){ v6.formaat = d.formaat || "jpg"; v6.maxKb = d.maxKb || 300; v6.achtergrond = !!d.achtergrond; } }catch(e){} }
+  function v6Bewaar(){ try{ localStorage.setItem(V6_STORE, JSON.stringify(v6)); }catch(e){} }
+  function v6Teken(){
+    var host = $("#v6-formaat"); if(!host) return;
+    each(host.querySelectorAll("[data-formaat]"), function(b){ b.setAttribute("aria-pressed", String(b.getAttribute("data-formaat") === v6.formaat)); });
+    $("#v6-maxkb").value = v6.maxKb; $("#v6-achtergrond").checked = v6.achtergrond;
+    $("#v6-achtergrond-lbl").hidden = v6.formaat === "jpg";
+    $("#v6-uitleg").textContent = v6.formaat === "png"
+      ? "PNG houdt transparantie en scherpe randen (logo\u2019s, plattegronden). Een foto wordt als PNG veel groter; past hij niet binnen het maximum, dan wordt hij verkleind."
+      : (v6.formaat === "webp" ? "WebP is kleiner dan JPG bij dezelfde kwaliteit en houdt transparantie. Alle moderne browsers tonen het."
+                                : "JPG is het veiligst voor foto\u2019s en werkt overal. Transparantie wordt wit.");
+  }
+  function v6Wijzig(){
+    v6Bewaar(); v6Teken();
+    // resultaten horen bij het oude formaat: opnieuw optimaliseren
+    V5.forEach(function(it){ if(it.uit){ if(it.uit.url) URL.revokeObjectURL(it.uit.url); it.uit = null; } });
+    v5Render();
+  }
+  // effen achtergrond transparant maken: vanaf de randen alles weghalen dat op de randkleur lijkt
+  function v6AchtergrondWeg(canvas){
+    var w = canvas.width, h = canvas.height, x = canvas.getContext("2d"), beeld = x.getImageData(0, 0, w, h), d = beeld.data;
+    var hoeken = [0, (w - 1) * 4, (h - 1) * w * 4, ((h - 1) * w + w - 1) * 4], r = 0, g = 0, b = 0;
+    hoeken.forEach(function(i){ r += d[i]; g += d[i + 1]; b += d[i + 2]; });
+    r /= 4; g /= 4; b /= 4;
+    var tol = 40, bezocht = new Uint8Array(w * h), rij = [];
+    function lijkt(i){ var k = i * 4; return Math.abs(d[k] - r) + Math.abs(d[k + 1] - g) + Math.abs(d[k + 2] - b) <= tol * 3; }
+    function zet(i){ if(!bezocht[i] && lijkt(i)){ bezocht[i] = 1; rij.push(i); } }
+    for(var i = 0; i < w; i++){ zet(i); zet((h - 1) * w + i); }
+    for(var j = 0; j < h; j++){ zet(j * w); zet(j * w + w - 1); }
+    while(rij.length){
+      var p = rij.pop(), px = p % w, py = (p - px) / w;
+      d[p * 4 + 3] = 0;
+      if(px > 0) zet(p - 1); if(px < w - 1) zet(p + 1); if(py > 0) zet(p - w); if(py < h - 1) zet(p + w);
+    }
+    x.putImageData(beeld, 0, 0);
+    return canvas;
+  }
   function v5BewaarVelden(){ try{ localStorage.setItem(V5_STORE, JSON.stringify({ctx: v5Ctx()})); }catch(e){} }
   function v5LaadVelden(){
     try{
@@ -4300,6 +4369,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       var beste = null, laatste = null;
       for(var ronde = 0; ronde < 5 && !beste; ronde++){
         var canvas = v5Teken(img, img.naturalWidth * schaal, img.naturalHeight * schaal, formaat === "jpg");
+        if(inst.achtergrond && formaat !== "jpg") v6AchtergrondWeg(canvas);
         var teGroot;
         if(formaat === "png"){
           var b = await naarBlob(canvas, mime);
@@ -4413,7 +4483,7 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
     var host = $("#v5-lijst"), bar = $("#v5-bar"); if(!host) return;
     var inst = v5Inst();
     if(!V5.length){
-      host.innerHTML = '<p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden herkent de tool het onderwerp en maakt een SEO-bestandsnaam; met Optimaliseren worden ze JPG tot 300 KB.</p>';
+      host.innerHTML = '<p class="v5-leeg">Nog geen foto’s toegevoegd. Na het uploaden herkent de tool het onderwerp en maakt een SEO-bestandsnaam; met Optimaliseren worden ze ' + inst.formaat.toUpperCase() + ' tot ' + inst.maxKb + ' KB.</p>';
       bar.hidden = true; return;
     }
     bar.hidden = false;
@@ -4552,6 +4622,12 @@ html[data-versie="5"] .paginakop .v5-sub{display:block}
       if(e.target && e.target.id === "v5-hotel"){ clearTimeout(v5ZoekTimer); v5ZoekTimer = setTimeout(v5ZoekHotel, 900); }
     });
     $("#v5-opt").addEventListener("click", function(){ if(V5.length) v5OptimaliseerAlles(); });
+    v6Laad(); v6Teken();
+    each(document.querySelectorAll("#v6-formaat [data-formaat]"), function(b){
+      b.addEventListener("click", function(){ if(v6.formaat === b.getAttribute("data-formaat")) return; v6.formaat = b.getAttribute("data-formaat"); v6Wijzig(); });
+    });
+    $("#v6-maxkb").addEventListener("change", function(){ v6.maxKb = Math.max(20, parseInt(this.value, 10) || 300); v6Wijzig(); });
+    $("#v6-achtergrond").addEventListener("change", function(){ v6.achtergrond = this.checked; v6Wijzig(); });
     $("#v5-zip").addEventListener("click", function(){ v5DownloadZip(this); });
     $("#v5-ai").addEventListener("click", function(){ v5Herken(null, this); });
     v5Render();
